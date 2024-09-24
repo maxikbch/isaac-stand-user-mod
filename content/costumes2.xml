@@ -1,0 +1,4 @@
+<costumes anm2root="gfx/characters/">
+	<costume anm2path="costume_josuke.anm2" type="none" />
+	<costume anm2path="costume_josuke2.anm2" type="none" />
+</costumes>    

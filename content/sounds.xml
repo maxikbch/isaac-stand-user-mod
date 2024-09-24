@@ -1,0 +1,17 @@
+<sounds root="sounds/">
+	<sound name="PunchLight">
+		<sample weight="1" path="punchlight.wav" />
+	</sound>
+	<sound name="PunchHeavy">
+		<sample weight="1" path="punchheavy.wav" />
+	</sound>
+	<sound name="Whoosh">
+		<sample weight="1" path="whoosh.wav" />
+	</sound>
+	<sound name="PunchReady">
+		<sample weight="1" path="ready.wav" />
+	</sound>
+	<sound name="Rage">
+		<sample weight="1" path="rage.wav" />
+	</sound>
+</sounds>

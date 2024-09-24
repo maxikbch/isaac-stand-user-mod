@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+    <name>Stand User</name>
+    <directory>josuke</directory>
+    <id>943074431</id>
+    <description>NOTICE: Updated with a bugfix to make it playable with rep, a few minor improvements, functionality for Birthright, and a tainted version. The current version of the API has major bugs with stats and sounds, but I may update again once those are fixed. Check the changelog.
+
+With this mod, play as both Josuke and Crazy Diamond from Jojo's Bizarre Adventure: Diamond is Unbreakable! While Josuke pelts foes with tears at range in typical Isaac fashion, Crazy Diamond charges up and rushes in for flurries of punches when shooting keys are released, and both can be used in conjunction to focus on multiple targets at once or rack up loads of damage. Fun for everyone, not just Jojo fans!
+
+Crazy Diamond is a new, special-made type of familiar which is very responsive and easy to control, sending him to intercept targets or even groups of enemies at melee range, doing high damage and knocking them back. Additionally, he is affected by every character stat, almost all tear effects, and has several special-case synergies to change how you play, so items can have as wild and varied effects on him as they do actual characters!
+
+More than that however, to be true to Josuke and the theme of Diamond is Unbreakable, Josuke and CD can punch some broken things and creatures back into working order, turning them into temporary or sometimes permanent new friends to help you on your way, giving you practically a small army of allies to clear out room after room. What other creative ways can you find to use this power?
+
+NotYourSagittarius did great work on all the sprites and I (melon) did my best to make the mod as good as I can, so please subscribe to the mod and have lots of fun with it!
+
+
+
+Lore? Well ahh... let's just imagine that Isaac read or watched Jojo or maybe his friends at school wouldn't shut up about it and here we are.
+
+
+
+Note: This mod has a setting enabled by default (more details in the readme) which disables achievements due to a bug in the AB+ API which can cause modded characters to crash while achievements are enabled. If the mod doesn't generally work well at all for you, it's most likely because of an incompatibility with another installed mod. You can likely solve this by disabling other mods until you find out which one was causing the conflict. If you find a mod conflict, please post it in the &quot;Mod Compatibility&quot; discussion thread for this mod.</description>
+    <version>1.15</version>
+    <visibility>Public</visibility>
+    <tag id="Lua"/>
+    <tag id="Player Characters"/>
+    <tag id="Familiars"/>
+</metadata>
