@@ -114,9 +114,6 @@ function mod:onPlayerInit()
 		player:EvaluateItems()
 		player:AddNullCostume(character.Costume1)
 	end
-	if (player:GetPlayerType() == character.Type or player:GetPlayerType() == character.Type2) then
-		player:GetData().lastrepair = 0
-	end
 end
 mod:AddCallback(ModCallbacks.MC_POST_PLAYER_INIT, mod:onPlayerInit())
 

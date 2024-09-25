@@ -69,7 +69,7 @@ function StandUpdate(player, stand, roomframes)
 			standData.punchtear:Remove()
 		end
 
-		StandBehaviors(player, stand, roomframes, shootDir)
+		StandBehaviors(player, stand, shootDir, roomframes)
 
 		--sprite alpha
 		if standData.alpha < standData.alphagoal then
