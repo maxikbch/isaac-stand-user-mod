@@ -1,5 +1,5 @@
 
-local character = require("src/character")
+local character = require("src/constants/character")
 
 local function SetStand(player, stand)
     local playerData = player:GetData()

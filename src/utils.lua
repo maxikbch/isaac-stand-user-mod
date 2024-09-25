@@ -58,4 +58,14 @@ function utils:AdjPos(dir, en)
 	return en.Position + Vector(0, 0) + (dir * (en.Size + 45))
 end
 
+ function utils:TableMerge(result, ...)
+	for _, t in ipairs({...}) do
+	  for _, v in ipairs(t) do
+		table.insert(result, v)
+	  end
+	end
+
+	return result;
+  end
+
 return utils

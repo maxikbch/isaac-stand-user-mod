@@ -1,13 +1,12 @@
 
 
-local STATS = require("src/stand/stats")
-local SETTINGS = require("src/settings")
-local ITEM_MODIFIERS = require("src/item_modifiers")
+local STATS = require("src/constants/stats")
 
-local sounds = require("src/sounds")
+local sounds = require("src/constants/sounds")
 
 local standChecks = require("src/stand/checks")
 local utils = require("src/utils")
+local setStat = require("src/stand/setStat")
 
 local game = Game()
 local sfx = SFXManager()
@@ -43,7 +42,6 @@ return function (player, stand, shootDir, roomframes)
 		--victim target
 		local closedist = (-player.TearHeight * STATS.RangeMult) + 40
 		local found = false
-		local safe = true
 		for i, en in ipairs(Isaac.GetRoomEntities()) do
 			if standChecks:IsValidEnemy(en) or standChecks:IsTargetable(en) then
 				local xdif = en.Position.X - player.Position.X
@@ -52,7 +50,6 @@ return function (player, stand, shootDir, roomframes)
 					if playerData.releasedir.Y * ydif > 0 and math.abs(xdif) < STATS.LockonWidth then
 						if math.abs(ydif) < closedist then
 							found = true
-							safe = false
 							standData.tgt = en
 							closedist = math.abs(ydif)
 						end
@@ -61,7 +58,6 @@ return function (player, stand, shootDir, roomframes)
 					if playerData.releasedir.X * xdif > 0 and math.abs(ydif) < STATS.LockonWidth then
 						if math.abs(xdif) < closedist then
 							found = true
-							safe = false
 							standData.tgt = en
 							closedist = math.abs(xdif)
 						end
@@ -79,18 +75,11 @@ return function (player, stand, shootDir, roomframes)
 		end
 
 		--charging up
-		local maxcharge = player.MaxFireDelay * STATS.ChargeLength
-		if player:HasCollectible(CollectibleType.COLLECTIBLE_CHOCOLATE_MILK) then maxcharge = maxcharge * ITEM_MODIFIERS.ChocolateMilkChargeMult end
-		if player:HasCollectible(CollectibleType.COLLECTIBLE_BRIMSTONE) then maxcharge = maxcharge * ITEM_MODIFIERS.BrimstoneChargeMult end
-		if player:HasCollectible(CollectibleType.COLLECTIBLE_EPIC_FETUS) then maxcharge = maxcharge * ITEM_MODIFIERS.EpicFetusChargeMult end
-		if player:HasCollectible(CollectibleType.COLLECTIBLE_IPECAC) then maxcharge = maxcharge * ITEM_MODIFIERS.IpecacChargeMult end
-		if player:HasCollectible(CollectibleType.COLLECTIBLE_MONSTROS_LUNG) then maxcharge = maxcharge * ITEM_MODIFIERS.MonstrosLungChargeMult end
-		if SETTINGS.NoShooting then maxcharge = maxcharge * ITEM_MODIFIERS.NoShootingChargeMult end
-		--if player:HasCollectible(52) then maxcharge = bal.DrFetusChargeMax end
+		local maxcharge = setStat:MaxCharge(player)
 		
 		local faceSpriteIndex = ((player:GetHeadDirection() + 2) % 4) + 1
 		local aimIndex = ((player:GetHeadDirection() + 2) % 4) + 1
-		if player:HasCollectible(329) then
+		if player:HasCollectible(CollectibleType.COLLECTIBLE_LUDOVICO_TECHNIQUE) then
 			faceSpriteIndex = utils:VecDir(shootDir) + 1
 			aimIndex = utils:VecDir(shootDir) + 1
 		end
@@ -106,19 +95,13 @@ return function (player, stand, shootDir, roomframes)
 				standData.launchdir = playerData.releasedir
 				if standData.launchdir.X == 0 and standData.launchdir.Y == 0 then standData.launchdir = Vector(1, 0) end
 			end
-			--repentance update
-			--cdd.charge = maxcharge
 			standData.charge = math.min(maxcharge, standData.charge + (maxcharge / 90))
-			--cdd.charge = utils:Lerp(cdd.charge, maxcharge, 1/60)
 			standData.ready = false
 			if roomframes < 1 or not player:HasCollectible(CollectibleType.COLLECTIBLE_LUDOVICO_TECHNIQUE) then
 				standData.launchto = game:GetRoom():GetClampedPosition(playerPosition + ((playerData.releasedir * standData.range) + (player:GetTearMovementInheritance(playerData.releasedir) * 10)), 20)
 			end
 		else
-			standData.range = -player.TearHeight * STATS.RangeMult
-				if player:HasCollectible(CollectibleType.COLLECTIBLE_PROPTOSIS) then standData.range = standData.range * ITEM_MODIFIERS.ProptosisRangeMult end
-				standData.range = math.max(standData.range, STATS.MinimumRange)
-				if player:HasCollectible(CollectibleType.COLLECTIBLE_LUDOVICO_TECHNIQUE) then standData.range = standData.range + ITEM_MODIFIERS.LudovicoRangeBonus end
+			setStat:Range(player, stand)
 			standData.launchto = game:GetRoom():GetClampedPosition(playerPosition + ((playerData.releasedir * standData.range) + (player:GetTearMovementInheritance(shootDir) * 10)), 20)
 			if standData.charge >0 then
 				standSprite:Play(stand.spWind[aimIndex])

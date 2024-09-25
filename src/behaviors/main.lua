@@ -1,8 +1,8 @@
 
-local IdleBehavior = require("src/stand/update/behaviors/idle")
-local RushBehavior = require("src/stand/update/behaviors/rush")
-local AttackBehavior = require("src/stand/update/behaviors/attack")
-local ReturnBehavior = require("src/stand/update/behaviors/return")
+local IdleBehavior = require("src/behaviors/idle")
+local RushBehavior = require("src/behaviors/rush")
+local AttackBehavior = require("src/behaviors/attack")
+local ReturnBehavior = require("src/behaviors/return")
 
 ---@param player EntityPlayer
 ---@param shootDir Vector

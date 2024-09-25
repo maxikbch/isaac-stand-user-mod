@@ -1,8 +1,11 @@
 
-local SETTINGS = require("src/settings")
-local ITEM_MODIFIERS = require("src/item_modifiers")
-local character = require("src/character")
-local stand = require("src/stand")
+local SETTINGS = require("src/constants/settings")
+local ITEM_MODIFIERS = require("src/constants/item_modifiers")
+local character = require("src/constants/character")
+local taintedCharacter = require("src/constants/tainted_character")
+local stand = require("src/constants/stand")
+
+local utils = require("src/utils")
 
 local StandUpdate = require("src/stand/update")
 local SetStand = require("src/stand/set")
@@ -12,12 +15,6 @@ local mod = RegisterMod("Maxo13:StandUser", 1 )
 local _log = {}
 local config = Isaac.GetItemConfig()
 
-local taintedStandUser = {
-	DamageMult = 6/7,
-	Damage = 0.5,
-	Speed = 0.15,
-	Range = -8.75,
-}
 
 local roomframes = 0
 
@@ -29,7 +26,12 @@ function mod:onRender()
 end
 
 function mod:evaluate_cache(player,flag)
-	if player:GetPlayerType() == character.Type then
+
+	if player:GetPlayerType() == character.Type or player:GetPlayerType() == character.Type2 then
+
+		local characterData = character
+		if player:GetPlayerType() == character.Type2 then characterData = utils:TableMerge(characterData, taintedCharacter) end
+
 		if flag == 1 then
 			player.Damage = (player.Damage * character.DamageMult) + character.Damage
 			if player:HasCollectible(CollectibleType.COLLECTIBLE_BRIMSTONE) then player.Damage = player.Damage * ITEM_MODIFIERS.BrimstonePlayerDamageMult end
@@ -37,15 +39,6 @@ function mod:evaluate_cache(player,flag)
 			player.TearHeight = math.min(-7.5, player.TearHeight - character.Range)
 		elseif flag == 16 then
 			player.MoveSpeed = player.MoveSpeed + character.Speed
-		end
-	elseif player:GetPlayerType() == character.Type2 then
-		if flag == 1 then
-			player.Damage = (player.Damage * taintedStandUser.DamageMult) + taintedStandUser.Damage
-			if player:HasCollectible(CollectibleType.COLLECTIBLE_BRIMSTONE) then player.Damage = player.Damage * ITEM_MODIFIERS.BrimstonePlayerDamageMult end
-		elseif flag == CacheFlag.CACHE_RANGE then
-			player.TearHeight = math.min(-7.5, player.TearHeight - taintedStandUser.Range)
-		elseif flag == 16 then
-			player.MoveSpeed = player.MoveSpeed + taintedStandUser.Speed
 		end
 	end
 end

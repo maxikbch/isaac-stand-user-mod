@@ -58,19 +58,18 @@ return function (player, stand, shootDir, roomframes)
         end
     
         local fade = Isaac.Spawn(1000, stand.Particle, 0, playerData[stand.Id].Position, Vector(0, 0), nil)
-        local fd = fade:GetData()
-        local fs = fade:GetSprite()
+        local fadeSprite = fade:GetSprite()
         fade.PositionOffset = playerData[stand.Id].PositionOffset
         if standData.launchdir.Y == -1 then
-            fs:Play("ParticleN")
+            fadeSprite:Play("ParticleN")
         elseif standData.launchdir.X == 1 then
-            fs:Play("ParticleE")
+            fadeSprite:Play("ParticleE")
         elseif standData.launchdir.Y == 1 then
-            fs:Play("ParticleS")
+            fadeSprite:Play("ParticleS")
         elseif standData.launchdir.X == -1 then
-            fs:Play("ParticleW")
+            fadeSprite:Play("ParticleW")
         end
-        fs.Color = Color(1, 1, 1, .25, 0, 0, 0)
+        fadeSprite.Color = Color(1, 1, 1, .25, 0, 0, 0)
     
         if playerData.mytgt and playerData.mytgt:Exists() then
             playerData.mytgt.Position = standData.launchto

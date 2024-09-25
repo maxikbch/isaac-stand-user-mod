@@ -1,8 +1,8 @@
-local STATS = require("src/stand/stats")
-local SETTINGS = require("src/settings")
+local STATS = require("src/constants/stats")
+local SETTINGS = require("src/constants/settings")
 
 local utils = require("src/utils")
-local StandBehaviors = require("src/stand/update/behaviors")
+local StandBehaviors = require("src/behaviors/main")
 
 
 ---@param player EntityPlayer
