@@ -1,9 +1,9 @@
 <AnimatedActor>
-	<Info CreatedBy="robot" CreatedOn="4/20/2017 9:56:11 PM" Version="115" Fps="30"/>
+	<Info CreatedBy="robot" CreatedOn="4/30/2017 5:01:23 PM" Version="117" Fps="30"/>
 	<Content>
 		<Spritesheets>
-			<Spritesheet Path="players\cosmetic_josuke_head.png" Id="0"/>
-			<Spritesheet Path="players\cosmetic_josuke_body.png" Id="1"/>
+			<Spritesheet Path="players\cosmetic_head_alt.png" Id="0"/>
+			<Spritesheet Path="players\cosmetic_body.png" Id="1"/>
 		</Spritesheets>
 		<Layers>
 			<Layer Name="body0" Id="0" SpritesheetId="1"/>

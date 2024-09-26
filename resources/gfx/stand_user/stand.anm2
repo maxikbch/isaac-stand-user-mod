@@ -2,7 +2,7 @@
 	<Info CreatedBy="Unknown" CreatedOn="5/23/2017 4:23:16 PM" Version="34" Fps="30"/>
 	<Content>
 		<Spritesheets>
-			<Spritesheet Path="familiars\bleh_crazy_diamond2.png" Id="0"/>
+			<Spritesheet Path="familiars\stand.png" Id="0"/>
 		</Spritesheets>
 		<Layers>
 			<Layer Name="Base" Id="0" SpritesheetId="0"/>

@@ -20,15 +20,17 @@ local sfx = SFXManager()
 local StandMeter = 
 {
 	StandMeter = Sprite(),
-	charged = ('charged'),
-	uncharging = ('uncharging'),
+	charging = 'charging',
+	charged = 'charged',
+	uncharging = 'uncharging',
 
 	--Stand Meter HUD sprite offsets
 	XOffset = 60, 
 	YOffset = 50
 }
   
-StandMeter.StandMeter:Load("gfx/stand_meter.anm2", true)
+StandMeter.StandMeter:Load("gfx/stand_user/stand_meter.anm2", true)
+StandMeter.StandMeter.PlaybackSpeed = 0.1
 
 local roomframes = 0
 
@@ -36,17 +38,27 @@ function mod:onRender()
 	local player = Isaac.GetPlayer(0)
 	local playerData = player:GetData()
 
-	if SETTINGS.HasUltimate and playerData[stand.Id] and playerData[stand.Id]:Exists() then
+	if SETTINGS.HasUltimate then
 
 		local standData = playerData[stand.Id]:GetData()
-		
-		if standData.UltimateCharge == STATS.UltimateMaxCharge then
-			StandMeter.StandMeter:Play(StandMeter.charged, true)
+		local charge = standData.UltimateCharge or 0
+		local duration = standData.UltimateDuration or 0
+
+		if duration > 0 then 
+			StandMeter.StandMeter:SetFrame(StandMeter.uncharging, 22 - math.floor(duration / STATS.UltimateDuration * 22))
+		elseif charge == STATS.UltimateMaxCharge then
+			if not StandMeter.StandMeter:IsPlaying(StandMeter.charged) then
+				StandMeter.StandMeter:Play(StandMeter.charged, true)
+			end
 		else
-			StandMeter.StandMeter:SetFrame("charging", math.floor(standData.UltimateCharge / STATS.UltimateMaxCharge * 20))
+			StandMeter.StandMeter:SetFrame(StandMeter.charging, math.floor(charge / STATS.UltimateMaxCharge * 22))
 		end
 		StandMeter.StandMeter:Render(Vector(StandMeter.XOffset, StandMeter.YOffset), Vector(0, 0), Vector(0, 0))
-
+		
+		if not Game():IsPaused() then
+			print("Updating StandMeter animation")
+			StandMeter.StandMeter:Update()
+		end
 	end
 	
 end

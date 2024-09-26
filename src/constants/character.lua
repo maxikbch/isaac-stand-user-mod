@@ -5,6 +5,6 @@ return {
 	Damage = 0,
 	Speed = 0.15,
 	Range = -3.75,
-	Costume1 = Isaac.GetCostumeIdByPath("gfx/characters/costume_josuke.anm2"),
-	Costume2 = Isaac.GetCostumeIdByPath("gfx/characters/costume_josuke2.anm2")
+	Costume1 = Isaac.GetCostumeIdByPath("gfx/stand_user/characters/costume.anm2"),
+	Costume2 = Isaac.GetCostumeIdByPath("gfx/stand_user/characters/costume_alt.anm2")
 }

@@ -23,5 +23,6 @@ return {
 	--ULTIMATE STATS
 
 	UltimateCooldown = 10,
-	UltimateMaxCharge = 80
+	UltimateMaxCharge = 80,
+	UltimateDuration = 165
 }

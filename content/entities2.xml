@@ -1,8 +1,8 @@
-<entities anm2root="gfx/" version="1">
-	<entity anm2path="star_platinum.anm2" baseHP="0" boss="0" champion="0" collisionDamage="0" collisionMass="5" collisionRadius="13" friction="1" name="Stand" numGridCollisionPoints="12" shadowSize="11" stageHP="0" variant="13200">
+<entities anm2root="gfx/stand_user/" version="1">
+	<entity anm2path="stand.anm2" baseHP="0" boss="0" champion="0" collisionDamage="0" collisionMass="5" collisionRadius="13" friction="1" name="Stand" numGridCollisionPoints="12" shadowSize="11" stageHP="0" variant="13200">
         <gibs amount="0" blood="0" bone="0" eye="0" gut="0" large="0" />
     </entity>
-	<entity anm2path="star_platinum.anm2" baseHP="0" boss="0" champion="0" collisionDamage="0" collisionMass="1000" collisionRadius="0" friction="1" name="Stand Particle" numGridCollisionPoints="12" shadowSize="0" stageHP="0" variant="13201">
+	<entity anm2path="stand.anm2" baseHP="0" boss="0" champion="0" collisionDamage="0" collisionMass="1000" collisionRadius="0" friction="1" name="Stand Particle" numGridCollisionPoints="12" shadowSize="0" stageHP="0" variant="13201">
         <gibs amount="0" blood="0" bone="0" eye="0" gut="0" large="0" />
     </entity>
 </entities>
