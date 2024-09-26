@@ -1,5 +1,6 @@
 return {
 
+	--BASIC STATS	
 	ChargeLength = 7,
 	RangeMult = 8,
 	MinimumRange = 60,
@@ -10,6 +11,7 @@ return {
 	KnockbackLastHitMult = 2.5,
 	PunchSize = 6,
 
+	--ADVANCED STATS
 	KnockbackBirthrightMult = 5,
 	KnockbackBossMult = .5,
 	LockonWidth = 50,
@@ -18,4 +20,8 @@ return {
 	DamageBirthrightFinisher = 1.5,
 	DamageBirthrightFinisherB = .8,
 
+	--ULTIMATE STATS
+
+	UltimateCooldown = 10,
+	UltimateMaxCharge = 80
 }

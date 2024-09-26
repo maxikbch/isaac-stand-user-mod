@@ -1,6 +1,7 @@
 
 local SETTINGS = require("src/constants/settings")
 local ITEM_MODIFIERS = require("src/constants/item_modifiers")
+local STATS = require("src/constants/stats")
 local character = require("src/constants/character")
 local taintedCharacter = require("src/constants/tainted_character")
 local stand = require("src/constants/stand")
@@ -10,20 +11,46 @@ local utils = require("src/utils")
 local StandUpdate = require("src/stand/update")
 local SetStand = require("src/stand/set")
 local StandClear = require("src/stand/clear")
+local StandUltimate = require("src/stand/ultimate")
 
 local mod = RegisterMod("Maxo13:StandUser", 1 )
-local _log = {}
 local config = Isaac.GetItemConfig()
+local sfx = SFXManager()
 
+local StandMeter = 
+{
+	StandMeter = Sprite(),
+	charged = ('charged'),
+	uncharging = ('uncharging'),
+
+	--Stand Meter HUD sprite offsets
+	XOffset = 60, 
+	YOffset = 50
+}
+  
+StandMeter.StandMeter:Load("gfx/stand_meter.anm2", true)
 
 local roomframes = 0
 
 function mod:onRender()
-	local min = math.max(1, #_log-10)
-	for i = min, #_log do
-		Isaac.RenderText(i..": ".._log[i], 50, 20+(i-min)*10, 1, 1, 0.9, 1.8)
+	local player = Isaac.GetPlayer(0)
+	local playerData = player:GetData()
+
+	if SETTINGS.HasUltimate and playerData[stand.Id] and playerData[stand.Id]:Exists() then
+
+		local standData = playerData[stand.Id]:GetData()
+		
+		if standData.UltimateCharge == STATS.UltimateMaxCharge then
+			StandMeter.StandMeter:Play(StandMeter.charged, true)
+		else
+			StandMeter.StandMeter:SetFrame("charging", math.floor(standData.UltimateCharge / STATS.UltimateMaxCharge * 20))
+		end
+		StandMeter.StandMeter:Render(Vector(StandMeter.XOffset, StandMeter.YOffset), Vector(0, 0), Vector(0, 0))
+
 	end
+	
 end
+mod:AddCallback(ModCallbacks.MC_POST_RENDER, mod.onRender)
 
 function mod:evaluate_cache(player,flag)
 
@@ -47,6 +74,8 @@ mod:AddCallback(ModCallbacks.MC_EVALUATE_CACHE, mod.evaluate_cache)
 
 function mod:post_update()
 	local player = Isaac.GetPlayer(0)
+	local playerData = player:GetData()
+	local controler = player.ControllerIndex
 
 	if SETTINGS.NoShooting then
 		player.FireDelay = 10
@@ -57,6 +86,26 @@ function mod:post_update()
 	StandClear(stand)
 
 	roomframes = roomframes + 1
+
+	--On new run, reset StandCharge
+	--if Game():GetFrameCount() == 1 then 
+	--	playerData[stand.Id].UltimateCharge = 0
+	--	Isaac.SaveModData(mod, tostring(0))
+	--end
+
+	StandUltimate(player, stand)
+
+	if player:GetPlayerType() == character.Type or player:GetPlayerType() == character.Type2 then
+		if character.VoiceA and Input.IsButtonPressed(SETTINGS.KEY_VOICE_A, controler) then
+			sfx:Play(character.VoiceA,2,0,false,1)
+		end
+		if character.VoiceB and Input.IsButtonPressed(SETTINGS.KEY_VOICE_B, controler) then
+			sfx:Play(character.VoiceB,2,0,false,1)
+		end
+		if character.VoiceC and Input.IsButtonPressed(SETTINGS.KEY_VOICE_C, controler) then
+			sfx:Play(character.VoiceC,2,0,false,1)
+		end
+	end
 
 end
 mod:AddCallback(ModCallbacks.MC_POST_UPDATE, mod.post_update)
@@ -100,17 +149,31 @@ function mod:onRoomEnter()
 end
 mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, mod.onRoomEnter)
 
-function mod:onPlayerInit() 
-	local player = Isaac.GetPlayer(0)
+function mod:onPlayerInit(player) 
 
 	if (player:GetPlayerType() == character.Type or player:GetPlayerType() == character.Type2) then
 		player:EvaluateItems()
 		player:AddNullCostume(character.Costume1)
 	end
 end
-mod:AddCallback(ModCallbacks.MC_POST_PLAYER_INIT, mod:onPlayerInit())
+mod:AddCallback(ModCallbacks.MC_POST_PLAYER_INIT, mod.onPlayerInit)
 
 function mod:post_render()
 	mod:onRender()
 end
 mod:AddCallback(ModCallbacks.MC_POST_RENDER, mod.post_render)
+
+---@param entity Entity
+function mod:ChargeMeter(entity, damageAmount, damageFlags, source, countdownFrames)
+	local player = Isaac.GetPlayer(0)
+	local playerData = player:GetData()
+	if playerData[stand.Id] and playerData[stand.Id]:Exists() and entity:IsEnemy() then
+		local standData = playerData[stand.Id]:GetData()
+
+		if SETTINGS.HasUltimate
+		and standData.UltimateCharge < STATS.UltimateMaxCharge then
+			standData.UltimateCharge = math.min(STATS.UltimateMaxCharge, standData.UltimateCharge + 1)
+		end
+	end	
+end
+mod:AddCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, mod.ChargeMeter)

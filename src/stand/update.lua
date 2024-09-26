@@ -33,6 +33,8 @@ function StandUpdate(player, stand, roomframes)
 			standData.posrate = .08
 			standData.alpha = -3
 			standData.alphagoal = -3
+			standData.UltimateCharge = 0
+			standData.UltimateCooldown = 0
 		end
 
 		--charge input
