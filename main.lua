@@ -40,24 +40,25 @@ function mod:onRender()
 
 	if SETTINGS.HasUltimate then
 
+		local meter = StandMeter.StandMeter
+
 		local standData = playerData[stand.Id]:GetData()
 		local charge = standData.UltimateCharge or 0
 		local duration = standData.UltimateDuration or 0
 
 		if duration > 0 then 
-			StandMeter.StandMeter:SetFrame(StandMeter.uncharging, 22 - math.floor(duration / STATS.UltimateDuration * 22))
+			meter:SetFrame(StandMeter.uncharging, 22 - math.floor(duration / STATS.UltimateDuration * 22))
 		elseif charge == STATS.UltimateMaxCharge then
-			if not StandMeter.StandMeter:IsPlaying(StandMeter.charged) then
-				StandMeter.StandMeter:Play(StandMeter.charged, true)
+			if not meter:IsPlaying(StandMeter.charged) then
+				meter:Play(StandMeter.charged, true)
 			end
 		else
-			StandMeter.StandMeter:SetFrame(StandMeter.charging, math.floor(charge / STATS.UltimateMaxCharge * 22))
+			meter:SetFrame(StandMeter.charging, math.floor(charge / STATS.UltimateMaxCharge * 22))
 		end
-		StandMeter.StandMeter:Render(Vector(StandMeter.XOffset, StandMeter.YOffset), Vector(0, 0), Vector(0, 0))
+		meter:Render(Vector(StandMeter.XOffset, StandMeter.YOffset), Vector(0, 0), Vector(0, 0))
 		
 		if not Game():IsPaused() then
-			print("Updating StandMeter animation")
-			StandMeter.StandMeter:Update()
+			meter:Update()
 		end
 	end
 	
