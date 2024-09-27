@@ -1,0 +1,1 @@
+return Isaac.GetItemIdByName("Stand");

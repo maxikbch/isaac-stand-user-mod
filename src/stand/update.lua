@@ -4,7 +4,6 @@ local SETTINGS = require("src/constants/settings")
 local utils = require("src/utils")
 local StandBehaviors = require("src/behaviors/main")
 
-
 ---@param player EntityPlayer
 function StandUpdate(player, stand, roomframes) 
 	local playerData = player:GetData()

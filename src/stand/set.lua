@@ -1,10 +1,10 @@
 
-local character = require("src/constants/character")
+local standItem = require("src/stand/item")
 
 local function SetStand(player, stand)
     local playerData = player:GetData()
 
-    if (player:GetPlayerType() ~= character.Type and player:GetPlayerType() ~= character.Type2) then
+    if not player:HasCollectible(standItem) then
 		if playerData[stand.Id] and playerData[stand.Id]:Exists() then
 			playerData[stand.Id]:Remove()
 			playerData[stand.Id] = nil
@@ -15,8 +15,12 @@ local function SetStand(player, stand)
 		end
 		return
 	end
-	if not playerData[stand.Id] or not playerData[stand.Id]:Exists() then
+	if player:HasCollectible(standItem) and not playerData[stand.Id] or not playerData[stand.Id]:Exists() then
 		playerData[stand.Id] = Isaac.Spawn(EntityType.ENTITY_FAMILIAR, stand.Variant, 0, player.Position, Vector(0, 0), player)
+	end
+
+	if player:HasCollectible(standItem) and not playerData[stand.Id..".Item"] then		
+		playerData[stand.Id..".Item"] = {}
 	end
 end
 

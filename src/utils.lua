@@ -5,10 +5,9 @@ function utils:Lerp(first,second,percent)
 	return (first + (second - first)*percent)
 end
 
-function utils:log(log, ...)
-	local args = {...}
-	for _, v in ipairs(args) do
-		table.insert(log, tostring(v))
+function utils:printTable(table)
+	for key, value in pairs(table) do
+		print(key, value)
 	end
 end
 
@@ -58,14 +57,25 @@ function utils:AdjPos(dir, en)
 	return en.Position + Vector(0, 0) + (dir * (en.Size + 45))
 end
 
- function utils:TableMerge(result, ...)
-	for _, t in ipairs({...}) do
-	  for _, v in ipairs(t) do
-		table.insert(result, v)
-	  end
+function utils:TableMerge(result, ...)
+for _, t in ipairs({...}) do
+	for _, v in ipairs(t) do
+	table.insert(result, v)
 	end
+end
 
-	return result;
-  end
+return result;
+end
+
+
+function utils:RoomHasEnemies()
+	local entities = Isaac.GetRoomEntities()
+	for _, entity in ipairs(entities) do
+		if entity:IsVulnerableEnemy() then
+			return true
+		end
+	end
+	return false
+end
 
 return utils

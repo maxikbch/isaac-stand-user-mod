@@ -5,6 +5,7 @@ local STATS = require("src/constants/stats")
 local character = require("src/constants/character")
 local taintedCharacter = require("src/constants/tainted_character")
 local stand = require("src/constants/stand")
+local standItem = require("src/stand/item")
 
 local utils = require("src/utils")
 
@@ -38,13 +39,13 @@ function mod:onRender()
 	local player = Isaac.GetPlayer(0)
 	local playerData = player:GetData()
 
-	if SETTINGS.HasUltimate then
-
+	if SETTINGS.HasUltimate and player:HasCollectible(standItem) and playerData[stand.Id..".Item"] then
 		local meter = StandMeter.StandMeter
+		
+		local standItemData = playerData[stand.Id..".Item"]
 
-		local standData = playerData[stand.Id]:GetData()
-		local charge = standData.UltimateCharge or 0
-		local duration = standData.UltimateDuration or 0
+		local charge = standItemData.UltimateCharge or 0
+		local duration = standItemData.UltimateDuration or 0
 
 		if duration > 0 then 
 			meter:SetFrame(StandMeter.uncharging, 22 - math.floor(duration / STATS.UltimateDuration * 22))
@@ -87,9 +88,8 @@ mod:AddCallback(ModCallbacks.MC_EVALUATE_CACHE, mod.evaluate_cache)
 
 function mod:post_update()
 	local player = Isaac.GetPlayer(0)
-	local playerData = player:GetData()
 	local controler = player.ControllerIndex
-
+	
 	if SETTINGS.NoShooting then
 		player.FireDelay = 10
 	end
@@ -99,12 +99,6 @@ function mod:post_update()
 	StandClear(stand)
 
 	roomframes = roomframes + 1
-
-	--On new run, reset StandCharge
-	--if Game():GetFrameCount() == 1 then 
-	--	playerData[stand.Id].UltimateCharge = 0
-	--	Isaac.SaveModData(mod, tostring(0))
-	--end
 
 	StandUltimate(player, stand)
 
@@ -162,8 +156,8 @@ function mod:onRoomEnter()
 end
 mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, mod.onRoomEnter)
 
+---@param player EntityPlayer
 function mod:onPlayerInit(player) 
-
 	if (player:GetPlayerType() == character.Type or player:GetPlayerType() == character.Type2) then
 		player:EvaluateItems()
 		player:AddNullCostume(character.Costume1)
@@ -180,13 +174,71 @@ mod:AddCallback(ModCallbacks.MC_POST_RENDER, mod.post_render)
 function mod:ChargeMeter(entity, damageAmount, damageFlags, source, countdownFrames)
 	local player = Isaac.GetPlayer(0)
 	local playerData = player:GetData()
-	if playerData[stand.Id] and playerData[stand.Id]:Exists() and entity:IsEnemy() then
-		local standData = playerData[stand.Id]:GetData()
+	local standItemData = playerData[stand.Id..".Item"]
+	if SETTINGS.HasUltimate and standItemData and entity:IsVulnerableEnemy() then
 
-		if SETTINGS.HasUltimate
-		and standData.UltimateCharge < STATS.UltimateMaxCharge then
-			standData.UltimateCharge = math.min(STATS.UltimateMaxCharge, standData.UltimateCharge + 1)
+		if not standItemData.UltimateCharge then standItemData.UltimateCharge = 0 end
+		if standItemData.UltimateCharge < STATS.UltimateMaxCharge then
+			standItemData.UltimateCharge = math.min(STATS.UltimateMaxCharge, standItemData.UltimateCharge + 1)
 		end
 	end	
 end
 mod:AddCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, mod.ChargeMeter)
+
+local json = require("json")
+
+function mod:OnNewGame(isContinuedGame)
+	if not isContinuedGame then
+		
+		local player = Isaac.GetPlayer(0)
+		local playerData = player:GetData()
+
+		--On new run, reset StandCharge
+		if playerData[stand.Id..".Item"] then 
+			playerData[stand.Id..".Item"] = nil
+			local serializedData = json.encode({})
+			mod:SaveData(serializedData)
+		end
+
+		if (player:GetPlayerType() == character.Type or player:GetPlayerType() == character.Type2) 
+		and not isContinuedGame
+		and not player:HasCollectible(standItem)
+		then
+			player:AddCollectible(standItem, 0 , false)
+		end
+	end 
+end
+mod:AddCallback(ModCallbacks.MC_POST_GAME_STARTED, mod.OnNewGame)
+
+function mod:SavePlayerData(ShouldSave)
+    local player = Isaac.GetPlayer(0)
+	local playerData = player:GetData()
+	if playerData[stand.Id..".Item"] then
+		local dataToSave = {}
+		dataToSave[stand.Id..".Item"] = playerData[stand.Id..".Item"]
+
+		local serializedData = json.encode(dataToSave)
+	
+		mod:SaveData(serializedData)
+	end
+end
+mod:AddCallback(ModCallbacks.MC_PRE_GAME_EXIT, 
+function (ShouldSave)
+	if ShouldSave and not utils:RoomHasEnemies() then
+		mod:SavePlayerData() 
+	end
+end)
+mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, mod.SavePlayerData)
+
+function mod:LoadPlayerData()
+    if mod:HasData() then
+        local savedData = mod:LoadData()
+        local playerDataLoaded = json.decode(savedData)
+        local player = Isaac.GetPlayer(0)
+		if playerDataLoaded[stand.Id..".Item"] then
+        	player:GetData()[stand.Id..".Item"] = playerDataLoaded[stand.Id..".Item"]
+			utils:printTable(playerDataLoaded[stand.Id..".Item"])
+		end
+    end
+end
+mod:AddCallback(ModCallbacks.MC_POST_PLAYER_INIT, mod.LoadPlayerData)
