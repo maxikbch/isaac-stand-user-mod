@@ -1,10 +1,14 @@
 
 local standChecks = require("src/stand/checks")
 local utils = require("src/utils")
+local SETTINGS = require("src/constants/settings")
 
+---@param player EntityPlayer
 return function (player, stand, shootDir, roomframes)
     local playerData = player:GetData()
-	local standData = playerData[stand.Id]:GetData()
+    ---@type Entity
+    local standEntity = playerData[stand.Id]
+	local standData = standEntity:GetData()
 	local standSprite = playerData[stand.Id]:GetSprite()
 
     if standData.behavior == 'rush' then
@@ -40,6 +44,13 @@ return function (player, stand, shootDir, roomframes)
         if not (standChecks:IsValidEnemy(standData.tgt) or standChecks:IsTargetable(standData.tgt)) then
             standData.tgt = nil
         end
+		if not standData.tgt and SETTINGS.TargetGridEntities then 
+            local gridEntity = standChecks:IsValidGridEntity(standEntity.Position)
+            if gridEntity then 
+                standData.tgt = gridEntity
+            end
+		end
+
         if standData.tgt then
             local dest2 = utils:AdjPos(-standData.launchdir, standData.tgt)
             standData.launchto = dest2
@@ -49,7 +60,7 @@ return function (player, stand, shootDir, roomframes)
         --velocity
         local diff2 = standData.launchto - playerData[stand.Id].Position
         playerData[stand.Id].Velocity = diff2:Normalized() * math.min(25, diff2:Length())
-        if diff2:Length() < 15 then
+        if diff2:Length() < 15 or (standData.tgt and standData.tgt.CollisionClass) then
             if standData.tgt then
                 standData.behavior = 'attack'
             else

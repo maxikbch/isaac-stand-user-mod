@@ -15,7 +15,7 @@ local sfx = SFXManager()
 ---@param shootDir Vector
 return function (player, stand, shootDir, roomframes)
     
-	local playerData = player:GetData()
+	local playerData = player:GetData()	
 	local standData = playerData[stand.Id]:GetData()
 	local standSprite = playerData[stand.Id]:GetSprite()
 	local playerPosition = player.Position

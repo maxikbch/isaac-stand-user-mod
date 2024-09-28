@@ -52,9 +52,9 @@ function utils:GetShootDir(player)
 
 	return shootDir
 end
-
+---@param en Entity | GridEntity
 function utils:AdjPos(dir, en)
-	return en.Position + Vector(0, 0) + (dir * (en.Size + 45))
+	return en.Position + Vector(0, 0) + (dir * ((en.Size or 0) + 45))
 end
 
 function utils:TableMerge(result, ...)
@@ -76,6 +76,30 @@ function utils:RoomHasEnemies()
 		end
 	end
 	return false
+end
+
+
+---@param player EntityPlayer
+function utils:findClosestEmptyPedestal(player)
+    local entities = Isaac.GetRoomEntities()
+    local closestPedestal = nil
+    local shortestDistance = math.huge
+
+    for _, entity in ipairs(entities) do
+        if entity.Type == EntityType.ENTITY_PICKUP and entity.Variant == PickupVariant.PICKUP_COLLECTIBLE then
+            local collectible = entity:ToPickup()
+            if collectible and collectible.SubType == CollectibleType.COLLECTIBLE_NULL then
+                local distance = player.Position:Distance(entity.Position)
+                
+                if distance < shortestDistance then
+                    shortestDistance = distance
+                    closestPedestal = entity
+                end
+            end
+        end
+    end
+
+    return closestPedestal
 end
 
 return utils

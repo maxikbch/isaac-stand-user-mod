@@ -1,4 +1,6 @@
 
+local mod = RegisterMod("Maxo13:StandUser", 1 )
+
 local SETTINGS = require("src/constants/settings")
 local ITEM_MODIFIERS = require("src/constants/item_modifiers")
 local STATS = require("src/constants/stats")
@@ -14,9 +16,10 @@ local SetStand = require("src/stand/set")
 local StandClear = require("src/stand/clear")
 local StandUltimate = require("src/stand/ultimate")
 
-local mod = RegisterMod("Maxo13:StandUser", 1 )
 local config = Isaac.GetItemConfig()
 local sfx = SFXManager()
+
+local OnPickUpStandItem = require("src/item/on_pick_up")
 
 local StandMeter = 
 {
@@ -89,6 +92,7 @@ mod:AddCallback(ModCallbacks.MC_EVALUATE_CACHE, mod.evaluate_cache)
 function mod:post_update()
 	local player = Isaac.GetPlayer(0)
 	local controler = player.ControllerIndex
+	local playerData = player:GetData()
 	
 	if SETTINGS.NoShooting then
 		player.FireDelay = 10
@@ -148,6 +152,7 @@ function mod:onRoomEnter()
 	if SETTINGS.ReapplyCostume and (player:GetPlayerType() == character.Type) then
 		player:AddNullCostume(character.Costume1)
 	end
+
 	if SETTINGS.ReapplyCostume and (player:GetPlayerType() == character.Type2) then
 		player:AddNullCostume(character.Costume2)
 		local meat = config:GetCollectible(CollectibleType.COLLECTIBLE_MEAT)
@@ -164,11 +169,6 @@ function mod:onPlayerInit(player)
 	end
 end
 mod:AddCallback(ModCallbacks.MC_POST_PLAYER_INIT, mod.onPlayerInit)
-
-function mod:post_render()
-	mod:onRender()
-end
-mod:AddCallback(ModCallbacks.MC_POST_RENDER, mod.post_render)
 
 ---@param entity Entity
 function mod:ChargeMeter(entity, damageAmount, damageFlags, source, countdownFrames)
@@ -205,12 +205,13 @@ function mod:OnNewGame(isContinuedGame)
 		and not player:HasCollectible(standItem)
 		then
 			player:AddCollectible(standItem, 0 , false)
+			playerData.StandDisc = standItem
 		end
 	end 
 end
 mod:AddCallback(ModCallbacks.MC_POST_GAME_STARTED, mod.OnNewGame)
 
-function mod:SavePlayerData(ShouldSave)
+function mod:SavePlayerData()
     local player = Isaac.GetPlayer(0)
 	local playerData = player:GetData()
 	if playerData[stand.Id..".Item"] then
@@ -231,14 +232,32 @@ end)
 mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, mod.SavePlayerData)
 
 function mod:LoadPlayerData()
+
+	local player = Isaac.GetPlayer(0)
+	local playerData = player:GetData()
     if mod:HasData() then
         local savedData = mod:LoadData()
         local playerDataLoaded = json.decode(savedData)
-        local player = Isaac.GetPlayer(0)
+        
 		if playerDataLoaded[stand.Id..".Item"] then
         	player:GetData()[stand.Id..".Item"] = playerDataLoaded[stand.Id..".Item"]
 			utils:printTable(playerDataLoaded[stand.Id..".Item"])
 		end
     end
+
+	if player:HasCollectible(standItem) and playerData.StandDisc ~= standItem then
+		playerData.StandDisc = standItem
+	end
 end
 mod:AddCallback(ModCallbacks.MC_POST_PLAYER_INIT, mod.LoadPlayerData)
+
+
+---@param Type CollectibleType
+---@param Player EntityPlayer
+function mod:OnPickUpItem(Type, Charge, FirstTime, Slot, VarData, Player)
+	if Type == standItem then
+		OnPickUpStandItem(Type, Player)
+	end
+    return Type
+end
+mod:AddCallback(ModCallbacks.MC_PRE_ADD_COLLECTIBLE, mod.OnPickUpItem)

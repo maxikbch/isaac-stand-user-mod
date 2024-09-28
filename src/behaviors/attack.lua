@@ -1,6 +1,7 @@
 
 local STATS = require("src/constants/stats")
 local ITEM_MODIFIERS = require("src/constants/item_modifiers")
+local SETTINGS = require("src/constants/settings")
 local sounds = require("src/constants/sounds")
 local character = require("src/constants/character")
 
@@ -15,7 +16,8 @@ local rng = RNG()
 return function (player, stand, shootDir, roomframes)
 
     local playerData = player:GetData()
-	local standData = playerData[stand.Id]:GetData()
+	local standEntity = playerData[stand.Id]
+	local standData = standEntity:GetData()
 	local standSprite = playerData[stand.Id]:GetSprite()
 
     if standData.behavior == 'attack' then
@@ -35,13 +37,13 @@ return function (player, stand, shootDir, roomframes)
             setStat:AttackDamage(player, stand)
         end
         --retarget
-        if standData.tgt and not standData.tgt:Exists() then
+        if standData.tgt and not standData.tgt.CollisionClass and not standData.tgt:Exists() then
             standData.tgt = nil
         end
-        if standData.punches < standData.maxpunches and not (standChecks:IsValidEnemy(standData.tgt) or standChecks:IsTargetable(standData.tgt)) then
+        if standData.punches < standData.maxpunches and not (standChecks:IsValidEnemy(standData.tgt) or standChecks:IsTargetable(standData.tgt)) and not (standData.tgt and standData.tgt.CollisionClass) then
             standData.tgt = nil
             local maxdist = STATS.ExtraTargetRange + (player.MoveSpeed * STATS.ExtraTargetRangeBonus)
-                if utils:hasbit(player.TearFlags, TearFlags.TEAR_HOMING) then maxdist = maxdist + ITEM_MODIFIERS.HomingTargetRangeBonus end
+            if utils:hasbit(player.TearFlags, TearFlags.TEAR_HOMING) then maxdist = maxdist + ITEM_MODIFIERS.HomingTargetRangeBonus end
             local dist = maxdist
             for i, en in ipairs(Isaac.GetRoomEntities()) do
                 if standChecks:IsValidEnemy(en) then
@@ -53,10 +55,16 @@ return function (player, stand, shootDir, roomframes)
                     end
                 end
             end
+            if not standData.tgt and SETTINGS.TargetGridEntities then 
+                local gridEntity = standChecks:IsValidGridEntity(standEntity.Position)
+                if gridEntity then 
+                    standData.tgt = gridEntity
+                end
+            end
         end
         if standData.tgt then
             playerData[stand.Id].Velocity = utils:AdjPos(-standData.launchdir, standData.tgt) - playerData[stand.Id].Position
-            if standData.tgt.Type == 4 and standData.tgt.Variant ~= 3 and standData.tgt.Variant ~= 4 and  ((standData.tgt.Position - player.Position):Length() > 80 or player:HasCollectible(52)) then
+            if not standData.tgt.CollisionClass and standData.tgt.Type == 4 and standData.tgt.Variant ~= 3 and standData.tgt.Variant ~= 4 and  ((standData.tgt.Position - player.Position):Length() > 80 or player:HasCollectible(52)) then
                 for gt, av in ipairs(Isaac.GetRoomEntities()) do
                     if av:IsVulnerableEnemy() and av.Type ~= 33 and not av:HasEntityFlags(EntityFlag.FLAG_FRIENDLY) then
                         if (av.Position - standData.tgt.Position):Length() < av.Size + 35 then
@@ -73,7 +81,7 @@ return function (player, stand, shootDir, roomframes)
         --attack
         if standData.statetime % 4 == 0 and standData.punches < standData.maxpunches then
             standData.punches = standData.punches + 1
-            if (not standData.tgt) or (standData.tgt and standChecks:IsTargetable(standData.tgt) and not standChecks:IsValidEnemy(standData.tgt)) then
+            if (not standData.tgt) or (standData.tgt and standChecks:IsTargetable(standData.tgt) and not standChecks:IsValidEnemy(standData.tgt) and not standData.tgt.CollisionClass) then
                 standData.punches = standData.maxpunches
             end
             if standData.punches == standData.maxpunches then
