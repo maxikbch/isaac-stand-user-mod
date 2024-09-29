@@ -55,7 +55,6 @@ local function LoadPlayerData(mod)
             and savedData.Players["Player"..index] 
             and savedData.Players["Player"..index][stand.Id..".Item"] then
                 player:GetData()[stand.Id..".Item"] = savedData.Players["Player"..index][stand.Id..".Item"]
-                utils:printTable(savedData.Players["Player"..index][stand.Id..".Item"]) -- TODO: Remove this
             end
         end
 

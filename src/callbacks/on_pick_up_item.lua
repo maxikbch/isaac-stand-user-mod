@@ -24,6 +24,7 @@ end
 ---@param Type CollectibleType
 ---@param Player EntityPlayer
 function OnPickUpItem(Type, Charge, FirstTime, Slot, VarData, Player)
+	local playerData = Player:GetData()
 	if Type == standItem then
 		OnPickUpStandItem(Type, Player)
 	end

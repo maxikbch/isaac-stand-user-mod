@@ -57,7 +57,6 @@ end)
 --save data at game exit
 mod:AddCallback(ModCallbacks.MC_PRE_GAME_EXIT, 
 	function (a, ShouldSave)
-		print(ShouldSave)
 		if ShouldSave and not utils:RoomHasEnemies() then
 			data:SavePlayersData(mod)
 		end
