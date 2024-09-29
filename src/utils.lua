@@ -102,4 +102,27 @@ function utils:findClosestEmptyPedestal(player)
     return closestPedestal
 end
 
+function utils:GetAllPlayers()
+    local players = {}
+    local numPlayers = Game():GetNumPlayers()
+
+    -- Loop through all the players
+    for i = 0, numPlayers - 1 do
+        local player = Isaac.GetPlayer(i) -- Get player by index
+        table.insert(players, player) -- Add the player to the table
+    end
+
+    return players
+end
+
+---comment
+---@param method function
+function utils:ForAllPlayers(method)
+    local numPlayers = Game():GetNumPlayers()
+    for i = 0, numPlayers - 1, 1 do
+		local player = Isaac.GetPlayer(i)
+        method(player, i)
+    end
+end
+
 return utils

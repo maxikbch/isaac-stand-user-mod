@@ -28,13 +28,13 @@ end
 
 local function UpdateUltimate(player, standEntity)
     local playerData = player:GetData()
-    local standItemData = playerData[stand.Id..".Item"]
+    local standItemData = playerData[stand.Id..".Item"] or {}
 
-	if standItemData.UltimateCooldown and stand.UltimateCooldown > 0 then
-        standItemData.UltimateCooldown = math.max(0, stand.UltimateCooldown - 1)
+	if (standItemData.UltimateCooldown or 0) > 0 then
+        standItemData.UltimateCooldown = math.max(0, standItemData.UltimateCooldown - 1)
     end
 
-    if standItemData.UltimateDuration and standItemData.UltimateDuration > 0 then
+    if (standItemData.UltimateDuration or 0) > 0 then
         standItemData.UltimateDuration = math.max(0, standItemData.UltimateDuration - 1)
         if standItemData.UltimateDuration == 0 then 
             FinishUltimate(player, stand)
@@ -49,7 +49,7 @@ return function (player, standEntity)
     if player:HasCollectible(standItem) then
 
         local controler = player.ControllerIndex
-        local standItemData = playerData[stand.Id..".Item"]
+        local standItemData = playerData[stand.Id..".Item"] or {}
         
         if Input.IsButtonPressed(SETTINGS.KEY_ULTIMATE, controler) 
         or (SETTINGS.ControllerOn and Input.IsActionTriggered(ButtonAction.ACTION_DROP, controler))

@@ -1,6 +1,6 @@
 
 
-return function (player, stand, shootDir, roomframes)
+return function (player, stand, shootDir)
     
 	local playerData = player:GetData()
 	local standData = playerData[stand.Id]:GetData()

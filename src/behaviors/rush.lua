@@ -4,7 +4,7 @@ local utils = require("src/utils")
 local SETTINGS = require("src/constants/settings")
 
 ---@param player EntityPlayer
-return function (player, stand, shootDir, roomframes)
+return function (player, stand, shootDir)
     local playerData = player:GetData()
     ---@type Entity
     local standEntity = playerData[stand.Id]

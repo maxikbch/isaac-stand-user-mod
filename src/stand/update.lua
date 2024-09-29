@@ -5,7 +5,7 @@ local utils = require("src/utils")
 local StandBehaviors = require("src/behaviors/main")
 
 ---@param player EntityPlayer
-function StandUpdate(player, stand, roomframes) 
+function StandUpdate(player, stand) 
 	local playerData = player:GetData()
 
 	--#region StandUpdate
@@ -70,7 +70,7 @@ function StandUpdate(player, stand, roomframes)
 			standData.punchtear:Remove()
 		end
 
-		StandBehaviors(player, stand, shootDir, roomframes)
+		StandBehaviors(player, stand, shootDir)
 
 		--sprite alpha
 		if standData.alpha < standData.alphagoal then

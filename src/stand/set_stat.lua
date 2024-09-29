@@ -19,7 +19,7 @@ function setStat:AttackAmount(player, stand)
 		if player:HasCollectible(CollectibleType.COLLECTIBLE_MUTANT_SPIDER) then standData.maxpunches = standData.maxpunches + (ITEM_MODIFIERS.PunchesPerExtraShot * 3) end
 		if player:HasCollectible(CollectibleType.COLLECTIBLE_INNER_EYE) then standData.maxpunches = standData.maxpunches + (ITEM_MODIFIERS.PunchesPerExtraShot * 2) end
 		if player:HasCollectible(CollectibleType.COLLECTIBLE_SOY_MILK) then standData.maxpunches = standData.maxpunches * ITEM_MODIFIERS.SoyMilkPunchesMult end
-		if player:GetData().usedbox then standData.maxpunches = standData.maxpunches * ITEM_MODIFIERS.BoxOfFriendsPunchesMult end
+		if player:GetData().usedBoxOfFriends then standData.maxpunches = standData.maxpunches * ITEM_MODIFIERS.BoxOfFriendsPunchesMult end
 end
 
 ---@param player EntityPlayer

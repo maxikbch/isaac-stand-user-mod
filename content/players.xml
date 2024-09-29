@@ -1,4 +1,6 @@
 <players root="gfx/stand_user/characters/players/" portraitroot="gfx/stand_user/ui/boss/" nameimageroot="gfx/stand_user/ui/boss/" bigportraitroot="gfx/stand_user/ui/stage/"> 
 	<player name="StandUser" skin="bleh.png" hp="4" coins="10" skinColor="-1" nameimage="playername.png" portrait="playerportrait.png" bigportrait="playerportrait.png" birthright="Triple finisher!" /> 
+	<!--
 	<player name="StandUser" bSkinParent="StandUser" skin="bleh.png" hp="2" black="2" broken = "3" coins="10" skinColor="-1" nameimage="playername.png" portrait="playerportrait.png" bigportrait="playerportrait.png" birthright="Combo!" /> 
+	-->
 </players>

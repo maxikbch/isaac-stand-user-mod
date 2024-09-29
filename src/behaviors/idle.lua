@@ -6,14 +6,14 @@ local sounds = require("src/constants/sounds")
 
 local standChecks = require("src/stand/checks")
 local utils = require("src/utils")
-local setStat = require("src/stand/setStat")
+local setStat = require("src/stand/set_stat")
 
 local game = Game()
 local sfx = SFXManager()
 
 ---@param player EntityPlayer
 ---@param shootDir Vector
-return function (player, stand, shootDir, roomframes)
+return function (player, stand, shootDir)
     
 	local playerData = player:GetData()	
 	local standData = playerData[stand.Id]:GetData()
@@ -97,7 +97,7 @@ return function (player, stand, shootDir, roomframes)
 			end
 			standData.charge = math.min(maxcharge, standData.charge + (maxcharge / 90))
 			standData.ready = false
-			if roomframes < 1 or not player:HasCollectible(CollectibleType.COLLECTIBLE_LUDOVICO_TECHNIQUE) then
+			if game:GetRoom():GetFrameCount() < 1 or not player:HasCollectible(CollectibleType.COLLECTIBLE_LUDOVICO_TECHNIQUE) then
 				standData.launchto = game:GetRoom():GetClampedPosition(playerPosition + ((playerData.releasedir * standData.range) + (player:GetTearMovementInheritance(playerData.releasedir) * 10)), 20)
 			end
 		else
@@ -122,7 +122,7 @@ return function (player, stand, shootDir, roomframes)
 			end
 
 			standData.charge = math.max(0, standData.charge - 1)
-			if roomframes <= 1 then
+			if game:GetRoom():GetFrameCount() <= 1 then
 				standData.charge = 0
 			end
 		end

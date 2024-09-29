@@ -6,14 +6,14 @@ local sounds = require("src/constants/sounds")
 local character = require("src/constants/character")
 
 local standChecks = require("src/stand/checks")
-local setStat = require("src/stand/setStat")
+local setStat = require("src/stand/set_stat")
 local StandEffects = require("src/stand/effects")
 local utils = require("src/utils")
 
 local sfx = SFXManager()
 local rng = RNG()
 
-return function (player, stand, shootDir, roomframes)
+return function (player, stand, shootDir)
 
     local playerData = player:GetData()
 	local standEntity = playerData[stand.Id]
