@@ -3,32 +3,51 @@ local STATS = require("src/constants/stats")
 local stand = require("src/constants/stand")
 local standItem = require("src/stand/item")
 
-local utils = require("src/utils")
+---@param sourceType EntityType
+local function ChargePoints(sourceType)
+	
+	if sourceType == EntityType.ENTITY_BOMB then return 4 end
+	return 1
+end
 
-local function ChargeStandMeter(entity)
-	if SETTINGS.HasUltimate and entity:IsVulnerableEnemy() then
 
-		utils:ForAllPlayers(function (player, index)
+---@param entity Entity
+---@param source Entity
+---@param sourceType EntityType
+local function ChargeStandMeter(entity, source, sourceType)
 
-			local playerData = player:GetData()
+	if source and source:Exists() and SETTINGS.HasUltimate and entity:IsVulnerableEnemy() then
+	
+		if source.Type == EntityType.ENTITY_PLAYER then
+
+			local player = source:ToPlayer()
+			local playerData = player and player:GetData() or {}
 			local standItemData = playerData[stand.Id..".Item"]
 
 			if playerData.StandDisc == standItem then
 				if not standItemData.UltimateCharge then standItemData.UltimateCharge = 0 end
 				
 				if standItemData.UltimateCharge < STATS.UltimateMaxCharge then
-					standItemData.UltimateCharge = math.min(STATS.UltimateMaxCharge, standItemData.UltimateCharge + 1)
+					standItemData.UltimateCharge = math.min(STATS.UltimateMaxCharge, standItemData.UltimateCharge + ChargePoints(sourceType))
 				end
 			end
 
-		end)
-
+		elseif source.SpawnerEntity then
+			local player = source.SpawnerEntity or {}
+			ChargeStandMeter(entity, player, sourceType)
+			
+		elseif source.Type == EntityType.ENTITY_FAMILIAR then
+			local familiar = source:ToFamiliar()
+			local player = familiar and familiar.Player or {}
+			ChargeStandMeter(entity, player, sourceType)
+		end
 	end	
 end
 
 ---@param entity Entity
+---@param source EntityRef
 local function OnEntityTakeDamage(entity, damageAmount, damageFlags, source, countdownFrames)
-	ChargeStandMeter(entity)
+	ChargeStandMeter(entity, source.Entity, source.Type)
 end
 
 return OnEntityTakeDamage

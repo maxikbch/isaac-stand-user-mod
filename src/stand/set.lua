@@ -16,7 +16,9 @@ local function SetStand(player, stand)
 		return
 	end
 	if player:HasCollectible(standItem) and not playerData[stand.Id] or not playerData[stand.Id]:Exists() then
-		playerData[stand.Id] = Isaac.Spawn(EntityType.ENTITY_FAMILIAR, stand.Variant, 0, player.Position, Vector(0, 0), player)
+		local standEntity = Isaac.Spawn(EntityType.ENTITY_FAMILIAR, stand.Variant, 0, player.Position, Vector(0, 0), player)
+		playerData[stand.Id] = standEntity
+		standEntity.Parent = player
 	end
 
 	if player:HasCollectible(standItem) and not playerData[stand.Id..".Item"] then		

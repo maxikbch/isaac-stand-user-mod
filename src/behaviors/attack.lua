@@ -13,6 +13,7 @@ local utils = require("src/utils")
 local sfx = SFXManager()
 local rng = RNG()
 
+---@param player EntityPlayer
 return function (player, stand, shootDir)
 
     local playerData = player:GetData()
@@ -40,13 +41,13 @@ return function (player, stand, shootDir)
         if standData.tgt and not standData.tgt.CollisionClass and not standData.tgt:Exists() then
             standData.tgt = nil
         end
-        if standData.punches < standData.maxpunches and not (standChecks:IsValidEnemy(standData.tgt) or standChecks:IsTargetable(standData.tgt)) and not (standData.tgt and standData.tgt.CollisionClass) then
+        if standData.punches < standData.maxpunches and not (standChecks:IsValidEnemy(standData.tgt, player, standEntity) or standChecks:IsTargetable(standData.tgt, player, standEntity)) and not (standData.tgt and standData.tgt.CollisionClass) then
             standData.tgt = nil
             local maxdist = STATS.ExtraTargetRange + (player.MoveSpeed * STATS.ExtraTargetRangeBonus)
             if utils:hasbit(player.TearFlags, TearFlags.TEAR_HOMING) then maxdist = maxdist + ITEM_MODIFIERS.HomingTargetRangeBonus end
             local dist = maxdist
             for i, en in ipairs(Isaac.GetRoomEntities()) do
-                if standChecks:IsValidEnemy(en) then
+                if standChecks:IsValidEnemy(en, player, standEntity) then
                     local dest = utils:AdjPos(-standData.launchdir, en)
                     dist = (playerData[stand.Id].Position - dest):Length()
                     if dist < maxdist then
@@ -56,7 +57,7 @@ return function (player, stand, shootDir)
                 end
             end
             if not standData.tgt and SETTINGS.TargetGridEntities then 
-                local gridEntity = standChecks:IsValidGridEntity(standEntity.Position)
+                local gridEntity = standChecks:IsValidGridEntity(standEntity.Position, player, standEntity)
                 if gridEntity then 
                     standData.tgt = gridEntity
                 end
@@ -81,8 +82,15 @@ return function (player, stand, shootDir)
         --attack
         if standData.statetime % 4 == 0 and standData.punches < standData.maxpunches then
             standData.punches = standData.punches + 1
-            if (not standData.tgt) or (standData.tgt and standChecks:IsTargetable(standData.tgt) and not standChecks:IsValidEnemy(standData.tgt) and not standData.tgt.CollisionClass) then
+            if (not standData.tgt) or (standData.tgt and standChecks:IsTargetable(standData.tgt, player, standEntity) and not standChecks:IsValidEnemy(standData.tgt, player, standEntity) and not standData.tgt.CollisionClass) then
                 standData.punches = standData.maxpunches
+            end
+            if standData.tgt and standData.tgt.CollisionClass then
+                ---@diagnostic disable-next-line: param-type-mismatch
+                StandEffects:ToGridEntities(player, stand, standData.tgt)
+                if not standChecks:IsValidGridEntity(standData.tgt.Position, player, standEntity) and standData.punches < standData.maxpunches then 
+                    standData.punches = standData.maxpunches
+                end
             end
             if standData.punches == standData.maxpunches then
                 if standData.launchdir.Y == -1 then
@@ -97,9 +105,9 @@ return function (player, stand, shootDir)
             end
             local hitpos = playerData[stand.Id].Position + (standData.launchdir * 35)
             if not player:HasCollectible(CollectibleType.COLLECTIBLE_IPECAC) and (not player:HasCollectible(CollectibleType.COLLECTIBLE_EXPLOSIVO) or (rng:RandomInt(100) > 10 + (player.Luck * 2))) then
-                local ref = player:FireTear(hitpos, Vector(0, 0), false, false, false)
+                local ref = player:FireTear(hitpos, Vector(0, 0), false, false, false, player)
                 ref:ToTear():AddTearFlags(TearFlags.TEAR_PIERCING)
-                local isfinisher = player:HasCollectible(619) and standData.punches + 3 > standData.maxpunches
+                local isfinisher = player:HasCollectible(CollectibleType.COLLECTIBLE_BIRTHRIGHT) and standData.punches + 3 > standData.maxpunches
                 if standData.punches == standData.maxpunches or isfinisher then
                     if standData.punches == standData.maxpunches then
                         ref.CollisionDamage = ref.CollisionDamage * (standData.damage * STATS.DamageLastHit)
@@ -144,7 +152,7 @@ return function (player, stand, shootDir)
             end
             local magnet = player:HasCollectible(CollectibleType.COLLECTIBLE_STRANGE_ATTRACTOR)
             for i, en in ipairs(Isaac.GetRoomEntities()) do
-                if standChecks:IsValidEnemy(en) then
+                if standChecks:IsValidEnemy(en, player, standEntity) then
                     local bossmult = 1
                     if en:IsBoss() then bossmult = STATS.KnockbackBossMult end
                     local length = (en.Position - hitpos):Length()

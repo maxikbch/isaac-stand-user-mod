@@ -16,7 +16,8 @@ local sfx = SFXManager()
 return function (player, stand, shootDir)
     
 	local playerData = player:GetData()	
-	local standData = playerData[stand.Id]:GetData()
+	local standEntity = playerData[stand.Id]
+	local standData = standEntity:GetData()
 	local standSprite = playerData[stand.Id]:GetSprite()
 	local playerPosition = player.Position
 
@@ -43,7 +44,7 @@ return function (player, stand, shootDir)
 		local closedist = (-player.TearHeight * STATS.RangeMult) + 40
 		local found = false
 		for i, en in ipairs(Isaac.GetRoomEntities()) do
-			if standChecks:IsValidEnemy(en) or standChecks:IsTargetable(en) then
+			if standChecks:IsValidEnemy(en, player, standEntity) or standChecks:IsTargetable(en, player, standEntity) then
 				local xdif = en.Position.X - player.Position.X
 				local ydif = en.Position.Y - player.Position.Y
 				if playerData.releasedir.Y ~= 0 then
@@ -68,7 +69,7 @@ return function (player, stand, shootDir)
 		if found then
 			standData.alphagoal = 1
 			standData.tgttimer = 10
-		elseif standData.tgttimer > 0 and (standChecks:IsValidEnemy(standData.tgt) or standChecks:IsTargetable(standData.tgt)) then
+		elseif standData.tgttimer > 0 and (standChecks:IsValidEnemy(standData.tgt, player, standEntity) or standChecks:IsTargetable(standData.tgt, player, standEntity)) then
 			standData.tgttimer = standData.tgttimer - 1
 		else
 			standData.tgt = nil

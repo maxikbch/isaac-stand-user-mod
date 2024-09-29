@@ -31,7 +31,7 @@ return function (player, stand, shootDir)
         end
         --intercept target
         for i, en in ipairs(Isaac.GetRoomEntities()) do
-            if standChecks:IsValidEnemy(en) then
+            if standChecks:IsValidEnemy(en, player, standEntity) then
                 local dest = utils:AdjPos(-standData.launchdir, en)
                 local diff = playerData[stand.Id].Position - dest
                 if diff:Length() < 45 and diff:Length() < (playerData[stand.Id].Position - standData.launchto):Length() then
@@ -41,11 +41,12 @@ return function (player, stand, shootDir)
             end
         end
         --engage target
-        if not (standChecks:IsValidEnemy(standData.tgt) or standChecks:IsTargetable(standData.tgt)) then
+        if not (standChecks:IsValidEnemy(standData.tgt, player, standEntity) or standChecks:IsTargetable(standData.tgt, player, standEntity)) then
             standData.tgt = nil
         end
 		if not standData.tgt and SETTINGS.TargetGridEntities then 
-            local gridEntity = standChecks:IsValidGridEntity(standEntity.Position)
+            local frontGrid = standData.launchdir * 50
+            local gridEntity = standChecks:IsValidGridEntity(standEntity.Position + frontGrid, player, standEntity)
             if gridEntity then 
                 standData.tgt = gridEntity
             end

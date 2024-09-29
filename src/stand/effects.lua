@@ -12,5 +12,13 @@ function StandEffects:TearEffects(player, stand, en)
     end
 end
 
+---@param player EntityPlayer
+---@param en GridEntity
+function StandEffects:ToGridEntities(player, stand, en)
+    if en.State then
+        en:Destroy()
+    end
+end
+
 
 return StandEffects

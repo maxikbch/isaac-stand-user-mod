@@ -34,6 +34,8 @@ function StandUpdate(player, stand)
 			standData.alphagoal = -3
 			standData.UltimateCharge = 0
 			standData.UltimateCooldown = 0
+			standData.TargetEntity = true
+			standData.TargetGrid = true
 		end
 
 		--charge input
