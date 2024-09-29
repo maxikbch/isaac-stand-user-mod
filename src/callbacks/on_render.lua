@@ -45,22 +45,22 @@ local function ForEachPlayer(player, index)
 	
 	local playerData = player:GetData()
 
-	if SETTINGS.HasUltimate and player:HasCollectible(standItem) and playerData[stand.Id..".Item"] then
+	if SETTINGS.HasSuper and player:HasCollectible(standItem) and playerData[stand.Id..".Item"] then
 		local meter = StandMeter.StandMeter
 		
 		local standItemData = playerData[stand.Id..".Item"]
 
-		local charge = standItemData.UltimateCharge or 0
-		local duration = standItemData.UltimateDuration or 0
+		local charge = standItemData.SuperCharge or 0
+		local duration = standItemData.SuperDuration or 0
 
 		if duration > 0 then 
-			meter:SetFrame(StandMeter.uncharging, 22 - math.floor(duration / STATS.UltimateDuration * 22))
-		elseif charge == STATS.UltimateMaxCharge then
+			meter:SetFrame(StandMeter.uncharging, 22 - math.floor(duration / STATS.SuperDuration * 22))
+		elseif charge == STATS.SuperMaxCharge then
 			if not meter:IsPlaying(StandMeter.charged) then
 				meter:Play(StandMeter.charged, true)
 			end
 		else
-			meter:SetFrame(StandMeter.charging, math.floor(charge / STATS.UltimateMaxCharge * 22))
+			meter:SetFrame(StandMeter.charging, math.floor(charge / STATS.SuperMaxCharge * 22))
 		end
 
 		if offset["Player"..index] then

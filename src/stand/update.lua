@@ -32,8 +32,8 @@ function StandUpdate(player, stand)
 			standData.posrate = .08
 			standData.alpha = -3
 			standData.alphagoal = -3
-			standData.UltimateCharge = 0
-			standData.UltimateCooldown = 0
+			standData.SuperCharge = 0
+			standData.SuperCooldown = 0
 			standData.TargetEntity = true
 			standData.TargetGrid = true
 		end

@@ -20,9 +20,9 @@ return {
 	DamageBirthrightFinisher = 1.5,
 	DamageBirthrightFinisherB = .8,
 
-	--ULTIMATE STATS
+	--Super STATS
 
-	UltimateCooldown = 10,
-	UltimateMaxCharge = 80,
-	UltimateDuration = 165
+	SuperCooldown = 10,
+	SuperMaxCharge = 80,
+	SuperDuration = 165
 }

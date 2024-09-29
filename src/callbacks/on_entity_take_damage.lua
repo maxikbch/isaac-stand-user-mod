@@ -16,7 +16,7 @@ end
 ---@param sourceType EntityType
 local function ChargeStandMeter(entity, source, sourceType)
 
-	if source and source:Exists() and SETTINGS.HasUltimate and entity:IsVulnerableEnemy() then
+	if source and source:Exists() and SETTINGS.HasSuper and entity:IsVulnerableEnemy() then
 	
 		if source.Type == EntityType.ENTITY_PLAYER then
 
@@ -25,10 +25,10 @@ local function ChargeStandMeter(entity, source, sourceType)
 			local standItemData = playerData[stand.Id..".Item"]
 
 			if playerData.StandDisc == standItem then
-				if not standItemData.UltimateCharge then standItemData.UltimateCharge = 0 end
+				if not standItemData.SuperCharge then standItemData.SuperCharge = 0 end
 				
-				if standItemData.UltimateCharge < STATS.UltimateMaxCharge then
-					standItemData.UltimateCharge = math.min(STATS.UltimateMaxCharge, standItemData.UltimateCharge + ChargePoints(sourceType))
+				if standItemData.SuperCharge < STATS.SuperMaxCharge then
+					standItemData.SuperCharge = math.min(STATS.SuperMaxCharge, standItemData.SuperCharge + ChargePoints(sourceType))
 				end
 			end
 

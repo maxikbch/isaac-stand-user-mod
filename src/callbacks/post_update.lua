@@ -5,7 +5,7 @@ local stand = require("src/constants/stand")
 local StandUpdate = require("src/stand/update")
 local SetStand = require("src/stand/set")
 local StandClear = require("src/stand/clear")
-local StandUltimate = require("src/stand/ultimate")
+local StandSuper = require("src/stand/super")
 
 local utils = require("src/utils")
 
@@ -23,7 +23,7 @@ local function ForEachPlayer(player, index)
 	StandUpdate(player, stand)
 	StandClear(stand)
 
-	StandUltimate(player, stand)
+	StandSuper(player, stand)
 
 	if player:GetPlayerType() == character.Type or player:GetPlayerType() == character.Type2 then
 		if character.VoiceA and Input.IsButtonPressed(SETTINGS.KEY_VOICE_A, controler) then
