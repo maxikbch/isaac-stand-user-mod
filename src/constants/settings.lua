@@ -11,5 +11,8 @@ return {
 	KEY_VOICE_A = Keyboard.KEY_1,
 	KEY_VOICE_B = Keyboard.KEY_2,
 	KEY_VOICE_C = Keyboard.KEY_3,
-	KEY_SUPER = Keyboard.KEY_LEFT_SHIFT
+	KEY_SUPER = Keyboard.KEY_LEFT_SHIFT,
+	KEY_SWITCH = Keyboard.KEY_C,
+	BUTTON_SUPER = 10, --- L3
+	BUTTON_SWITCH = 11 --- R3
 }
