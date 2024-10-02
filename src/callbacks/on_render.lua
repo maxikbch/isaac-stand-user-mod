@@ -1,80 +1,51 @@
 local SETTINGS = require("src/constants/settings")
-local STATS = require("src/constants/stats")
 local stand = require("src/constants/stand")
-local standItem = require("src/stand/item")
+
+local RenderMeter = require("src/meter/bar")
+local RenderStandHead = require("src/meter/stand_head")
+local RenderButton = require("src/meter/button")
+
 
 local utils = require("src/utils")
 
-local StandMeter = 
-{
-	StandMeter = Sprite(),
-	charging = 'charging',
-	charged = 'charged',
-	uncharging = 'uncharging',
-}
+local standItem = require("src/stand/item")
 
-local x1 = 60
-local x2 = 120
-local y1 = 50
-local y2 = 100
+local x1 = 36
+local x2 = 360
+local y1 = 27
+local y2 = 190
+
+local frame = 0
 
 local offset = {
-	Player0 = {	
-		X = x1, 
-		Y = y1
-	},
-	Player1 = {	
-		X = x2, 
-		Y = y1
-	},
-	Player2 = {	
-		X = x1, 
-		Y = y2
-	},
-	Player3 = {	
-		X = x2, 
-		Y = y2
-	}
+	Player0 = Vector(x1, y1),
+	Player1 = Vector(x2, y1),
+	Player2 = Vector(x1, y2),
+	Player3 = Vector(x2, y2),
 }
-  
-StandMeter.StandMeter:Load("gfx/stand_user/stand_meter.anm2", true)
-StandMeter.StandMeter.PlaybackSpeed = 0.15
 
+local function Meter(playerData, offset, data)
+	
+	RenderStandHead(offset, data)
+	RenderMeter(frame, playerData, offset, data, 1)
+	RenderButton(frame, playerData, offset, data, 2)
+	
+end
+  
 ---@param player EntityPlayer
 local function ForEachPlayer(player, index)
 	
 	local playerData = player:GetData()
 
-	if SETTINGS.HasSuper and player:HasCollectible(standItem) and playerData[stand.Id..".Item"] then
-		local meter = StandMeter.StandMeter
-		
-		local standItemData = playerData[stand.Id..".Item"]
-
-		local charge = standItemData.SuperCharge or 0
-		local duration = standItemData.SuperDuration or 0
-
-		if duration > 0 then 
-			meter:SetFrame(StandMeter.uncharging, 22 - math.floor(duration / STATS.SuperDuration * 22))
-		elseif charge == STATS.SuperMaxCharge then
-			if not meter:IsPlaying(StandMeter.charged) then
-				meter:Play(StandMeter.charged, true)
-			end
-		else
-			meter:SetFrame(StandMeter.charging, math.floor(charge / STATS.SuperMaxCharge * 22))
-		end
-
-		if offset["Player"..index] then
-			meter:Render(Vector(offset["Player"..index].X , offset["Player"..index].Y), Vector(0, 0), Vector(0, 0))
-		end
-
-		if not Game():IsPaused() then
-			meter:Update()
-		end
+	if SETTINGS.HasSuper and player:HasCollectible(standItem) and playerData[stand.Id..".Item"] and offset["Player"..index] then
+		Meter(playerData, offset["Player"..index], playerData[stand.Id..".Item"])
 	end
 end
 
 local function onRender()
 	utils:ForAllPlayers(ForEachPlayer)
+
+	frame = frame + 1
 end
 
 return onRender

@@ -121,7 +121,9 @@ function utils:ForAllPlayers(method)
     local numPlayers = Game():GetNumPlayers()
     for i = 0, numPlayers - 1, 1 do
 		local player = Isaac.GetPlayer(i)
-        method(player, i)
+		if player.BabySkin == -1 then
+        	method(player, i)
+		end
     end
 end
 

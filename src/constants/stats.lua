@@ -24,5 +24,6 @@ return {
 
 	SuperCooldown = 10,
 	SuperMaxCharge = 80,
-	SuperDuration = 165
+	SuperDuration = 165,
+	PowerCost = 10
 }
