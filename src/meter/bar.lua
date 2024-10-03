@@ -16,7 +16,7 @@ local function RenderMeterBar(frame, playerData, offset, data, type --[[type: {1
 
     if not playerData.StandMeter then
         playerData.StandMeter = Sprite()
-        playerData.StandMeter:Load("gfx/stand_user/ui/meter_bar.anm2", true)
+        playerData.StandMeter:Load("gfx/jotaro/ui/meter_bar.anm2", true)
         playerData.StandMeter.PlaybackSpeed = 0.25
     end
 

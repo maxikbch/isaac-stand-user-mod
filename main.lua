@@ -1,5 +1,5 @@
 
-local mod = RegisterMod("Maxo13:StandUser", 1 )
+local mod = RegisterMod("Maxo13:Jotaro", 1 )
 
 local utils = require("src/utils")
 local data = require("src/data")

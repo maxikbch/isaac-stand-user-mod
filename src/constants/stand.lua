@@ -1,7 +1,7 @@
 return {
 	Id = "stand",
-	Variant = Isaac.GetEntityVariantByName("Stand"),
-	Particle = Isaac.GetEntityVariantByName("Stand Particle"),
+	Variant = Isaac.GetEntityVariantByName("Star Platinum"),
+	Particle = Isaac.GetEntityVariantByName("Star Platinum Particle"),
 	FloatOffset = Vector(0, -36),
 	spIdle = {'IdleE', 'IdleS', 'IdleW', 'IdleN'},
 	spMad = {'MadE', 'MadS', 'MadW', 'MadN'},

@@ -1,1 +1,1 @@
-return Isaac.GetItemIdByName("Stand");
+return Isaac.GetItemIdByName("Star Platinum");

@@ -19,7 +19,7 @@ local function RenderButton(frame, playerData, offset, data, type --[[type: {1="
 
     if not playerData["StandMeterButton"..type] then
         playerData["StandMeterButton"..type] = Sprite()
-        playerData["StandMeterButton"..type]:Load("gfx/stand_user/ui/meter_buttons.anm2", true)
+        playerData["StandMeterButton"..type]:Load("gfx/jotaro/ui/meter_buttons.anm2", true)
         playerData["StandMeterButton"..type].PlaybackSpeed = 0.25
     end
 

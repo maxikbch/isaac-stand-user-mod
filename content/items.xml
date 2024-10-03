@@ -1,3 +1,3 @@
-<items gfxroot="gfx/stand_user/items/" version="1">
-	<passive cache="" name="Stand" description="Ore No Stando Da!" gfx="stand_disc.png" />
+<items gfxroot="gfx/jotaro/items/" version="1">
+	<passive cache="" name="Star Platinum" description="Ore No Stando Da!" gfx="stand_disc.png" />
 </items>
