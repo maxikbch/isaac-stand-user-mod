@@ -1,4 +1,4 @@
-local SETTINGS = require("src/constants/settings")
+local Settings = require("src/constants/settings")
 local stand = require("src/constants/stand")
 
 local RenderMeter = require("src/meter/bar")
@@ -37,7 +37,7 @@ local function ForEachPlayer(player, index)
 	
 	local playerData = player:GetData()
 
-	if SETTINGS.HasSuper and player:HasCollectible(standItem) and playerData[stand.Id..".Item"] and offset["Player"..index] then
+	if Settings.HasSuper and player:HasCollectible(standItem) and playerData[stand.Id..".Item"] and offset["Player"..index] then
 		Meter(playerData, offset["Player"..index], playerData[stand.Id..".Item"])
 	end
 end

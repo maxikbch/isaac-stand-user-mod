@@ -1,5 +1,5 @@
 local STATS = require("src/constants/stats")
-local SETTINGS = require("src/constants/settings")
+local Settings = require("src/constants/settings")
 
 local utils = require("src/utils")
 local StandBehaviors = require("src/behaviors/main")
@@ -55,7 +55,7 @@ function StandUpdate(player, stand)
 		end
 
 		--temp target
-		if SETTINGS.VisibleTarget then
+		if Settings.VisibleTarget then
 			if not (playerData.mytgt and playerData.mytgt:Exists()) then
 				playerData.mytgt = Isaac.Spawn(1000, 30, 0, playerPosition, Vector(0, 0), player)
 				playerData.mytgt.RenderZOffset = -10000

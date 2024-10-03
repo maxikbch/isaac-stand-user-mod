@@ -1,7 +1,7 @@
 
 local STATS = require("src/constants/stats")
 local ITEM_MODIFIERS = require("src/constants/item_modifiers")
-local SETTINGS = require("src/constants/settings")
+local Settings = require("src/constants/settings")
 local sounds = require("src/constants/sounds")
 local character = require("src/constants/character")
 
@@ -57,7 +57,7 @@ return function (player, stand, shootDir)
                     end
                 end
             end
-            if not standData.tgt and SETTINGS.TargetGridEntities then 
+            if not standData.tgt and Settings.TargetGridEntities then 
                 local gridEntity = standChecks:IsValidGridEntity(standEntity.Position, player, standEntity)
                 if gridEntity then 
                     standData.tgt = gridEntity
@@ -176,21 +176,23 @@ return function (player, stand, shootDir)
             end
         end
 
-        if standData.punches == standData.maxpunches then
-            if sfx:IsPlaying(sounds.cryMid) then
-                sfx:Stop(sounds.cryMid)
-                sfx:Play(sounds.cryFinish, .75, 0, false)
-            elseif not sfx:IsPlaying(sounds.cryFinish) and not sfx:IsPlaying(sounds.cry) then
-                sfx:Play(sounds.cry, .75, 0, false)
+        if Settings.ExtraSounds then
+            if standData.punches == standData.maxpunches then
+                if sfx:IsPlaying(sounds.cryMid) then
+                    sfx:Stop(sounds.cryMid)
+                    sfx:Play(sounds.cryFinish, .75, 0, false)
+                elseif not sfx:IsPlaying(sounds.cryFinish) and not sfx:IsPlaying(sounds.cry) then
+                    sfx:Play(sounds.cry, .75, 0, false)
+                end
+            elseif standData.punches == 0 then
+                if not sfx:IsPlaying(sounds.cryStart) then
+                    sfx:Play(sounds.cryStart, .75, 0, false)
+                end
+            else 
+                if not sfx:IsPlaying(sounds.cryStart) and not sfx:IsPlaying(sounds.cryMid) then
+                    sfx:Play(sounds.cryMid, .75, 0, true)
+                end 
             end
-        elseif standData.punches == 0 then
-            if not sfx:IsPlaying(sounds.cryStart) then
-                sfx:Play(sounds.cryStart, .75, 0, false)
-            end
-        else 
-            if not sfx:IsPlaying(sounds.cryStart) and not sfx:IsPlaying(sounds.cryMid) then
-                sfx:Play(sounds.cryMid, .75, 0, true)
-            end 
         end
 
         --return

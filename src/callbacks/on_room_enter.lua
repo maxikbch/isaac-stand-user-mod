@@ -1,5 +1,5 @@
 
-local SETTINGS = require("src/constants/settings")
+local Settings = require("src/constants/settings")
 local character = require("src/constants/character")
 local stand = require("src/constants/stand")
 
@@ -26,11 +26,11 @@ local function ForEachPlayer(player, index)
 	standSprite.Color = Color(1, 1, 1, -2.5, 0, 0, 0)
 	playerData.usedBoxOfFriends = false
 
-	if SETTINGS.ReapplyCostume and (player:GetPlayerType() == character.Type) then
+	if Settings.ReapplyCostume and (player:GetPlayerType() == character.Type) then
 		player:AddNullCostume(character.Costume1)
 	end
 
-	if SETTINGS.ReapplyCostume and (player:GetPlayerType() == character.Type2) then
+	if Settings.ReapplyCostume and (player:GetPlayerType() == character.Type2) then
 		player:AddNullCostume(character.Costume2)
 		local meat = config:GetCollectible(CollectibleType.COLLECTIBLE_MEAT)
 		player:AddCostume(meat, false)

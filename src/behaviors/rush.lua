@@ -1,7 +1,7 @@
 
 local standChecks = require("src/stand/checks")
 local utils = require("src/utils")
-local SETTINGS = require("src/constants/settings")
+local Settings = require("src/constants/settings")
 
 ---@param player EntityPlayer
 return function (player, stand, shootDir)
@@ -44,7 +44,7 @@ return function (player, stand, shootDir)
         if not (standChecks:IsValidEnemy(standData.tgt, player, standEntity) or standChecks:IsTargetable(standData.tgt, player, standEntity)) then
             standData.tgt = nil
         end
-		if not standData.tgt and SETTINGS.TargetGridEntities then 
+		if not standData.tgt and Settings.TargetGridEntities then 
             local frontGrid = standData.launchdir * 50
             local gridEntity = standChecks:IsValidGridEntity(standEntity.Position + frontGrid, player, standEntity)
             if gridEntity then 

@@ -1,4 +1,4 @@
-local SETTINGS = require("src/constants/settings")
+local Settings = require("src/constants/settings")
 local STATS = require("src/constants/stats")
 local stand = require("src/constants/stand")
 local standItem = require("src/stand/item")
@@ -16,7 +16,7 @@ end
 ---@param sourceType EntityType
 local function ChargeStandMeter(entity, source, sourceType)
 
-	if source and source:Exists() and SETTINGS.HasSuper and entity:IsVulnerableEnemy() then
+	if source and source:Exists() and Settings.HasSuper and entity:IsVulnerableEnemy() then
 	
 		if source.Type == EntityType.ENTITY_PLAYER then
 

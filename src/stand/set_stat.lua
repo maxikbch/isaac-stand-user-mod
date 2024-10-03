@@ -3,7 +3,7 @@ local setStat = {}
 local character = require("src/constants/character")
 local STATS = require("src/constants/stats")
 local ITEM_MODIFIERS = require("src/constants/item_modifiers")
-local SETTINGS = require("src/constants/settings")
+local Settings = require("src/constants/settings")
 
 ---@param player EntityPlayer
 function setStat:AttackAmount(player, stand)
@@ -41,7 +41,7 @@ function setStat:MaxCharge(player)
 	if player:HasCollectible(CollectibleType.COLLECTIBLE_EPIC_FETUS) then maxcharge = maxcharge * ITEM_MODIFIERS.EpicFetusChargeMult end
 	if player:HasCollectible(CollectibleType.COLLECTIBLE_IPECAC) then maxcharge = maxcharge * ITEM_MODIFIERS.IpecacChargeMult end
 	if player:HasCollectible(CollectibleType.COLLECTIBLE_MONSTROS_LUNG) then maxcharge = maxcharge * ITEM_MODIFIERS.MonstrosLungChargeMult end
-	if SETTINGS.NoShooting then maxcharge = maxcharge * ITEM_MODIFIERS.NoShootingChargeMult end
+	if Settings.NoShooting then maxcharge = maxcharge * ITEM_MODIFIERS.NoShootingChargeMult end
 	--if player:HasCollectible(52) then maxcharge = bal.DrFetusChargeMax end
 
 	return maxcharge
