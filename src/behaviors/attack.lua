@@ -17,6 +17,7 @@ local rng = RNG()
 return function (player, stand, shootDir)
 
     local playerData = player:GetData()
+    ---@type Entity
 	local standEntity = playerData[stand.Id]
 	local standData = standEntity:GetData()
 	local standSprite = playerData[stand.Id]:GetSprite()
@@ -174,6 +175,24 @@ return function (player, stand, shootDir)
                 end
             end
         end
+
+        if standData.punches == standData.maxpunches then
+            if sfx:IsPlaying(sounds.cryMid) then
+                sfx:Stop(sounds.cryMid)
+                sfx:Play(sounds.cryFinish, .75, 0, false)
+            elseif not sfx:IsPlaying(sounds.cryFinish) and not sfx:IsPlaying(sounds.cry) then
+                sfx:Play(sounds.cry, .75, 0, false)
+            end
+        elseif standData.punches == 0 then
+            if not sfx:IsPlaying(sounds.cryStart) then
+                sfx:Play(sounds.cryStart, .75, 0, false)
+            end
+        else 
+            if not sfx:IsPlaying(sounds.cryStart) and not sfx:IsPlaying(sounds.cryMid) then
+                sfx:Play(sounds.cryMid, .75, 0, true)
+            end 
+        end
+
         --return
         if standSprite:IsFinished("PunchN") or standSprite:IsFinished("PunchE") or
         standSprite:IsFinished("PunchS") or standSprite:IsFinished("PunchW") then
