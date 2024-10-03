@@ -1,4 +1,4 @@
-<sounds root="sounds/">
+<sounds root="sounds/stand_user/">
 	<sound name="PunchLight">
 		<sample weight="1" path="punchlight.wav" />
 	</sound>
