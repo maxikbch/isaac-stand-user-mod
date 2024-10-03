@@ -1,3 +1,31 @@
+--How to make your own character
+
+I recomend to match the case if you use replace all.
+
+0.Change metadata.xml mod name. You can also change other values or leave them for later. Example: Jotaro
+1.Rename stand_user folders for the name of the stand user you are going to use, low case is better. Example: jotaro
+2.Rename stand_user in every file for the same name. Example: jotaro
+3.Rename StandUser in every file for the name of the character and mod. Example: Jotaro
+4.Rename Maxo13 in mod name for any name that represents you. Example: MyName
+5.Replace content/gfx with your character sprites, and (if you didnt use my sprites as base) change the animations.
+6.You can change character stats in content/players.xml
+7.Rename Stand name in each needed file. I recomend to use a replace all with match whole word activated.
+8.Change Stand and Stand Particle variant in content/entities2. Preferable if you use the next formula:
+	Stand = 13000 + value (even)
+ 	Particle = 13000 + value + 1
+(I will leave a list with used variants to reduce the amount of mods with incompability)
+9.Add any sounds that you want, but is better if you name them by the character or stand they belong to. Generic ones dont need to be changed
+10.Change gfx sprites to match your character/stand. You can also change the colors of the meter if you want.
+11.Main code is extensive so im not going to put everything you can change from it, just some notes:
+.Meter has 3 button types. Super is ment to be used in "Ultimate" abilities, Power in some lower abilities that doesnt use all the meter, and shift is for switching abilities (if you want more than 1 super or something like that) or stand (for example: Echoes ACTS)
+.stand/checks have the functions used to know what does the stand can target while stand/effects are centered in what happen when it target some type of targets (WIP: Add method to effect in entities)
+.src/behaviors has all stand behaviors. You can use them, change them and add new at you own will.
+.stand/super is ment to be use to manage all special abilities.
+.YOU CAN ASK ME IF YOU HAVE A DOUBT WITH ANYTHING.
+
+-------old
+ 
+
 Stat effects on Crazy Diamond:
 	+Move Speed: Affects the range at which CD will acquire new targets in the middle of a punch flurry
 	+Range: Affects how far from the position of launch CD will travel
