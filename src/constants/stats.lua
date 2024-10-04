@@ -1,17 +1,17 @@
 return {
 
 	--BASIC STATS	
-	ChargeLength = 7,
-	RangeMult = 8,
-	MinimumRange = 60,
+	ChargeLength = 5,
+	RangeMult = 3,
+	MinimumRange = 15,
 	Punches = 5,
-	Damage = .4,
-	DamageLastHit = 2.4,
+	Damage = .6,
+	DamageLastHit = 3,
+
+	--ADVANCED STATS
 	Knockback = 5,
 	KnockbackLastHitMult = 2.5,
 	PunchSize = 6,
-
-	--ADVANCED STATS
 	KnockbackBirthrightMult = 5,
 	KnockbackBossMult = .5,
 	LockonWidth = 50,

@@ -28,7 +28,7 @@ local function Meter(playerData, offset, data)
 	
 	RenderStandHead(offset, data)
 	RenderMeter(frame, playerData, offset, data, 1)
-	RenderButton(frame, playerData, offset, data, 2)
+	--RenderButton(frame, playerData, offset, data, 2)
 	
 end
   

@@ -1,9 +1,9 @@
 <sounds root="sounds/jotaro/">
 	<sound name="Stand_PunchLight">
-		<sample weight="1" path="punchlight.wav" />
+		<sample weight="1" path="punchLight.wav" />
 	</sound>
 	<sound name="Stand_PunchHeavy">
-		<sample weight="1" path="punchheavy.wav" />
+		<sample weight="1" path="punchHeavy.wav" />
 	</sound>
 	<sound name="Stand_Whoosh">
 		<sample weight="1" path="whoosh.wav" />
@@ -14,16 +14,31 @@
 	<sound name="Stand_Rage">
 		<sample weight="1" path="rage.wav" />
 	</sound>
-	<sound name="StarPlatinum_Cry_Start">
-		<sample weight="1" path="cry_start.wav" />
+	<sound name="StarPlatinum_CryStart">
+		<sample weight="1" path="cryStart.wav" />
 	</sound>
-	<sound name="StarPlatinum_Cry_Mid">
-		<sample weight="1" path="cry_mid.wav" />
+	<sound name="StarPlatinum_CryMid">
+		<sample weight="1" path="cryMid.wav" />
 	</sound>
-	<sound name="StarPlatinum_Cry_Finish">
-		<sample weight="1" path="cry_finish.wav" />
+	<sound name="StarPlatinum_CryFinish">
+		<sample weight="1" path="cryFinish.wav" />
 	</sound>
 	<sound name="StarPlatinum_Cry">
-		<sample weight="1" path="cry_unique.wav" />
+		<sample weight="1" path="cryUnique.wav" />
+	</sound>
+    <sound name="StarPlatinum_ZaWarudo">
+		<sample weight="1" path="starPlatinumZaWarudo.wav"/>
+	</sound>
+	<sound name="StopTime">
+		<sample weight="1" path="timeStop.wav"/>
+	</sound>
+	<sound name="ResumeTime">
+		<sample weight="1" path="timeResume.wav"/>
+	</sound>
+	<sound name="Tick5">
+		<sample weight="1" path="ticking5.wav"/>
+	</sound>
+	<sound name="Tick9">
+		<sample weight="1" path="ticking9.wav"/>
 	</sound>
 </sounds>
