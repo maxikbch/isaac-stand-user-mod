@@ -3,21 +3,21 @@ local Settings = require("src/constants/settings")
 local input = {}
 
 function input:IsKeyboardController(controllerIndex)
-	return controllerIndex == 0
+	return controllerIndex == 0 and Input.IsKeyboardEnabled()
 end
 
-function input:IsSuperTriggered(controllerIndex)
+function input:IsSkill1Triggered(controllerIndex)
 	if self:IsKeyboardController(controllerIndex) then
-		return Input.IsButtonTriggered(Settings.KEY_SUPER, 0)
+		return Input.IsButtonTriggered(Settings.KEY_SKILL1, 0)
 	end
-	return Input.IsButtonTriggered(Settings.BUTTON_SUPER, controllerIndex)
+	return Input.IsButtonTriggered(Settings.BUTTON_SKILL1, controllerIndex)
 end
 
-function input:IsAltTriggered(controllerIndex)
+function input:IsSkill2Triggered(controllerIndex)
 	if self:IsKeyboardController(controllerIndex) then
-		return Input.IsButtonTriggered(Settings.KEY_ALT, 0)
+		return Input.IsButtonTriggered(Settings.KEY_SKILL2, 0)
 	end
-	return Input.IsButtonTriggered(Settings.BUTTON_ALT, controllerIndex)
+	return Input.IsButtonTriggered(Settings.BUTTON_SKILL2, controllerIndex)
 end
 
 return input

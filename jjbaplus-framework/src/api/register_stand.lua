@@ -4,47 +4,99 @@ local debug = require("src/debug")
 
 local REQUIRED_FIELDS = { "id", "discItem", "familiarVariant" }
 
-local function normalizeAbilities(def)
+local SLOT_NAMES = { "skill1", "skill2" }
+
+local function mergeSkillHooks(def, skillId, skill)
+    local hooks = def.hooks or {}
+
+    if skill.onActivate == nil and hooks.onSkillActivate then
+        skill.onActivate = hooks.onSkillActivate[skillId]
+    end
+    if skill.onDeactivate == nil and hooks.onSkillDeactivate then
+        skill.onDeactivate = hooks.onSkillDeactivate[skillId]
+    end
+    if skill.onPress == nil and hooks.onSkillPress then
+        skill.onPress = hooks.onSkillPress[skillId]
+    end
+    if skill.onToggle == nil and hooks.onSkillToggle then
+        skill.onToggle = hooks.onSkillToggle[skillId]
+    end
+    if skill.onTick == nil and hooks.onSkillTick then
+        skill.onTick = hooks.onSkillTick[skillId]
+    end
+end
+
+local function normalizeChargePools(def)
     local stats = def.stats
-    local abilities = def.abilities or {}
+    def.chargePools = def.chargePools or {}
 
-    abilities.charges = abilities.charges or {}
-    if abilities.charges.super == nil then
-        abilities.charges.super = (stats.SuperMaxCharge or 0) > 0
-    end
-    if abilities.charges.alt == nil then
-        abilities.charges.alt = false
-    end
-
-    abilities.super = abilities.super or {}
-    if abilities.super.enabled == nil then
-        abilities.super.enabled = abilities.charges.super
-    end
-    if abilities.super.requiresCharge == nil then
-        abilities.super.requiresCharge = true
-    end
-    if abilities.super.chargePool == nil then
-        abilities.super.chargePool = "super"
-    end
-    if abilities.super.useCost == nil then
-        abilities.super.useCost = stats.SuperMaxCharge
+    if not next(def.chargePools) and (stats.SuperMaxCharge or 0) > 0 then
+        def.chargePools.primary = {
+            maxCharge = stats.SuperMaxCharge,
+            gainOnHit = true,
+        }
     end
 
-    abilities.alt = abilities.alt or {}
-    if abilities.alt.enabled == nil then
-        abilities.alt.enabled = false
+    for poolId, poolDef in pairs(def.chargePools) do
+        if poolDef.maxCharge == nil then
+            if poolId == "primary" then
+                poolDef.maxCharge = stats.SuperMaxCharge or 0
+            elseif poolId == "secondary" then
+                poolDef.maxCharge = stats.AltMaxCharge or stats.PowerCost or 0
+            else
+                poolDef.maxCharge = 0
+            end
+        end
+        if poolDef.gainOnHit == nil then
+            poolDef.gainOnHit = poolId == "primary"
+        end
     end
-    if abilities.alt.requiresCharge == nil then
-        abilities.alt.requiresCharge = true
-    end
-    if abilities.alt.chargePool == nil then
-        abilities.alt.chargePool = "alt"
-    end
-    if abilities.alt.useCost == nil then
-        abilities.alt.useCost = stats.AltMaxCharge or stats.PowerCost
-    end
+end
 
-    def.abilities = abilities
+local function normalizeSlots(def)
+    def.slots = def.slots or {}
+
+    for _, slotName in ipairs(SLOT_NAMES) do
+        local slot = def.slots[slotName] or { enabled = false }
+        def.slots[slotName] = slot
+
+        if slot.enabled == nil then
+            slot.enabled = false
+        end
+        if slot.chargePool == nil then
+            slot.chargePool = slotName == "skill1" and "primary" or "secondary"
+        end
+        if slot.requiresCharge == nil then
+            slot.requiresCharge = true
+        end
+    end
+end
+
+local function normalizeSkills(def)
+    def.skills = def.skills or {}
+    local stats = def.stats
+
+    for skillId, skill in pairs(def.skills) do
+        if skill.kind == nil then
+            skill.kind = "active"
+        end
+        if skill.chargePool == nil then
+            skill.chargePool = "primary"
+        end
+
+        local poolDef = def.chargePools[skill.chargePool]
+        if skill.useCost == nil and poolDef then
+            skill.useCost = poolDef.maxCharge
+        end
+        if skill.duration == nil and skill.kind == "active" then
+            skill.duration = stats.SuperDuration or 0
+        end
+        if skill.cooldown == nil then
+            skill.cooldown = stats.SuperCooldown or 0
+        end
+
+        mergeSkillHooks(def, skillId, skill)
+    end
 end
 
 local function validateStandDef(def)
@@ -79,7 +131,9 @@ local function normalizeStandDef(def)
     def.floatOffset = def.floatOffset or Vector(0, -36)
     def.meterGfx = def.meterGfx or {}
 
-    normalizeAbilities(def)
+    normalizeChargePools(def)
+    normalizeSlots(def)
+    normalizeSkills(def)
 end
 
 return function(registry)
@@ -102,12 +156,18 @@ return function(registry)
             registry.characterToStand[playerType] = def.id
         end
 
+        local skillCount = 0
+        for _ in pairs(def.skills or {}) do
+            skillCount = skillCount + 1
+        end
+
         debug:Log(string.format(
-            "RegisterStand ok id=%s disc=%s variant=%s linkedChars=%d",
+            "RegisterStand ok id=%s disc=%s variant=%s linkedChars=%d skills=%d",
             def.id,
             tostring(def.discItem),
             tostring(def.familiarVariant),
-            #def.linkedCharacters
+            #def.linkedCharacters,
+            skillCount
         ))
     end
 end

@@ -1,4 +1,4 @@
-﻿local character = require("character_definition")
+local character = require("character_definition")
 local stats = require("stand_stats")
 local timeStop = require("time_stop")
 
@@ -28,10 +28,36 @@ return {
         head = "gfx/jotaro/ui/stand_head.anm2",
     },
 
-    abilities = {
-        charges = { super = true, alt = false },
-        super = { enabled = true, requiresCharge = true },
-        alt = { enabled = false },
+    chargePools = {
+        primary = {
+            maxCharge = stats.SuperMaxCharge,
+            gainOnHit = true,
+        },
+    },
+
+    skills = {
+        time_stop = {
+            kind = "active",
+            chargePool = "primary",
+            useCost = stats.SuperMaxCharge,
+            duration = stats.SuperDuration,
+            cooldown = stats.SuperCooldown,
+            onActivate = function(ctx)
+                timeStop.onActivate(ctx.player, ctx.standDef)
+            end,
+        },
+    },
+
+    slots = {
+        skill1 = {
+            enabled = true,
+            skill = "time_stop",
+            requiresCharge = true,
+            chargePool = "primary",
+        },
+        skill2 = {
+            enabled = false,
+        },
     },
 
     sounds = {
@@ -56,9 +82,6 @@ return {
     },
 
     hooks = {
-        onSuperStart = function(player, standEntity, standDef)
-            timeStop.onSuperStart(player, standDef)
-        end,
         getMaxPunches = function(player, standDef)
             if player:GetPlayerType() == character.Type2 then
                 return standDef.stats.Punches

@@ -27,10 +27,34 @@ return {
         head = "gfx/character/ui/stand_head.anm2",
     },
 
-    abilities = {
-        charges = { super = true, alt = false },
-        super = { enabled = true, requiresCharge = true },
-        alt = { enabled = false },
+    chargePools = {
+        primary = {
+            maxCharge = stats.SuperMaxCharge,
+            gainOnHit = true,
+        },
+    },
+
+    skills = {
+        -- Example active skill on skill1 (rename id and wire callbacks as needed)
+        example_skill = {
+            kind = "active",
+            chargePool = "primary",
+            useCost = stats.SuperMaxCharge,
+            duration = stats.SuperDuration,
+            cooldown = stats.SuperCooldown,
+        },
+    },
+
+    slots = {
+        skill1 = {
+            enabled = true,
+            skill = "example_skill",
+            requiresCharge = true,
+            chargePool = "primary",
+        },
+        skill2 = {
+            enabled = false,
+        },
     },
 
     sounds = {

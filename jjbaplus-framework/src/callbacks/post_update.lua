@@ -4,7 +4,7 @@ local debug = require("src/debug")
 local StandUpdate = require("src/core/update")
 local SetStand = require("src/core/set")
 local StandClear = require("src/core/clear")
-local StandSuper = require("src/core/super")
+local SkillDispatcher = require("src/skills/dispatcher")
 local LocalControllers = require("src/core/local_controllers")
 local utils = require("src/utils")
 
@@ -24,7 +24,7 @@ return function(jsf)
 
         SetStand(player, standDef, jsfData)
         StandUpdate(player, standDef, jsfData)
-        StandSuper(player, standDef, jsfData)
+        SkillDispatcher(player, standDef, jsfData)
     end
 
     local function resetStandLinks()

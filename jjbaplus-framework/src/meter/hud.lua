@@ -3,86 +3,73 @@ local RenderVerticalBar = require("src/meter/vertical_bar")
 local RenderCircularMeter = require("src/meter/circular_meter")
 local RenderButtonGlyph = require("src/meter/button_glyph")
 local RenderStandHead = require("src/meter/stand_head")
+local SkillState = require("src/skills/state")
+local SkillResolve = require("src/skills/resolve")
 
-local function getChargeValue(standState, pool)
-    if pool == "super" then
-        return standState.SuperCharge or 0
+local METER_POOL_ORDER = { "primary", "secondary" }
+
+local function getMeterPools(standDef)
+    local pools = {}
+    local chargePools = standDef.chargePools or {}
+
+    for _, poolId in ipairs(METER_POOL_ORDER) do
+        local poolDef = chargePools[poolId]
+        if poolDef and (poolDef.maxCharge or 0) > 0 and poolDef.meter ~= false then
+            pools[#pools + 1] = poolId
+        end
     end
-    if pool == "alt" then
-        return standState.AltCharge or 0
-    end
-    return 0
+
+    return pools
 end
 
-local function getMaxCharge(stats, pool)
-    if pool == "super" then
-        return stats.SuperMaxCharge or 0
+local function getSlotSkillDef(standDef, slotDef, player, standState)
+    if not slotDef then
+        return nil, nil
     end
-    if pool == "alt" then
-        return stats.AltMaxCharge or 0
+
+    local skillId = SkillResolve.resolveSkillId(slotDef, player, standDef, standState)
+    if not skillId then
+        return nil, nil
     end
-    return 0
+
+    return skillId, standDef.skills and standDef.skills[skillId]
 end
 
-local function renderChargeBars(anchor, standState, stats, abilities)
-    local charges = abilities.charges or {}
-    local hasSuper = charges.super == true
-    local hasAlt = charges.alt == true
-
-    if not hasSuper and not hasAlt then
+local function renderChargeBars(anchor, standState, standDef)
+    local meterPools = getMeterPools(standDef)
+    if #meterPools == 0 then
         return
     end
 
     local barPos = anchor + Constants.CHARGE_BAR
+    local chargePools = standDef.chargePools
 
-    if hasSuper and hasAlt then
+    for index, poolId in ipairs(meterPools) do
+        local poolDef = chargePools[poolId]
+        local yOffset = (index - 1) * Constants.CHARGE_BAR_SPACING
         RenderVerticalBar.render(
-            barPos,
-            getChargeValue(standState, "super"),
-            getMaxCharge(stats, "super"),
-            false
-        )
-        RenderVerticalBar.render(
-            barPos + Vector(0, Constants.CHARGE_BAR_SPACING),
-            getChargeValue(standState, "alt"),
-            getMaxCharge(stats, "alt"),
-            false
-        )
-    elseif hasSuper then
-        RenderVerticalBar.render(
-            barPos,
-            getChargeValue(standState, "super"),
-            getMaxCharge(stats, "super"),
-            true
-        )
-    elseif hasAlt then
-        RenderVerticalBar.render(
-            barPos,
-            getChargeValue(standState, "alt"),
-            getMaxCharge(stats, "alt"),
-            true
+            barPos + Vector(0, yOffset),
+            SkillState.getCharge(standState, poolId),
+            poolDef.maxCharge,
+            #meterPools == 1
         )
     end
 end
 
-local function renderAbilitySlot(anchor, frame, player, standState, stats, abilityDef, bindingName)
-    if not abilityDef or not abilityDef.enabled then
+local function renderSkillSlot(anchor, yOffset, frame, player, standState, standDef, slotName, slotDef)
+    if not slotDef or not slotDef.enabled then
         return
     end
 
-    local slotPos = anchor + Constants.ABILITY_COLUMN
-    local requiresCharge = abilityDef.requiresCharge ~= false
-    local useCost = abilityDef.useCost or stats.SuperMaxCharge or 0
-    local charge = getChargeValue(standState, abilityDef.chargePool or "super")
-    local duration = 0
-    local maxDuration = stats.SuperDuration or 0
-
-    if bindingName == "SUPER" then
-        duration = standState.SuperDuration or 0
-    elseif bindingName == "ALT" then
-        duration = standState.AltDuration or 0
-        maxDuration = stats.AltDuration or maxDuration
-    end
+    local slotPos = anchor + Constants.ABILITY_COLUMN + Vector(0, yOffset)
+    local skillId, skillDef = getSlotSkillDef(standDef, slotDef, player, standState)
+    local requiresCharge = slotDef.requiresCharge ~= false
+    local poolId = slotDef.chargePool or (skillDef and skillDef.chargePool) or "primary"
+    local poolDef = standDef.chargePools and standDef.chargePools[poolId]
+    local useCost = slotDef.useCost or (skillDef and skillDef.useCost) or (poolDef and poolDef.maxCharge) or 0
+    local charge = SkillState.getCharge(standState, poolId)
+    local duration = skillId and SkillState.getDuration(standState, skillId) or 0
+    local maxDuration = skillDef and skillDef.duration or 0
 
     local glyphCenter = Vector(16, 8)
     if requiresCharge then
@@ -102,34 +89,28 @@ local function renderAbilitySlot(anchor, frame, player, standState, stats, abili
     RenderButtonGlyph.render(
         slotPos + glyphCenter,
         player.ControllerIndex,
-        bindingName
+        slotName
     )
 end
 
-return function(frame, anchor, player, standState, stats, abilities, meterGfx)
+return function(frame, anchor, player, standState, standDef, meterGfx)
     local root = anchor + Constants.HUD_ORIGIN
 
-    renderChargeBars(root, standState, stats, abilities)
+    renderChargeBars(root, standState, standDef)
 
     local headPos = root + Constants.STAND_HEAD
     RenderStandHead(headPos, standState, meterGfx)
 
-    renderAbilitySlot(
+    local slots = standDef.slots or {}
+    renderSkillSlot(root, 0, frame, player, standState, standDef, "skill1", slots.skill1)
+    renderSkillSlot(
         root,
+        Constants.ABILITY_SLOT_SPACING,
         frame,
         player,
         standState,
-        stats,
-        abilities.super,
-        "SUPER"
-    )
-    renderAbilitySlot(
-        root + Vector(0, Constants.ABILITY_SLOT_SPACING),
-        frame,
-        player,
-        standState,
-        stats,
-        abilities.alt,
-        "ALT"
+        standDef,
+        "skill2",
+        slots.skill2
     )
 end

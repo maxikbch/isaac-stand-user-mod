@@ -1,4 +1,5 @@
 local Settings = require("src/constants/settings")
+local SkillState = require("src/skills/state")
 
 local MAX_SOURCE_DEPTH = 6
 
@@ -72,7 +73,7 @@ return function(jsf)
         if not player or not player:Exists() then
             return
         end
-        if not Settings.HasSuper or not entity:IsVulnerableEnemy() then
+        if not Settings.HasChargeMeter or not entity:IsVulnerableEnemy() then
             return
         end
 
@@ -84,17 +85,15 @@ return function(jsf)
         local jsfData = jsf:GetPlayerData(player)
         jsfData.activeDiscItem = standDef.discItem
 
-        local standState = jsfData.standState
-        if not standState.SuperCharge then
-            standState.SuperCharge = 0
-        end
+        local standState = jsfData.standState or {}
+        jsfData.standState = standState
+        SkillState.ensurePools(standState, standDef.chargePools)
 
-        local STATS = standDef.stats
-        if standState.SuperCharge < STATS.SuperMaxCharge then
-            standState.SuperCharge = math.min(
-                STATS.SuperMaxCharge,
-                standState.SuperCharge + ChargePoints(sourceType)
-            )
+        local points = ChargePoints(sourceType)
+        for poolId, poolDef in pairs(standDef.chargePools or {}) do
+            if poolDef.gainOnHit then
+                SkillState.addCharge(standState, poolId, points, poolDef.maxCharge or 0)
+            end
         end
     end
 

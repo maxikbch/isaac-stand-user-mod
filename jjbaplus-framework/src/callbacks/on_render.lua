@@ -19,7 +19,7 @@ return function(jsf)
         local jsfData = jsf:GetPlayerData(player)
         local screenOffset = utils:GetStandMeterScreenOffset(index)
 
-        if not Settings.HasSuper
+        if not Settings.HasChargeMeter
             or not player:HasCollectible(standDef.discItem)
             or not jsfData.standState
             or not screenOffset then
@@ -31,8 +31,7 @@ return function(jsf)
             screenOffset,
             player,
             jsfData.standState,
-            standDef.stats,
-            standDef.abilities,
+            standDef,
             standDef.meterGfx
         )
     end

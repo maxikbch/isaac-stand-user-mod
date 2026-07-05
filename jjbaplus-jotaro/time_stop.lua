@@ -1,8 +1,19 @@
 local STAND_ID = "star_platinum"
+local SKILL_ID = "time_stop"
 
 local randomV = Vector(0, 0)
 local sfx = SFXManager()
 local music = MusicManager()
+
+local function getSkillDuration(standState)
+    standState.skillDurations = standState.skillDurations or {}
+    return standState.skillDurations[SKILL_ID] or 0
+end
+
+local function setSkillDuration(standState, value)
+    standState.skillDurations = standState.skillDurations or {}
+    standState.skillDurations[SKILL_ID] = value
+end
 
 local function getStandContext(player, JSF)
     local standDef = JSF:GetActiveStand(player)
@@ -34,14 +45,12 @@ local function updateTimeFreeze(player, standDef, standState)
     local entities = Isaac.GetRoomEntities()
 
     if not player:HasCollectible(standDef.discItem) or Game():GetRoom():GetFrameCount() == 0 then
-        standState.SuperDuration = 0
+        setSkillDuration(standState, 0)
     end
 
-    if standState.SuperDuration == nil then
-        return
-    end
+    local duration = getSkillDuration(standState)
 
-    if standState.SuperDuration == 1 then
+    if duration == 1 then
         for i, entity in pairs(entities) do
             if entity:HasEntityFlags(EntityFlag.FLAG_FREEZE) then
                 entity:ClearEntityFlags(EntityFlag.FLAG_FREEZE)
@@ -61,7 +70,7 @@ local function updateTimeFreeze(player, standDef, standState)
                 end
             end
         end
-    elseif standState.SuperDuration > 1 then
+    elseif duration > 1 then
         for i, entity in pairs(entities) do
             if entity.Type ~= EntityType.ENTITY_PLAYER and entity.Type ~= EntityType.ENTITY_FAMILIAR then
                 if entity.Type ~= EntityType.ENTITY_PROJECTILE then
@@ -172,7 +181,7 @@ local function updateTimeFreeze(player, standDef, standState)
 end
 
 return {
-    onSuperStart = function(player, standDef)
+    onActivate = function(player, standDef)
         sfx:Play(standDef.sounds.stopTime, 2, 0, false, 1)
         sfx:Play(standDef.sounds.zaWarudo, 2, 0, false, 1)
         music:Disable()
@@ -197,25 +206,24 @@ return {
         local maxTime = standDef.stats.SuperDuration
 
         forEachStarPlatinumPlayer(JSF, function(_, _, standState)
-            if standState.SuperDuration and standState.SuperDuration > 0 then
-                dist = 1 / (maxTime - 2 - standState.SuperDuration)
-                    + 1 / (standState.SuperDuration - 2)
+            local duration = getSkillDuration(standState)
+            if duration > 0 then
+                dist = 1 / (maxTime - 2 - duration)
+                    + 1 / (duration - 2)
                 if dist < 0 then
                     dist = math.abs(dist) ^ 2
-                elseif standState.SuperDuration - 2 == 0 or maxTime - 2 - standState.SuperDuration == 0 then
+                elseif duration - 2 == 0 or maxTime - 2 - duration == 0 then
                     dist = 1
                 else
                     on = 0.5
                 end
-                if standState.SuperDuration == 277 then
+                if duration == 277 then
                     sfx:Play(standDef.sounds.tick9, 5, 0, false, 1)
-                elseif standState.SuperDuration == 157 then
+                elseif duration == 157 then
                     sfx:Play(standDef.sounds.tick5, 5, 0, false, 1)
-                elseif standState.SuperDuration == 1 then
+                elseif duration == 1 then
                     sfx:Play(standDef.sounds.resumeTime, 2, 0, false, 1)
                     music:Resume()
-                elseif standState.SuperDuration == 0 then
-                    dist = 0
                 end
             end
         end)
@@ -243,13 +251,14 @@ return {
             return
         end
 
-        if standState.SuperDuration == 1 then
+        local duration = getSkillDuration(standState)
+        if duration == 1 then
             local data = tear:GetData()
             data.TimeFrozen = false
             tear.Velocity = data.StoredVel
             tear.FallingSpeed = data.StoredFall
             tear.FallingAccel = data.StoredAcc
-        elseif standState.SuperDuration > 1 then
+        elseif duration > 1 then
             local data = tear:GetData()
             if not data.TimeFrozen then
                 data.TimeFrozen = true
@@ -284,7 +293,7 @@ return {
             return nil
         end
 
-        if standState.SuperDuration and standState.SuperDuration > 0
+        if getSkillDuration(standState) > 0
             and entity.Type ~= EntityType.ENTITY_PLAYER
             and damageFlags & DamageFlag.DAMAGE_LASER ~= 0
             and not player:HasCollectible(CollectibleType.COLLECTIBLE_LUDOVICO_TECHNIQUE) then

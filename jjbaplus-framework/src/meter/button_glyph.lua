@@ -4,13 +4,13 @@ local Constants = require("src/meter/constants")
 local input = require("src/core/input")
 
 local BINDINGS = {
-    SUPER = {
-        key = function() return Settings.KEY_SUPER end,
-        button = function() return Settings.BUTTON_SUPER end,
+    skill1 = {
+        key = function() return Settings.KEY_SKILL1 end,
+        button = function() return Settings.BUTTON_SKILL1 end,
     },
-    ALT = {
-        key = function() return Settings.KEY_ALT end,
-        button = function() return Settings.BUTTON_ALT end,
+    skill2 = {
+        key = function() return Settings.KEY_SKILL2 end,
+        button = function() return Settings.BUTTON_SKILL2 end,
     },
 }
 

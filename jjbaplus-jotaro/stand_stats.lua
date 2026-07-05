@@ -1,4 +1,4 @@
-﻿return {
+return {
     ChargeLength = 5,
     RangeMult = 3,
     MinimumRange = 15,

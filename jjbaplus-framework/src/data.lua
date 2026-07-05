@@ -1,5 +1,6 @@
 local json = require("json")
 local utils = require("src/utils")
+local SkillState = require("src/skills/state")
 
 local data = {
     runContinued = false,
@@ -107,7 +108,7 @@ end
 function data:ResetPlayerSession(jsf, player)
     local playerData = player:GetData()
     local oldJsf = playerData.JSF
-    local hadActiveSuper = oldJsf and oldJsf.standState and (oldJsf.standState.SuperDuration or 0) > 0
+    local hadActiveSkill = SkillState.hasAnyActiveDuration(oldJsf and oldJsf.standState)
 
     playerData.JSF = {
         activeStandId = nil,
@@ -116,7 +117,7 @@ function data:ResetPlayerSession(jsf, player)
         standState = {},
     }
 
-    if hadActiveSuper then
+    if hadActiveSkill then
         Music():Resume()
     end
 end
