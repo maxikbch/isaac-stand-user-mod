@@ -23,6 +23,16 @@ return {
 
     stats = stats,
 
+    meterGfx = {
+        head = "gfx/character/ui/stand_head.anm2",
+    },
+
+    abilities = {
+        charges = { super = true, alt = false },
+        super = { enabled = true, requiresCharge = true },
+        alt = { enabled = false },
+    },
+
     sounds = {
         punchlight = Isaac.GetSoundIdByName("{{SOUND_PREFIX}}_PunchLight"),
         punchheavy = Isaac.GetSoundIdByName("{{SOUND_PREFIX}}_PunchHeavy"),

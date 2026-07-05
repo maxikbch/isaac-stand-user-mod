@@ -25,9 +25,13 @@ return {
     stats = stats,
 
     meterGfx = {
-        bar = "gfx/jotaro/ui/meter_bar.anm2",
-        buttons = "gfx/jotaro/ui/meter_buttons.anm2",
         head = "gfx/jotaro/ui/stand_head.anm2",
+    },
+
+    abilities = {
+        charges = { super = true, alt = false },
+        super = { enabled = true, requiresCharge = true },
+        alt = { enabled = false },
     },
 
     sounds = {
