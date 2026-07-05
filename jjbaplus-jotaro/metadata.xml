@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+    <name>JJBA+ Jotaro</name>
+    <directory>jjbaplus_jotaro</directory>
+    <id>0</id>
+    <description>JJBA+ Jotaro character and stand mod. Requires JJBA+ Framework.</description>
+    <version>1.0</version>
+    <visibility>Public</visibility>
+    <tag id="Lua"/>
+    <tag id="Player Characters"/>
+    <tag id="Familiars"/>
+</metadata>

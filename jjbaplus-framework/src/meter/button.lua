@@ -10,14 +10,20 @@ local ButtonType = {"super - ", "power - ", "shift - "}
 local centerOffset = Vector(8.5, 34)
 local secondaryOffset = Vector(0, 15)
 
-return function(frame, playerData, offset, data, stats, type, forMeter)
-    if not playerData["StandMeterButton"..type] then
-        playerData["StandMeterButton"..type] = Sprite()
-        playerData["StandMeterButton"..type]:Load("gfx/stand_framework/ui/meter_buttons.anm2", true)
-        playerData["StandMeterButton"..type].PlaybackSpeed = 0.25
+local DEFAULT_BUTTONS = "gfx/stand_framework/ui/meter_buttons.anm2"
+
+return function(frame, playerData, offset, data, stats, type, forMeter, meterGfx)
+    local buttonsPath = (meterGfx and meterGfx.buttons) or DEFAULT_BUTTONS
+    local buttonKey = "StandMeterButton" .. type
+
+    if not playerData[buttonKey] or playerData[buttonKey .. "Path"] ~= buttonsPath then
+        playerData[buttonKey] = Sprite()
+        playerData[buttonKey]:Load(buttonsPath, true)
+        playerData[buttonKey].PlaybackSpeed = 0.25
+        playerData[buttonKey .. "Path"] = buttonsPath
     end
 
-    local meter = playerData["StandMeterButton"..type]
+    local meter = playerData[buttonKey]
     local charge = data.SuperCharge or 0
 
     if type == 2 or (not forMeter and type == 3) then

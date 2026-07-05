@@ -20,10 +20,10 @@ local offset = {
 return function(jsf)
     local frame = 0
 
-    local function Meter(playerData, screenOffset, standState, stats)
-        RenderStandHead(screenOffset, standState)
-        RenderMeter(frame, playerData, screenOffset, standState, stats, 1)
-        RenderButton(frame, playerData, screenOffset, standState, stats, 2)
+    local function Meter(playerData, screenOffset, standState, stats, meterGfx)
+        RenderStandHead(screenOffset, standState, meterGfx)
+        RenderMeter(frame, playerData, screenOffset, standState, stats, 1, meterGfx)
+        RenderButton(frame, playerData, screenOffset, standState, stats, 2, false, meterGfx)
     end
 
     local function ForEachPlayer(player, index)
@@ -34,7 +34,7 @@ return function(jsf)
         local playerData = player:GetData()
 
         if Settings.HasSuper and player:HasCollectible(standDef.discItem) and jsfData.standState and offset["Player"..index] then
-            Meter(playerData, offset["Player"..index], jsfData.standState, standDef.stats)
+            Meter(playerData, offset["Player"..index], jsfData.standState, standDef.stats, standDef.meterGfx)
         end
     end
 

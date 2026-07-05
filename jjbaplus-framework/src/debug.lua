@@ -7,9 +7,10 @@ local debug = {
 }
 
 function debug:Log(message)
-    if settings.DebugStand then
-        local text = "[JSF] " .. tostring(message)
-        Isaac.DebugString(text)
+    local text = "[JSF] " .. tostring(message)
+    Isaac.DebugString(text)
+
+    if settings.DebugOverlay then
         table.insert(self._lines, text)
         while #self._lines > self._maxLines do
             table.remove(self._lines, 1)
@@ -18,10 +19,6 @@ function debug:Log(message)
 end
 
 function debug:LogEvery(interval, key, message)
-    if not settings.DebugStand then
-        return
-    end
-
     local frame = Game():GetFrameCount()
     if not self._last[key] or frame - self._last[key] >= interval then
         self._last[key] = frame
@@ -30,7 +27,7 @@ function debug:LogEvery(interval, key, message)
 end
 
 function debug:Render()
-    if not settings.DebugStand or #self._lines == 0 then
+    if not settings.DebugOverlay or #self._lines == 0 then
         return
     end
 

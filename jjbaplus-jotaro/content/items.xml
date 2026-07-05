@@ -1,0 +1,3 @@
+﻿<items gfxroot="gfx/jotaro/items/" version="1">
+	<passive cache="" name="Star Platinum Disc" description="Ore No Stando Da!" gfx="stand_disc.png" />
+</items>

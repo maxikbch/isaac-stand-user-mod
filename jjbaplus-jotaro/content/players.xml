@@ -1,0 +1,3 @@
+﻿<players root="gfx/jotaro/characters/players/" portraitroot="gfx/jotaro/ui/boss/" nameimageroot="gfx/jotaro/ui/boss/" bigportraitroot="gfx/jotaro/ui/stage/">
+	<player name="Jotaro" skin="character.png" hp="4" coins="10" skinColor="-1" nameimage="playername.png" portrait="playerportrait.png" bigportrait="playerportrait.png" birthright="Triple finisher!" />
+</players>

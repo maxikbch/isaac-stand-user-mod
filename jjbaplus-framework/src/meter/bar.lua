@@ -8,11 +8,16 @@ local MeterBar =
 
 local RenderButton = require("src/meter/button")
 
-return function(frame, playerData, offset, data, stats, type)
-    if not playerData.StandMeter then
+local DEFAULT_BAR = "gfx/stand_framework/ui/meter_bar.anm2"
+
+return function(frame, playerData, offset, data, stats, type, meterGfx)
+    local barPath = (meterGfx and meterGfx.bar) or DEFAULT_BAR
+
+    if not playerData.StandMeter or playerData.StandMeterBarPath ~= barPath then
         playerData.StandMeter = Sprite()
-        playerData.StandMeter:Load("gfx/stand_framework/ui/meter_bar.anm2", true)
+        playerData.StandMeter:Load(barPath, true)
         playerData.StandMeter.PlaybackSpeed = 0.25
+        playerData.StandMeterBarPath = barPath
     end
 
     local meter = playerData.StandMeter
@@ -37,5 +42,5 @@ return function(frame, playerData, offset, data, stats, type)
         meter:Update()
     end
 
-    RenderButton(frame, playerData, offset, data, stats, type, true)
+    RenderButton(frame, playerData, offset, data, stats, type, true, meterGfx)
 end
