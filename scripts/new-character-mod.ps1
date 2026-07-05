@@ -1,4 +1,4 @@
-# Creates a new JJBA+ character mod from templates/character-mod.
+# Creates a new JJBA+ character mod from template/.
 param(
     [Parameter(Mandatory = $true)]
     [string]$CharacterName,
@@ -89,53 +89,51 @@ function Expand-JJBATemplate {
     return $result
 }
 
-function Copy-JJBAAssetTree {
+function Write-JJBATemplateFile {
     param(
         [string]$Source,
         [string]$Destination
     )
-    if (-not (Test-Path $Source)) {
-        return
+    $targetDir = Split-Path -Parent $Destination
+    if (-not (Test-Path $targetDir)) {
+        New-Item -ItemType Directory -Force -Path $targetDir | Out-Null
     }
-    Get-ChildItem -Path $Source -Recurse -File | ForEach-Object {
-        $relative = $_.FullName.Substring($Source.Length).TrimStart('\', '/')
-        $target = Join-Path $Destination $relative
-        $targetDir = Split-Path -Parent $target
-        if (-not (Test-Path $targetDir)) {
-            New-Item -ItemType Directory -Force -Path $targetDir | Out-Null
-        }
-        Copy-Item -Path $_.FullName -Destination $target -Force
-    }
+    $raw = Get-Content -Path $Source -Raw -Encoding UTF8
+    Set-Content -Path $Destination -Value (Expand-JJBATemplate -Text $raw) -Encoding UTF8 -NoNewline
 }
 
 Write-Host "Creating $displayName at $modPath"
 
 New-Item -ItemType Directory -Force -Path $modPath | Out-Null
 
-Get-ChildItem -Path $JJBA_TemplatePath -Recurse -File | ForEach-Object {
-    $relative = $_.FullName.Substring($JJBA_TemplatePath.Length).TrimStart('\', '/')
-    $target = Join-Path $modPath $relative
-    $targetDir = Split-Path -Parent $target
-    if (-not (Test-Path $targetDir)) {
-        New-Item -ItemType Directory -Force -Path $targetDir | Out-Null
-    }
-
-    $raw = Get-Content -Path $_.FullName -Raw -Encoding UTF8
-    Set-Content -Path $target -Value (Expand-JJBATemplate -Text $raw) -Encoding UTF8 -NoNewline
+Get-ChildItem -Path $JJBA_TemplatePath -File | ForEach-Object {
+    Write-JJBATemplateFile -Source $_.FullName -Destination (Join-Path $modPath $_.Name)
 }
 
-$sourceGfx = Join-Path $JJBA_PlaceholderAssetsPath "character-gfx"
-$targetContentGfx = Join-Path $modPath "content\gfx\$gfxNamespace"
-Copy-JJBAAssetTree -Source $sourceGfx -Destination $targetContentGfx
+Get-ChildItem -Path (Join-Path $JJBA_TemplatePath "content") -File | ForEach-Object {
+    Write-JJBATemplateFile -Source $_.FullName -Destination (Join-Path $modPath "content\$($_.Name)")
+}
 
-$sourceContentMenuGfx = Join-Path $JJBA_PlaceholderAssetsPath "menu-gfx"
+$targetResourcesGfx = Join-Path $modPath "resources\gfx\$gfxNamespace"
+Copy-JJBAAssetTree -Source $JJBA_TemplateCharacterGfxPath -Destination $targetResourcesGfx
+
 $targetContentMenuGfx = Join-Path $modPath "content\gfx"
 if (-not (Test-Path $targetContentMenuGfx)) {
     New-Item -ItemType Directory -Force -Path $targetContentMenuGfx | Out-Null
 }
-Get-ChildItem -Path $sourceContentMenuGfx -File | ForEach-Object {
-    Copy-Item -Path $_.FullName -Destination (Join-Path $targetContentMenuGfx $_.Name) -Force
+Get-ChildItem -Path $JJBA_TemplateMenuGfxPath -File | ForEach-Object {
+    $target = Join-Path $targetContentMenuGfx $_.Name
+    if ($_.Extension -eq ".anm2") {
+        Write-JJBATemplateFile -Source $_.FullName -Destination $target
+    } else {
+        Copy-Item -Path $_.FullName -Destination $target -Force
+    }
 }
+
+& "$PSScriptRoot\setup-framework-assets.ps1"
+
+$targetSounds = Join-Path $modPath "resources\sounds\$gfxNamespace"
+Copy-JJBAAssetTree -Source $JJBA_TemplateCharacterSoundsPath -Destination $targetSounds
 
 $newEntry = [ordered]@{
     folder = $modFolder
@@ -168,5 +166,5 @@ Write-Host ""
 Write-Host "Next steps:"
 Write-Host "  1. Run .\install-mods.cmd (or .\scripts\install-mods.ps1)"
 Write-Host "  2. Enable JJBA+ Framework + $displayName in Isaac"
-Write-Host "  3. Replace art in content/gfx/$gfxNamespace/ (and content/gfx/ menu files if needed)"
+Write-Host "  3. Replace art in resources/gfx/$gfxNamespace/ (and content/gfx/ menu files if needed)"
 Write-Host "  4. Tune stand_stats.lua and stand_definition.lua hooks if needed"

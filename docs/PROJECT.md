@@ -1,6 +1,6 @@
-# JoJo Stand Mods — Documento del proyecto
+# JJBA+ Mods — Documento del proyecto
 
-Documento vivo con la visión, infraestructura y convenciones del monorepo.  
+Documento vivo con la visión, infraestructura y convenciones del monorepo **JJBA+**.  
 Para instalación rápida ver [README.md](../README.md).
 
 ---
@@ -11,8 +11,8 @@ Mod de *The Binding of Isaac: Repentance* inspirado en **JoJo's Bizarre Adventur
 
 ### Origen
 
-- Base original: mod de **Josuke + Crazy Diamond** (melon / NotYourSagittarius).
-- Extensiones previas del autor: variantes con **Jotaro / Star Platinum** y **Kakyoin / Hierophant Green**.
+- Base original: mod monolítico de stand/combate (melon / NotYourSagittarius).
+- Extensiones previas del autor: variantes con otros personajes y stands.
 - El código original era monolítico y difícil de extender; este repo es la reescritura hacia un **estándar compartido**.
 
 ### Visión: “comunión” entre mods JoJo
@@ -28,9 +28,9 @@ La meta no es un solo mod gigante, sino un **ecosistema de mods compatibles**:
 ### Mecánicas futuras (roadmap)
 
 - [ ] **Stand Arrow** — otorgar o evolucionar stands en personajes que no lo tengan
-- [ ] **Discos de Stand** (estilo Whitesnake) — ítems que intercambian el stand activo
+- [ ] **Discos de Stand** (estilo Whitesnake) — intercambio de stand activo entre personajes
 - [ ] **Sala especial** — tipo observatorio de Repentance; discos, flechas, eventos JoJo
-- [ ] **Mods de personaje** — Josuke, Jotaro, Kakyoin como content mods separados
+- [ ] **Más personajes** — vía scaffold
 - [ ] **Sinergias entre stands** — hooks/eventos cuando conviven varios mods
 
 ---
@@ -42,11 +42,13 @@ La meta no es un solo mod gigante, sino un **ecosistema de mods compatibles**:
 | Framework | **JJBA+ Framework** | `jjbaplus-framework/` | Implementado (API v1) |
 | Personajes | **JJBA+ {Nombre}** | `jjbaplus-{slug}/` | Generados con scaffold |
 
-No hay mod jugable “Stand User” en el repo: solo plantillas en `templates/`.
+No hay mod jugable “Stand User” en el repo: solo la plantilla en `template/`.
 
 Comportamiento de combate por defecto: **punch flurry de Crazy Diamond** (`idle → rush → attack → return`).
 
-**Dependencias:** solo API vanilla de Repentance. No requiere Repentogon ni otros extenders.
+**Dependencias:** solo API vanilla de Repentance. **No requiere Repentogon.**
+
+Registro de mods e IDs: [`docs/variant_ids.json`](variant_ids.json).
 
 ---
 
@@ -55,19 +57,20 @@ Comportamiento de combate por defecto: **punch flurry de Crazy Diamond** (`idle 
 ### Monorepo
 
 ```
-isaac-stand-user-mod/          ← repo (contenedor, NO es un mod de Isaac)
+isaac-stand-user-mod/              ← repo contenedor (NO es un mod de Isaac)
 ├── docs/
-│   ├── PROJECT.md
-│   └── variant_ids.json
-├── templates/
-│   ├── character-mod/         ← plantilla Lua + XML
-│   └── placeholder-assets/    ← sprites/anm2 placeholder
-├── jjbaplus-framework/      ← mod instalable (framework)
-├── jjbaplus-{personaje}/         ← mods generados (ej. jjbaplus-jotaro)
+│   ├── PROJECT.md                 ← este archivo
+│   └── variant_ids.json           ← mods registrados + variant IDs
+├── template/                      ← plantilla única para scaffold (Lua, XML, gfx)
+├── jjbaplus-framework/            ← mod framework (instalable)
+├── jjbaplus-{slug}/               ← mods de personaje (ej. jjbaplus-jotaro)
 ├── scripts/
-│   └── install-mods.ps1
-├── install-mods.cmd           ← doble clic
-├── create-character.cmd
+│   ├── jjba-config.ps1            ← constantes y helpers
+│   ├── new-character-mod.ps1      ← scaffold de personajes
+│   ├── install-mods.ps1           ← junctions (auto-generado)
+│   └── update-install-mods.ps1    ← regenera install-mods.ps1
+├── install-mods.cmd               ← launcher: junctions
+├── create-character.cmd           ← launcher: scaffold interactivo
 ├── README.md
 └── credit.txt
 ```
@@ -77,26 +80,48 @@ Isaac solo carga carpetas **directas** dentro de `mods/`. Cada mod jugable se ex
 ```powershell
 .\install-mods.cmd
 # o: .\scripts\install-mods.ps1
-# mods/jjbaplus-framework  →  repo/jjbaplus-framework
-# mods/jjbaplus-jotaro           →  repo/jjbaplus-jotaro  (tras scaffold)
+```
+
+Ejemplo de junctions:
+
+```
+mods/jjbaplus-framework  →  repo/jjbaplus-framework
+mods/jjbaplus-jotaro     →  repo/jjbaplus-jotaro
 ```
 
 ### Orden de carga
 
-Cada content mod **depende** del framework:
-
-1. `jjbaplus-framework` debe cargar primero (el prefijo alfabético ayuda).
-2. Cada `jjbaplus-{personaje}/` llama a `JSF:RegisterStand(...)` al iniciar.
+1. **`jjbaplus-framework`** debe cargar primero (el prefijo alfabético ayuda).
+2. Cada **`jjbaplus-{slug}/`** llama a `JSF:RegisterStand(...)` al iniciar.
 
 Si el framework no está presente, el content mod aborta con mensaje en consola.
 
-### Entorno de prueba aislado (idea)
+### Assets: `content/` + `resources/`
 
-Isaac no tiene perfiles de mods. Opciones:
+Isaac carga **XML y menú** desde `content/`. Los sprites de juego (costumes, stand, retratos de boss/stage, meter HUD) y los **`.wav`** van en **`resources/`**.
 
-1. Activar framework + al menos un personaje generado.
-2. Carpeta `mods-test/` con solo esos mods y script de swap (pendiente).
-3. Seed fija para pruebas repetibles.
+| Mod | Dónde editar arte |
+|-----|-------------------|
+| Framework (meter HUD) | `jjbaplus-framework/resources/gfx/stand_framework/` |
+| Personaje (stand, costumes, disco, UI boss/stage) | `jjbaplus-{slug}/resources/gfx/{slug}/` |
+| Menú de personaje | `jjbaplus-{slug}/content/gfx/` (charactermenu, portraits, etc.) |
+| Sonidos | `jjbaplus-{slug}/resources/sounds/{slug}/` (`.wav` referenciados en `content/sounds.xml`) |
+
+El scaffold copia desde `template/` a `resources/gfx/{slug}/`, `content/gfx/` (menú) y sincroniza el HUD del framework. Los `.anm2` de menú deben usar una animación con el **mismo nombre** que `<player name="...">` en `players.xml` (ej. `"Jotaro"` para el personaje Jotaro).
+
+---
+
+## Scripts
+
+| Archivo | Qué hace |
+|---------|----------|
+| `install-mods.cmd` | Crea junctions en `mods/` según `variant_ids.json`. |
+| `create-character.cmd` | Pide personaje y stand; ejecuta el scaffold. |
+| `scripts/new-character-mod.ps1` | Genera `jjbaplus-{slug}/`, registra variants e IDs. |
+| `scripts/install-mods.ps1` | Igual que `install-mods.cmd` (auto-generado). |
+| `scripts/update-install-mods.ps1` | Regenera `install-mods.ps1` desde `variant_ids.json`. |
+| `scripts/setup-framework-assets.ps1` | Sincroniza HUD del framework desde `template/resources/gfx/framework/`. |
+| `scripts/jjba-config.ps1` | Helpers compartidos (slugs, namespace, variants). |
 
 ---
 
@@ -128,14 +153,14 @@ flowchart TD
 ### Responsabilidades
 
 | Capa | Framework | Content mod (personaje) |
-|------|-----------|------------------------------|
+|------|-----------|-------------------------|
 | Callbacks del juego | Sí | Solo personaje (stats, costume) |
 | FSM combate default | Sí | No (salvo `behaviorModule`) |
-| Meter / HUD | Sí | Sprites propios opcionales |
+| Meter / HUD | Sí (`resources/gfx/stand_framework/`) | Sprites propios opcionales en `resources/gfx/` |
 | Save/load (`playerData.JSF`) | Sí | No |
-| Swap de discos | Sí | Define el ítem disco |
-| Personaje + XML | No | Sí |
-| Sprites del stand | No | Sí |
+| Swap de discos | Sí | Define el ítem disco en `items.xml` |
+| Personaje + XML | No | Sí (`content/`) |
+| Sprites del stand | No | Sí (`resources/gfx/{slug}/`) |
 | Super / hooks específicos | Infraestructura | Implementación en hooks |
 
 ### Datos del jugador
@@ -146,9 +171,8 @@ Namespace único para evitar colisiones entre mods:
 playerData.JSF = {
     activeStandId = "star_platinum",
     activeDiscItem = CollectibleType.X,
-    standEntity = Entity,      -- familiar spawneado
-    standState = {             -- SuperCharge, SuperDuration, ...
-    },
+    standEntity = Entity,
+    standState = { SuperCharge = 0, ... },
 }
 ```
 
@@ -167,34 +191,30 @@ Expuesta al cargar el framework. Versión: `JSF.API_VERSION = 1`.
 | `IsRegisteredDisc(collectibleId)` | ¿Es un disco registrado? |
 | `GetPlayerData(player)` | Tabla `playerData.JSF` |
 | `SetActiveStand(player, standId)` | Asignar stand |
-| `SwapStandDisc(player, discItemId)` | Cambiar disco (deja el anterior en pedestal). Disparado vía `MC_PRE_PICKUP_COLLISION` al tocar un pickup de disco |
+| `SwapStandDisc(player, discItemId)` | Cambiar disco (`MC_PRE_PICKUP_COLLISION`) |
 | `EnsureLinkedStandDisc(player)` | Auto-disco si el personaje está en `linkedCharacters` |
 | `GetAllStandDefs()` | Lista de stands registrados |
 
 ### Schema de `stand_definition.lua`
 
-Ver ejemplo en [`templates/character-mod/stand_definition.lua`](../templates/character-mod/stand_definition.lua).
-
-Campos principales:
+Ver ejemplo en [`template/stand_definition.lua`](../template/stand_definition.lua).
 
 ```lua
 {
     id = "star_platinum",
-    discItem = Isaac.GetItemIdByName("Stand"),
+    discItem = Isaac.GetItemIdByName("Star Platinum Disc"),
     familiarVariant = 13000,
     particleVariant = 13001,
     floatOffset = Vector(0, -36),
     animations = { spIdle = {...}, spMad = {...}, ... },
     stats = { ChargeLength = 7, Punches = 5, ... },
     sounds = { punchlight = ..., ... },
-    behaviorModule = nil,       -- nil = default CD del framework
+    behaviorModule = nil,
     hooks = {
         getMaxPunches = function(player, standDef) ... end,
         getFinisherDamageMult = function(player, standDef) ... end,
-        onSuperStart = function(player, standEntity, standDef) ... end,
-        onSuperFinish = function(player, standEntity, standDef) ... end,
     },
-    linkedCharacters = { Isaac.GetPlayerTypeByName("StandUser") },
+    linkedCharacters = { Isaac.GetPlayerTypeByName("Jotaro") },
 }
 ```
 
@@ -204,59 +224,56 @@ Campos principales:
 
 ### Nomenclatura JJBA+
 
-Prefijo de marca visible en el launcher: **`JJBA+`**.
+El **`+`** solo aparece en el nombre visible del launcher. Carpetas e ids Lua evitan símbolos especiales.
 
 | Capa | Convención | Ejemplo |
 |------|------------|---------|
-| Nombre en launcher (`metadata.xml`) | `JJBA+ {Nombre}` | `JJBA+ Jotaro` |
+| Nombre en launcher | `JJBA+ {Nombre}` | `JJBA+ Jotaro` |
 | Carpeta del mod | `jjbaplus-{slug}` | `jjbaplus-jotaro` |
-| `RegisterMod` (ID Lua estable) | `Maxo13:JJBAPlus_{Nombre}` | `Maxo13:JJBAPlus_Jotaro` |
-| Personaje (`players.xml`) | PascalCase, sin espacios | `Jotaro` |
-| Stand id (`stand_definition`) | snake_case | `star_platinum` |
+| `metadata.xml` `<directory>` | guiones → `_` | `jjbaplus_jotaro` |
+| `RegisterMod` | `Maxo13:JJBAPlus_{Nombre}` | `Maxo13:JJBAPlus_Jotaro` |
+| Personaje (`players.xml`) | PascalCase | `Jotaro` |
+| Stand id | snake_case (auto desde nombre) | `star_platinum` |
+| Mod slug | lowercase (auto desde personaje) | `jotaro` |
 | Disco (`items.xml`) | nombre único | `Star Platinum Disc` |
-| Gfx namespace | slug del mod | `gfx/jotaro/` |
+| Gfx en disco | `resources/gfx/{slug}/` | `resources/gfx/jotaro/stand.anm2` |
 | Sonidos combate | `{Personaje}_PunchLight` | `Jotaro_PunchLight` |
 | Sonidos cry | `{StandPascal}_Cry_Start` | `StarPlatinum_Cry_Start` |
 
-Registro central de variant IDs y mods: [`docs/variant_ids.json`](../variant_ids.json).
-
 ### Variant IDs de entidades
 
-Reservar pares consecutivos por stand (asignados automáticamente por el scaffold):
+Asignados automáticamente por el scaffold. Fuente de verdad: `variant_ids.json`.
 
-| Stand | Familiar | Partícula |
-|-------|----------|-----------|
-| *(primer personaje)* | 13000 | 13001 |
-| *(segundo)* | 13002 | 13003 |
-| *(próximo)* | 13004 | 13005 |
+| Personaje (orden) | Familiar | Partícula |
+|-------------------|----------|-----------|
+| 1.º | 13000 | 13001 |
+| 2.º | 13002 | 13003 |
+| n.º | `13000 + 2*(n-1)` | `+ 1` |
 
-Fórmula: `13000 + 2*n` (familiar) y `+ 1` (partícula).
+`entities2.xml` debe usar **`version="5"`** (Repentance+).
 
 ### Behaviors
 
-**No hay presets** (`melee`, `ranged`, etc.).
-
 - El framework incluye **un solo default**: punch flurry CD.
-- Stands futuros con combate distinto:
-  - `behaviorModule` propio, **o**
-  - copiar/adaptar los behaviors del framework dentro de su mod.
+- Combate distinto: `behaviorModule` propio o behaviors copiados/adaptados en el mod del personaje.
 
 ### Nombres de ítems
 
-Usar nombres únicos por stand: `"Star Platinum Disc"`, no `"Stand"` genérico (salvo el stand base de prueba).
-
-### Mod IDs (`RegisterMod`)
-
-| Mod | Launcher | RegisterMod |
-|-----|----------|-------------|
-| Framework | JJBA+ Framework | `Maxo13:JJBAPlus_Framework` |
-| Personajes | JJBA+ {Nombre} | `Maxo13:JJBAPlus_{Nombre}` |
+Cada stand usa un disco con **nombre único** en `items.xml` (ej. `"Star Platinum Disc"`). No reutilizar el mismo nombre entre mods.
 
 ---
 
 ## Crear un mod de personaje nuevo
 
-### Script scaffold (recomendado)
+### Scaffold (recomendado)
+
+Doble clic:
+
+```powershell
+.\create-character.cmd
+```
+
+O desde consola:
 
 ```powershell
 .\scripts\new-character-mod.ps1 `
@@ -264,42 +281,79 @@ Usar nombres únicos por stand: `"Star Platinum Disc"`, no `"Stand"` genérico (
   -StandName "Star Platinum"
 ```
 
-Deriva slugs: `jotaro` → carpeta `jjbaplus-jotaro`, `star_platinum` → stand id. Opcional: `-Id`, `-StandId` para override.
+**Slugs automáticos:** `Jotaro` → `jotaro`, `"Star Platinum"` → `star_platinum`.  
+Overrides opcionales: `-Id`, `-StandId`, `-DiscName`, `-DiscDescription`.
 
-Genera `jjbaplus-jotaro/` desde `templates/character-mod/` con:
+**Genera:**
 
-- `metadata.xml`, `main.lua`, definiciones Lua
-- `content/*.xml` (players, items, entities2, costumes, sounds)
-- Assets placeholder copiados de `templates/placeholder-assets/` en `content/gfx/{slug}/`
-- Variants y registro en `docs/variant_ids.json`
-- Junction en `scripts/install-mods.ps1` (vía `scripts/update-install-mods.ps1`; launcher: `install-mods.cmd`)
+- Carpeta `jjbaplus-jotaro/`
+- Lua + XML + assets desde `template/`
+- Placeholders en `resources/gfx/jotaro/` y menú en `content/gfx/`
+- Entrada en `docs/variant_ids.json`
+- Actualiza `scripts/install-mods.ps1`
 
-Editá sprites directamente en `content/gfx/{slug}/` — Isaac no usa carpeta `resources/`.
+**Después:**
 
-1. Usar `templates/character-mod/` (vía script scaffold).
-2. Registrar el mod en `docs/variant_ids.json`.
-3. Ejecutar `.\scripts\update-install-mods.ps1`.
+1. `.\install-mods.cmd`
+2. Activar **JJBA+ Framework** + personaje en Isaac
+3. Reemplazar arte en `resources/gfx/{slug}/`
+4. Ajustar `stand_stats.lua` y hooks si hace falta
+
+### Manual (alternativa)
+
+1. Copiar/adaptar `template/`.
+2. Reservar variant IDs en `variant_ids.json`.
+3. `.\scripts\update-install-mods.ps1` → `.\install-mods.cmd`.
+
+---
+
+## Estructura de un mod de personaje
+
+```
+jjbaplus-jotaro/
+├── content/
+│   ├── gfx/
+│   │   ├── charactermenu.anm2   ← menú / portraits (raíz gfx/)
+│   │   └── ...
+│   ├── players.xml
+│   ├── items.xml
+│   ├── entities2.xml
+│   ├── costumes2.xml
+│   └── sounds.xml
+├── resources/
+│   ├── gfx/
+│   │   └── jotaro/              ← stand, costumes, disco, UI boss/stage
+│   └── sounds/
+│       └── jotaro/              ← .wav referenciados en sounds.xml
+├── main.lua
+├── stand_definition.lua
+├── stand_stats.lua
+├── character_definition.lua
+├── character_callbacks.lua
+├── settings.lua
+└── metadata.xml
+```
 
 ---
 
 ## Checklist de prueba manual
 
-- [ ] Solo framework activo → no crashea (sin stands registrados no hay gameplay visible)
-- [ ] Framework + personaje generado → disco y familiar visibles
+- [ ] Solo framework activo → no crashea
+- [ ] Framework + personaje → disco y familiar visibles
 - [ ] Combate: carga → rush → punch flurry
-- [ ] Super: meter carga y activa con tecla configurada (`C` / L3)
-- [ ] Cambio de sala: fade del stand + persistencia de meter
+- [ ] Super: meter carga y activa (`C` / L3)
+- [ ] Cambio de sala: fade del stand + meter persistente
 - [ ] Coop 2 jugadores
-- [ ] Swap de disco (cuando haya más de un stand registrado)
+- [ ] Swap de disco (con más de un stand registrado)
 
 ---
 
 ## Deuda técnica / notas
 
-- Puede quedar código legacy en la raíz del repo (`src/`, `content/` del mod viejo). No debe cargarse como mod; conviene limpiarlo.
-- Tainted StandUser comentado en `players.xml`; hooks ya preparados en `stand_definition.lua`.
-- Sonidos referenciados en `sounds.xml`; verificar que los `.wav` estén en `content/sounds/{slug}/`.
-- Swap de discos usa `MC_PRE_PICKUP_COLLISION` (vanilla). El disco anterior se suelta en el pedestal vacío más cercano o en el suelo.
+- Puede quedar código legacy en la raíz del repo (`src/`, `content/`). **No activar** `isaac-stand-user-mod` como mod en Isaac.
+- Sonidos en `content/sounds.xml` requieren `.wav` en `resources/sounds/{slug}/`. El scaffold copia placeholders desde `template/resources/sounds/character/`.
+- Swap de discos: `MC_PRE_PICKUP_COLLISION` (vanilla); disco anterior va al pedestal vacío más cercano o al suelo.
+- Debug del framework: `jjbaplus-framework/settings.lua` → `DebugStand = true` (overlay `[JSF]` en pantalla).
 
 ---
 
@@ -319,5 +373,8 @@ Ver [credit.txt](../credit.txt).
 
 | Fecha | Notas |
 |-------|-------|
-| 2026-07-05 | Split framework + stand-user; API v1; este documento inicial |
-| 2026-07-05 | Eliminado mod jugable stand-user; assets en `templates/placeholder-assets/` |
+| 2026-07-05 | Documento inicial; split framework + stand-user; API v1 |
+| 2026-07-05 | Marca JJBA+; scaffold; `variant_ids.json`; sin mod Stand User jugable |
+| 2026-07-05 | Carpetas `jjbaplus-*`; `RegisterMod` `Maxo13:JJBAPlus_*`; solo `content/` (sin sync) |
+| 2026-07-05 | Slugs auto; scripts `.cmd`; fix spawn stand (`ForAllPlayers`, entities2 v5) |
+| 2026-07-05 | Assets en `resources/`; plantilla unificada en `template/` |

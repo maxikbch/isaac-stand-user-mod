@@ -30,13 +30,24 @@ O: `.\scripts\new-character-mod.ps1 -CharacterName Jotaro -StandName "Star Plati
 
 Ids derivados automáticamente: `jotaro`, `star_platinum`. Overrides opcionales: `-Id`, `-StandId`.
 
-Genera `jjbaplus-jotaro/` con nomenclatura, IDs, XML, Lua y assets placeholder en `content/`. Después:
+Genera `jjbaplus-jotaro/` con nomenclatura, IDs, XML, Lua y assets placeholder en `resources/gfx/` (juego) y `content/gfx/` (menú). Después:
 
 1. `.\install-mods.cmd`
-2. Reemplazá arte en `content/gfx/<id>/` (sprites, anm2, etc.)
+2. Reemplazá arte en `resources/gfx/<id>/` (sprites, anm2, etc.)
 3. Ajustá `stand_stats.lua` / hooks si hace falta
 
-Plantillas: `templates/character-mod/` · Assets placeholder: `templates/placeholder-assets/`
+Plantilla: [`template/`](template/) · Ver [`template/README.md`](template/README.md)
+
+## Assets
+
+| Capa | Carpeta |
+|------|---------|
+| Gameplay (stand, costumes, UI boss/stage) | `resources/gfx/{slug}/` |
+| Menú (selector, portraits, death screen) | `content/gfx/` |
+| Sonidos | `resources/sounds/{slug}/` + `content/sounds.xml` |
+| HUD del framework | `jjbaplus-framework/resources/gfx/stand_framework/` |
+
+Los `.anm2` de menú deben declarar una animación con el mismo nombre que el personaje en `players.xml`.
 
 ## Nomenclatura JJBA+
 
@@ -46,7 +57,7 @@ Plantillas: `templates/character-mod/` · Assets placeholder: `templates/placeho
 | Carpeta en disco | `jjbaplus-jotaro` (framework: `jjbaplus-framework`) |
 | `RegisterMod` | `Maxo13:JJBAPlus_Jotaro` |
 | Stand id (Lua) | `star_platinum` |
-| Gfx namespace / carpeta de arte | `content/gfx/jotaro/` |
+| Gfx namespace / carpeta de arte | `resources/gfx/jotaro/` |
 
 El `+` solo aparece en el nombre visible del launcher; carpetas usan `jjbaplus-` e ids Lua `Maxo13:JJBAPlus_*`.
 
@@ -59,7 +70,7 @@ local JSF = _G.JoJoStandFramework
 JSF:RegisterStand(require("stand_definition"))
 ```
 
-Referencia de definición: `templates/character-mod/stand_definition.lua`
+Referencia de definición: `template/stand_definition.lua`
 
 ## Scripts
 
@@ -75,7 +86,8 @@ Referencia de definición: `templates/character-mod/stand_definition.lua`
 | Script | Qué hace |
 |--------|----------|
 | `install-mods.ps1` | Mismo que `install-mods.cmd`. Auto-generado por `update-install-mods.ps1`. |
-| `new-character-mod.ps1` | Crea un mod de personaje desde plantillas: carpeta `jjbaplus-{slug}`, Lua/XML, variant IDs, assets placeholder en `content/` y entrada en `variant_ids.json`. |
+| `new-character-mod.ps1` | Crea un mod de personaje desde `template/`: carpeta `jjbaplus-{slug}`, Lua/XML, variant IDs, assets y entrada en `variant_ids.json`. |
+| `setup-framework-assets.ps1` | Sincroniza sprites del HUD del framework desde `template/resources/gfx/framework/`. |
 | `update-install-mods.ps1` | Regenera `scripts/install-mods.ps1` a partir de `docs/variant_ids.json`. Lo llama `new-character-mod.ps1` al crear un personaje. |
 | `jjba-config.ps1` | Constantes y helpers compartidos (prefijo JJBA+, slugs, variant IDs). No se ejecuta solo; lo importan los otros scripts. |
 

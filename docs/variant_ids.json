@@ -1,13 +1,26 @@
 ﻿{
-  "familyPrefix": "JJBA+",
-  "authorNamespace": "Maxo13:JJBAPlus",
-  "baseVariant": 13000,
-  "mods": [
-    {
-      "folder": "jjbaplus-framework",
-      "type": "framework",
-      "displayName": "Framework",
-      "registerMod": "Maxo13:JJBAPlus_Framework"
-    }
-  ]
+    "familyPrefix":  "JJBA+",
+    "authorNamespace":  "Maxo13:JJBAPlus",
+    "baseVariant":  13000,
+    "mods":  [
+                 {
+                     "folder":  "jjbaplus-framework",
+                     "type":  "framework",
+                     "displayName":  "Framework",
+                     "registerMod":  "Maxo13:JJBAPlus_Framework"
+                 },
+                 {
+                     "folder":  "jjbaplus-jotaro",
+                     "type":  "character",
+                     "displayName":  "Jotaro",
+                     "registerMod":  "Maxo13:JJBAPlus_Jotaro",
+                     "characterName":  "Jotaro",
+                     "standId":  "star_platinum",
+                     "standName":  "Star Platinum",
+                     "discName":  "Star Platinum Disc",
+                     "gfxNamespace":  "jotaro",
+                     "familiarVariant":  13000,
+                     "particleVariant":  13001
+                 }
+             ]
 }

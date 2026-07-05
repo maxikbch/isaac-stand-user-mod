@@ -3,8 +3,11 @@ $script:JJBA_AuthorNamespace = "Maxo13:JJBAPlus"
 $script:JJBA_BaseVariant = 13000
 $script:JJBA_RepoRoot = Split-Path -Parent $PSScriptRoot
 $script:JJBA_VariantIdsPath = Join-Path $JJBA_RepoRoot "docs\variant_ids.json"
-$script:JJBA_TemplatePath = Join-Path $JJBA_RepoRoot "templates\character-mod"
-$script:JJBA_PlaceholderAssetsPath = Join-Path $JJBA_RepoRoot "templates\placeholder-assets"
+$script:JJBA_TemplatePath = Join-Path $JJBA_RepoRoot "template"
+$script:JJBA_TemplateCharacterGfxPath = Join-Path $JJBA_TemplatePath "resources\gfx\character"
+$script:JJBA_TemplateMenuGfxPath = Join-Path $JJBA_TemplatePath "content\gfx"
+$script:JJBA_TemplateFrameworkGfxPath = Join-Path $JJBA_TemplatePath "resources\gfx\framework"
+$script:JJBA_TemplateCharacterSoundsPath = Join-Path $JJBA_TemplatePath "resources\sounds\character"
 
 function Get-JJBAVariantRegistry {
     if (-not (Test-Path $JJBA_VariantIdsPath)) {
@@ -68,4 +71,23 @@ function Get-JJBAModFolderName {
 function Get-JJBADisplayName {
     param([string]$Name)
     return "$JJBA_FamilyPrefix $Name"
+}
+
+function Copy-JJBAAssetTree {
+    param(
+        [string]$Source,
+        [string]$Destination
+    )
+    if (-not (Test-Path $Source)) {
+        return
+    }
+    Get-ChildItem -Path $Source -Recurse -File | ForEach-Object {
+        $relative = $_.FullName.Substring($Source.Length).TrimStart('\', '/')
+        $target = Join-Path $Destination $relative
+        $targetDir = Split-Path -Parent $target
+        if (-not (Test-Path $targetDir)) {
+            New-Item -ItemType Directory -Force -Path $targetDir | Out-Null
+        }
+        Copy-Item -Path $_.FullName -Destination $target -Force
+    }
 }
