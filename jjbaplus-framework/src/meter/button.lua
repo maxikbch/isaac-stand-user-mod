@@ -46,7 +46,7 @@ return function(frame, playerData, offset, data, stats, type, forMeter, meterGfx
                 meter:Play(ButtonType[type]..Button.charged, true)
             end
         else
-            meter:SetFrame(ButtonType[type]..Button.charging, 0)
+            meter:SetFrame(ButtonType[type]..Button.charging, math.floor(charge / stats.SuperMaxCharge * Button.frames))
         end
     end
 

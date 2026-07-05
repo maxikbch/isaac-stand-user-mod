@@ -31,8 +31,6 @@ function StandUpdate(player, standDef, jsf)
         standData.posrate = .08
         standData.alpha = -3
         standData.alphagoal = -3
-        standData.SuperCharge = 0
-        standData.SuperCooldown = 0
         standData.TargetEntity = true
         standData.TargetGrid = true
     end

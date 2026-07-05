@@ -1,7 +1,9 @@
 local json = require("json")
 local utils = require("src/utils")
 
-local data = {}
+local data = {
+    runContinued = false,
+}
 
 function data:Get(mod)
     if mod:HasData() then
@@ -9,6 +11,23 @@ function data:Get(mod)
         return json.decode(saved)
     end
     return nil
+end
+
+function data:GetRunSeed()
+    return Game():GetSeeds():GetStartSeed()
+end
+
+function data:ShouldRestoreSession(mod)
+    if not mod:HasData() then
+        return false
+    end
+
+    local savedData = self:Get(mod)
+    if not savedData or not savedData.runSeed or not savedData.Players then
+        return false
+    end
+
+    return savedData.runSeed == self:GetRunSeed()
 end
 
 local function SavePlayerData(mod, jsf)
@@ -20,6 +39,8 @@ local function SavePlayerData(mod, jsf)
 
         local savedData = data:Get(mod) or {}
         local jsfData = jsf:GetPlayerData(player)
+
+        savedData.runSeed = data:GetRunSeed()
 
         if not savedData.Players then
             savedData.Players = {}
@@ -43,6 +64,10 @@ end
 
 local function LoadPlayerData(mod, jsf)
     return function(player, index)
+        if not data:ShouldRestoreSession(mod) then
+            return
+        end
+
         local jsfData = jsf:GetPlayerData(player)
         local savedData = data:Get(mod)
 
@@ -65,6 +90,39 @@ local function LoadPlayerData(mod, jsf)
             jsfData.activeDiscItem = standDef.discItem
         end
     end
+end
+
+function data:OnGameStarted(isContinuedGame, mod)
+    self.runContinued = isContinuedGame
+
+    if not isContinuedGame then
+        mod:SaveData(json.encode({}))
+    end
+end
+
+function data:IsRunContinued()
+    return self.runContinued
+end
+
+function data:ResetPlayerSession(jsf, player)
+    local playerData = player:GetData()
+    local oldJsf = playerData.JSF
+    local hadActiveSuper = oldJsf and oldJsf.standState and (oldJsf.standState.SuperDuration or 0) > 0
+
+    playerData.JSF = {
+        activeStandId = nil,
+        activeDiscItem = nil,
+        standEntity = nil,
+        standState = {},
+    }
+
+    if hadActiveSuper then
+        Music():Resume()
+    end
+end
+
+function data:LoadPlayer(mod, jsf, player, index)
+    LoadPlayerData(mod, jsf)(player, index)
 end
 
 function data:SavePlayersData(mod, jsf)

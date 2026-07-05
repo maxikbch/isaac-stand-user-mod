@@ -1,4 +1,4 @@
-local Settings = require("src/constants/settings")
+local StandInput = require("src/core/input")
 
 local function DoSuper(player, standDef, jsf)
     local standState = jsf.standState
@@ -23,6 +23,12 @@ local function FinishSuper(player, standDef, jsf)
     end
 end
 
+local function TryAlt(player, standDef, jsf)
+    if standDef.hooks.onAltTriggered then
+        standDef.hooks.onAltTriggered(player, jsf.standEntity, standDef)
+    end
+end
+
 local function UpdateSuper(player, standDef, jsf)
     local standState = jsf.standState or {}
     local STATS = standDef.stats
@@ -44,14 +50,18 @@ return function(player, standDef, jsf)
         return
     end
 
-    local controler = player.ControllerIndex
+    local controllerIndex = player.ControllerIndex
     local standState = jsf.standState or {}
     local STATS = standDef.stats
 
-    if Input.IsButtonPressed(Settings.KEY_PRIMARY, controler) or Input.IsButtonPressed(Settings.BUTTON_PRIMARY, controler) then
+    if StandInput:IsSuperTriggered(controllerIndex) then
         if standState.SuperCharge == STATS.SuperMaxCharge then
             DoSuper(player, standDef, jsf)
         end
+    end
+
+    if StandInput:IsAltTriggered(controllerIndex) then
+        TryAlt(player, standDef, jsf)
     end
 
     UpdateSuper(player, standDef, jsf)

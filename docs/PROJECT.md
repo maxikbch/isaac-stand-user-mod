@@ -46,7 +46,7 @@ No hay mod jugable “Stand User” en el repo: solo la plantilla en `template/`
 
 Comportamiento de combate por defecto: **punch flurry de Crazy Diamond** (`idle → rush → attack → return`).
 
-**Dependencias:** solo API vanilla de Repentance. **No requiere Repentogon.**
+**Dependencias:** solo API vanilla de Repentance.
 
 Registro de mods e IDs: [`docs/variant_ids.json`](variant_ids.json).
 

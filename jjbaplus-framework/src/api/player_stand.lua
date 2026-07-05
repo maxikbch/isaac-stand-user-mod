@@ -43,7 +43,9 @@ return function(registry)
         local jsf = ensurePlayerData(player)
 
         if jsf.activeStandId and registry.stands[jsf.activeStandId] then
-            if player:HasCollectible(registry.stands[jsf.activeStandId].discItem) then
+            local cachedDef = registry.stands[jsf.activeStandId]
+            if player:HasCollectible(cachedDef.discItem) then
+                jsf.activeDiscItem = cachedDef.discItem
                 return jsf.activeStandId
             end
         end

@@ -6,11 +6,12 @@ return {
 	VisibleTarget = true, -- shows a target to further assist with aiming
 	DebugOverlay = false, -- on-screen [JSF] text overlay (console logs always active)
 
-	--KEYS
-	KEY_PRIMARY = Keyboard.KEY_C, --Keyboard primary ability button
-	KEY_SECONDARY = Keyboard.KEY_LEFT_SHIFT, --Keyboard secondary ability button
-	--L3 = 10, R3 = 11
-	BUTTON_PRIMARY = 10, --Joystick primary ability button
-	BUTTON_SECONDARY = 11 --Joystick secondary ability button
+	-- Super: C / R3 (right stick click)
+	KEY_SUPER = Keyboard.KEY_C,
+	BUTTON_SUPER = 13, -- STICK_RIGHT (R3) on XInput layout
+
+	-- Alt: Left Shift / L3 (left stick click) — reserved for future stand abilities
+	KEY_ALT = Keyboard.KEY_LEFT_SHIFT,
+	BUTTON_ALT = 10, -- STICK_LEFT (L3) on XInput layout
 
 }

@@ -1,3 +1,4 @@
+local LocalControllers = require("src/core/local_controllers")
 
 local utils = {}
 
@@ -130,6 +131,82 @@ function utils:ForAllPlayers(method)
             method(player, i)
         end
     end
+end
+
+---@param player EntityPlayer
+function utils:GetPlayerIndex(player)
+    for i = 0, Game():GetNumPlayers() - 1 do
+        local other = Isaac.GetPlayer(i)
+        if other and other:Exists() and GetPtrHash(other) == GetPtrHash(player) then
+            return i
+        end
+    end
+    return 0
+end
+
+---@param player EntityPlayer
+function utils:IsLocallyControlledPlayer(player)
+    if Game():GetNumPlayers() <= 1 then
+        return true
+    end
+
+    if LocalControllers:GetActiveCount() == 0 then
+        return true
+    end
+
+    return LocalControllers:IsActive(player.ControllerIndex)
+end
+
+---@param player EntityPlayer
+function utils:ShouldRenderStandMeter(player)
+    if not player or not player:Exists() then
+        return false
+    end
+
+    if player:IsCoopGhost() then
+        return false
+    end
+
+    local otherTwin = player:GetOtherTwin()
+    if otherTwin and player:GetPlayerType() == PlayerType.PLAYER_ESAU then
+        return false
+    end
+
+    return self:IsLocallyControlledPlayer(player)
+end
+
+local METER_OFFSETS = {
+    Player0 = Vector(36, 27),
+    Player1 = Vector(360, 27),
+    Player2 = Vector(36, 190),
+    Player3 = Vector(360, 190),
+}
+
+---@param playerIndex integer
+function utils:GetStandMeterScreenOffset(playerIndex)
+    local numPlayers = Game():GetNumPlayers()
+    if numPlayers <= 1 then
+        return METER_OFFSETS.Player0
+    end
+
+    local localPlayerCount = 0
+    local thisPlayerIsLocal = false
+
+    for i = 0, numPlayers - 1 do
+        local p = Isaac.GetPlayer(i)
+        if p and p:Exists() and self:IsLocallyControlledPlayer(p) then
+            localPlayerCount = localPlayerCount + 1
+            if i == playerIndex then
+                thisPlayerIsLocal = true
+            end
+        end
+    end
+
+    if localPlayerCount == 1 and thisPlayerIsLocal then
+        return METER_OFFSETS.Player0
+    end
+
+    return METER_OFFSETS["Player" .. playerIndex]
 end
 
 return utils
