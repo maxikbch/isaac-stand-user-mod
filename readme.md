@@ -1,51 +1,83 @@
-# JoJo Stand Mods (Monorepo)
+# JJBA+ Mods (Monorepo)
 
-Monorepo con mods separados para The Binding of Isaac: Repentance.
+Monorepo con mods separados para *The Binding of Isaac: Repentance*, familia **JJBA+**.
 
-| Mod | Carpeta | Descripción |
-|-----|---------|-------------|
-| **JoJo Stand Framework** | `jojo-stand-framework/` | API, combate, meter, discos, save/load |
-| **JoJo Stand User** | `jojo-stand-user/` | Personaje genérico + stand base (punch flurry CD) |
+| Launcher | Carpeta | Descripción |
+|----------|---------|-------------|
+| **JJBA+ Framework** | `jjbaplus-framework/` | API, combate, meter, discos, save/load |
 
-El content mod **requiere** el framework cargado primero. **No requiere Repentogon** — solo API vanilla de Repentance.
+Los personajes son mods separados generados con el scaffold (no hay mod “Stand User” jugable en el repo).
 
-Documentación del proyecto (visión, arquitectura, roadmap): [docs/PROJECT.md](docs/PROJECT.md).
+Documentación: [docs/PROJECT.md](docs/PROJECT.md) · Registro de IDs: [docs/variant_ids.json](docs/variant_ids.json)
 
 ## Instalación
 
-Isaac carga cada mod como carpeta directa dentro de `mods/`. Ejecutá desde la raíz del repo:
-
 ```powershell
-.\install-mods.ps1
+.\install-mods.cmd
 ```
 
-Eso crea junctions en `mods/jojo-stand-framework` y `mods/jojo-stand-user`. Activá ambos en el launcher.
+O desde consola: `.\scripts\install-mods.ps1`
 
-## Variant IDs reservados
+Activa **JJBA+ Framework** y los personajes que hayas generado.
 
-| Stand | Familiar | Partícula |
-|-------|----------|-----------|
-| generic_stand (Stand User) | 13000 | 13001 |
+## Crear un personaje
 
-Convención para futuros stands: par `13000 + n` (par) y `+ 1` (partícula).
+```powershell
+.\create-character.cmd
+```
+
+O: `.\scripts\new-character-mod.ps1 -CharacterName Jotaro -StandName "Star Platinum"`
+
+Ids derivados automáticamente: `jotaro`, `star_platinum`. Overrides opcionales: `-Id`, `-StandId`.
+
+Genera `jjbaplus-jotaro/` con nomenclatura, IDs, XML, Lua y assets placeholder en `content/`. Después:
+
+1. `.\install-mods.cmd`
+2. Reemplazá arte en `content/gfx/<id>/` (sprites, anm2, etc.)
+3. Ajustá `stand_stats.lua` / hooks si hace falta
+
+Plantillas: `templates/character-mod/` · Assets placeholder: `templates/placeholder-assets/`
+
+## Nomenclatura JJBA+
+
+| Capa | Ejemplo |
+|------|---------|
+| Nombre en launcher | `JJBA+ Jotaro` |
+| Carpeta en disco | `jjbaplus-jotaro` (framework: `jjbaplus-framework`) |
+| `RegisterMod` | `Maxo13:JJBAPlus_Jotaro` |
+| Stand id (Lua) | `star_platinum` |
+| Gfx namespace / carpeta de arte | `content/gfx/jotaro/` |
+
+El `+` solo aparece en el nombre visible del launcher; carpetas usan `jjbaplus-` e ids Lua `Maxo13:JJBAPlus_*`.
+
+Variant IDs: [docs/variant_ids.json](docs/variant_ids.json) (primer personaje: `13000` / `13001`).
 
 ## API v1 (`_G.JoJoStandFramework`)
 
 ```lua
 local JSF = _G.JoJoStandFramework
-
 JSF:RegisterStand(require("stand_definition"))
-JSF:GetStand("generic_stand")
-JSF:GetActiveStand(player)
-JSF:GetActiveStandId(player)
-JSF:IsRegisteredDisc(collectibleId)
-JSF:GetPlayerData(player)
-JSF:SetActiveStand(player, id)
-JSF:SwapStandDisc(player, discItemId)
-JSF:EnsureLinkedStandDisc(player)
 ```
 
-Ver `jojo-stand-user/stand_definition.lua` como ejemplo de definición de stand.
+Referencia de definición: `templates/character-mod/stand_definition.lua`
+
+## Scripts
+
+### Launchers (doble clic)
+
+| Archivo | Qué hace |
+|---------|----------|
+| `install-mods.cmd` | Crea junctions en la carpeta `mods/` de Isaac para cada mod listado en `docs/variant_ids.json`. |
+| `create-character.cmd` | Pide nombre de personaje y stand; ejecuta el scaffold y registra el mod nuevo. |
+
+### PowerShell (`scripts/`)
+
+| Script | Qué hace |
+|--------|----------|
+| `install-mods.ps1` | Mismo que `install-mods.cmd`. Auto-generado por `update-install-mods.ps1`. |
+| `new-character-mod.ps1` | Crea un mod de personaje desde plantillas: carpeta `jjbaplus-{slug}`, Lua/XML, variant IDs, assets placeholder en `content/` y entrada en `variant_ids.json`. |
+| `update-install-mods.ps1` | Regenera `scripts/install-mods.ps1` a partir de `docs/variant_ids.json`. Lo llama `new-character-mod.ps1` al crear un personaje. |
+| `jjba-config.ps1` | Constantes y helpers compartidos (prefijo JJBA+, slugs, variant IDs). No se ejecuta solo; lo importan los otros scripts. |
 
 ## Créditos
 

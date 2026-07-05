@@ -1,0 +1,3 @@
+<items gfxroot="gfx/{{GFX_NAMESPACE}}/items/" version="1">
+	<passive cache="" name="{{DISC_NAME}}" description="{{DISC_DESCRIPTION}}" gfx="stand_disc.png" />
+</items>

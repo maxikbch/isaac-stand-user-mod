@@ -37,10 +37,12 @@ La meta no es un solo mod gigante, sino un **ecosistema de mods compatibles**:
 
 ## Estado actual
 
-| Mod | ID | Estado |
-|-----|-----|--------|
-| `jojo-stand-framework/` | `Maxo13:JoJoStandFramework` | Implementado (API v1) |
-| `jojo-stand-user/` | `Maxo13:JoJoStandUser` | Personaje genérico + stand base |
+| Mod | Launcher | Carpeta | Estado |
+|-----|----------|---------|--------|
+| Framework | **JJBA+ Framework** | `jjbaplus-framework/` | Implementado (API v1) |
+| Personajes | **JJBA+ {Nombre}** | `jjbaplus-{slug}/` | Generados con scaffold |
+
+No hay mod jugable “Stand User” en el repo: solo plantillas en `templates/`.
 
 Comportamiento de combate por defecto: **punch flurry de Crazy Diamond** (`idle → rush → attack → return`).
 
@@ -55,28 +57,36 @@ Comportamiento de combate por defecto: **punch flurry de Crazy Diamond** (`idle 
 ```
 isaac-stand-user-mod/          ← repo (contenedor, NO es un mod de Isaac)
 ├── docs/
-│   └── PROJECT.md             ← este archivo
-├── jojo-stand-framework/      ← mod instalable
-├── jojo-stand-user/           ← mod instalable
-├── install-mods.ps1           ← crea junctions en mods/
+│   ├── PROJECT.md
+│   └── variant_ids.json
+├── templates/
+│   ├── character-mod/         ← plantilla Lua + XML
+│   └── placeholder-assets/    ← sprites/anm2 placeholder
+├── jjbaplus-framework/      ← mod instalable (framework)
+├── jjbaplus-{personaje}/         ← mods generados (ej. jjbaplus-jotaro)
+├── scripts/
+│   └── install-mods.ps1
+├── install-mods.cmd           ← doble clic
+├── create-character.cmd
 ├── README.md
 └── credit.txt
 ```
 
-Isaac solo carga carpetas **directas** dentro de `mods/`. Por eso cada mod vive en subcarpeta y se expone con junction:
+Isaac solo carga carpetas **directas** dentro de `mods/`. Cada mod jugable se expone con junction:
 
 ```powershell
-.\install-mods.ps1
-# mods/jojo-stand-framework  →  repo/jojo-stand-framework
-# mods/jojo-stand-user        →  repo/jojo-stand-user
+.\install-mods.cmd
+# o: .\scripts\install-mods.ps1
+# mods/jjbaplus-framework  →  repo/jjbaplus-framework
+# mods/jjbaplus-jotaro           →  repo/jjbaplus-jotaro  (tras scaffold)
 ```
 
 ### Orden de carga
 
-El content mod **depende** del framework:
+Cada content mod **depende** del framework:
 
-1. `jojo-stand-framework` debe cargar primero (el prefijo alfabético ayuda).
-2. `jojo-stand-user` llama a `JSF:RegisterStand(...)` al iniciar.
+1. `jjbaplus-framework` debe cargar primero (el prefijo alfabético ayuda).
+2. Cada `jjbaplus-{personaje}/` llama a `JSF:RegisterStand(...)` al iniciar.
 
 Si el framework no está presente, el content mod aborta con mensaje en consola.
 
@@ -84,7 +94,7 @@ Si el framework no está presente, el content mod aborta con mensaje en consola.
 
 Isaac no tiene perfiles de mods. Opciones:
 
-1. Activar solo framework + stand-user en el launcher.
+1. Activar framework + al menos un personaje generado.
 2. Carpeta `mods-test/` con solo esos mods y script de swap (pendiente).
 3. Seed fija para pruebas repetibles.
 
@@ -94,7 +104,7 @@ Isaac no tiene perfiles de mods. Opciones:
 
 ```mermaid
 flowchart TD
-    subgraph framework [jojo-stand-framework]
+    subgraph framework [jjbaplus-framework]
         API["RegisterStand / GetActiveStand"]
         CB[callbacks MC_*]
         DEF[behaviors default CD]
@@ -102,7 +112,7 @@ flowchart TD
         METER[HUD meter]
     end
 
-    subgraph content [jojo-stand-user u otros]
+    subgraph content [jjbaplus-jotaro u otros]
         SD[stand_definition.lua]
         CHAR[character_callbacks.lua]
         XML[content XML + gfx]
@@ -117,7 +127,7 @@ flowchart TD
 
 ### Responsabilidades
 
-| Capa | Framework | Content mod (ej. stand-user) |
+| Capa | Framework | Content mod (personaje) |
 |------|-----------|------------------------------|
 | Callbacks del juego | Sí | Solo personaje (stats, costume) |
 | FSM combate default | Sí | No (salvo `behaviorModule`) |
@@ -134,7 +144,7 @@ Namespace único para evitar colisiones entre mods:
 
 ```lua
 playerData.JSF = {
-    activeStandId = "generic_stand",
+    activeStandId = "star_platinum",
     activeDiscItem = CollectibleType.X,
     standEntity = Entity,      -- familiar spawneado
     standState = {             -- SuperCharge, SuperDuration, ...
@@ -163,13 +173,13 @@ Expuesta al cargar el framework. Versión: `JSF.API_VERSION = 1`.
 
 ### Schema de `stand_definition.lua`
 
-Ver ejemplo completo en [`jojo-stand-user/stand_definition.lua`](../jojo-stand-user/stand_definition.lua).
+Ver ejemplo en [`templates/character-mod/stand_definition.lua`](../templates/character-mod/stand_definition.lua).
 
 Campos principales:
 
 ```lua
 {
-    id = "generic_stand",
+    id = "star_platinum",
     discItem = Isaac.GetItemIdByName("Stand"),
     familiarVariant = 13000,
     particleVariant = 13001,
@@ -192,17 +202,35 @@ Campos principales:
 
 ## Convenciones
 
+### Nomenclatura JJBA+
+
+Prefijo de marca visible en el launcher: **`JJBA+`**.
+
+| Capa | Convención | Ejemplo |
+|------|------------|---------|
+| Nombre en launcher (`metadata.xml`) | `JJBA+ {Nombre}` | `JJBA+ Jotaro` |
+| Carpeta del mod | `jjbaplus-{slug}` | `jjbaplus-jotaro` |
+| `RegisterMod` (ID Lua estable) | `Maxo13:JJBAPlus_{Nombre}` | `Maxo13:JJBAPlus_Jotaro` |
+| Personaje (`players.xml`) | PascalCase, sin espacios | `Jotaro` |
+| Stand id (`stand_definition`) | snake_case | `star_platinum` |
+| Disco (`items.xml`) | nombre único | `Star Platinum Disc` |
+| Gfx namespace | slug del mod | `gfx/jotaro/` |
+| Sonidos combate | `{Personaje}_PunchLight` | `Jotaro_PunchLight` |
+| Sonidos cry | `{StandPascal}_Cry_Start` | `StarPlatinum_Cry_Start` |
+
+Registro central de variant IDs y mods: [`docs/variant_ids.json`](../variant_ids.json).
+
 ### Variant IDs de entidades
 
-Reservar pares consecutivos por stand:
+Reservar pares consecutivos por stand (asignados automáticamente por el scaffold):
 
 | Stand | Familiar | Partícula |
 |-------|----------|-----------|
-| `generic_stand` | 13000 | 13001 |
-| *(próximo)* | 13002 | 13003 |
+| *(primer personaje)* | 13000 | 13001 |
+| *(segundo)* | 13002 | 13003 |
 | *(próximo)* | 13004 | 13005 |
 
-Fórmula sugerida: `13000 + 2*n` (familiar) y `+ 1` (partícula).
+Fórmula: `13000 + 2*n` (familiar) y `+ 1` (partícula).
 
 ### Behaviors
 
@@ -217,38 +245,47 @@ Fórmula sugerida: `13000 + 2*n` (familiar) y `+ 1` (partícula).
 
 Usar nombres únicos por stand: `"Star Platinum Disc"`, no `"Stand"` genérico (salvo el stand base de prueba).
 
-### Mod IDs
+### Mod IDs (`RegisterMod`)
 
-| Mod | RegisterMod |
-|-----|-------------|
-| Framework | `Maxo13:JoJoStandFramework` |
-| Stand User | `Maxo13:JoJoStandUser` |
-| Futuros | `Maxo13:JoJo_<Nombre>` |
+| Mod | Launcher | RegisterMod |
+|-----|----------|-------------|
+| Framework | JJBA+ Framework | `Maxo13:JJBAPlus_Framework` |
+| Personajes | JJBA+ {Nombre} | `Maxo13:JJBAPlus_{Nombre}` |
 
 ---
 
-## Crear un mod de stand nuevo
+## Crear un mod de personaje nuevo
 
-1. Copiar estructura de `jojo-stand-user/` como plantilla.
-2. Reservar variant IDs en la tabla de arriba.
-3. Definir `stand_definition.lua` + assets (`content/`, `resources/gfx/`).
-4. En `main.lua`:
+### Script scaffold (recomendado)
 
-```lua
-local JSF = _G.JoJoStandFramework
-if not JSF then return end
-JSF:RegisterStand(require("stand_definition"))
+```powershell
+.\scripts\new-character-mod.ps1 `
+  -CharacterName Jotaro `
+  -StandName "Star Platinum"
 ```
 
-5. Agregar junction en `install-mods.ps1` o carpeta `mods-test/`.
-6. Probar con framework + nuevo mod activos.
+Deriva slugs: `jotaro` → carpeta `jjbaplus-jotaro`, `star_platinum` → stand id. Opcional: `-Id`, `-StandId` para override.
+
+Genera `jjbaplus-jotaro/` desde `templates/character-mod/` con:
+
+- `metadata.xml`, `main.lua`, definiciones Lua
+- `content/*.xml` (players, items, entities2, costumes, sounds)
+- Assets placeholder copiados de `templates/placeholder-assets/` en `content/gfx/{slug}/`
+- Variants y registro en `docs/variant_ids.json`
+- Junction en `scripts/install-mods.ps1` (vía `scripts/update-install-mods.ps1`; launcher: `install-mods.cmd`)
+
+Editá sprites directamente en `content/gfx/{slug}/` — Isaac no usa carpeta `resources/`.
+
+1. Usar `templates/character-mod/` (vía script scaffold).
+2. Registrar el mod en `docs/variant_ids.json`.
+3. Ejecutar `.\scripts\update-install-mods.ps1`.
 
 ---
 
 ## Checklist de prueba manual
 
 - [ ] Solo framework activo → no crashea (sin stands registrados no hay gameplay visible)
-- [ ] Framework + stand-user → personaje StandUser con disco y familiar
+- [ ] Framework + personaje generado → disco y familiar visibles
 - [ ] Combate: carga → rush → punch flurry
 - [ ] Super: meter carga y activa con tecla configurada (`C` / L3)
 - [ ] Cambio de sala: fade del stand + persistencia de meter
@@ -261,7 +298,7 @@ JSF:RegisterStand(require("stand_definition"))
 
 - Puede quedar código legacy en la raíz del repo (`src/`, `content/` del mod viejo). No debe cargarse como mod; conviene limpiarlo.
 - Tainted StandUser comentado en `players.xml`; hooks ya preparados en `stand_definition.lua`.
-- Sonidos referenciados en `sounds.xml`; verificar que los `.wav` estén en `content/sounds/stand_user/`.
+- Sonidos referenciados en `sounds.xml`; verificar que los `.wav` estén en `content/sounds/{slug}/`.
 - Swap de discos usa `MC_PRE_PICKUP_COLLISION` (vanilla). El disco anterior se suelta en el pedestal vacío más cercano o en el suelo.
 
 ---
@@ -283,4 +320,4 @@ Ver [credit.txt](../credit.txt).
 | Fecha | Notas |
 |-------|-------|
 | 2026-07-05 | Split framework + stand-user; API v1; este documento inicial |
-| 2026-07-05 | Swap de discos migrado a `MC_PRE_PICKUP_COLLISION`; sin dependencia de Repentogon |
+| 2026-07-05 | Eliminado mod jugable stand-user; assets en `templates/placeholder-assets/` |

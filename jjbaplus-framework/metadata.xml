@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+    <name>JJBA+ Framework</name>
+    <directory>jjbaplus_framework</directory>
+    <id>0</id>
+    <description>JJBA+ core framework: stand combat, meter, disc swapping, and RegisterStand API. Required by all JJBA+ character mods.</description>
+    <version>2.0</version>
+    <visibility>Public</visibility>
+    <tag id="Lua"/>
+    <tag id="Familiars"/>
+</metadata>

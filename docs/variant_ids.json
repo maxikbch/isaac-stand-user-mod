@@ -1,0 +1,13 @@
+﻿{
+  "familyPrefix": "JJBA+",
+  "authorNamespace": "Maxo13:JJBAPlus",
+  "baseVariant": 13000,
+  "mods": [
+    {
+      "folder": "jjbaplus-framework",
+      "type": "framework",
+      "displayName": "Framework",
+      "registerMod": "Maxo13:JJBAPlus_Framework"
+    }
+  ]
+}
