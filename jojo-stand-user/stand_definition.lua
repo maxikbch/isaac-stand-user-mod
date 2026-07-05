@@ -1,0 +1,56 @@
+local character = require("character_definition")
+local stats = require("stand_stats")
+
+return {
+    id = "generic_stand",
+    discItem = Isaac.GetItemIdByName("Stand"),
+    familiarVariant = Isaac.GetEntityVariantByName("Stand"),
+    particleVariant = Isaac.GetEntityVariantByName("Stand Particle"),
+    floatOffset = Vector(0, -36),
+
+    animations = {
+        spIdle = { "IdleE", "IdleS", "IdleW", "IdleN" },
+        spMad = { "MadE", "MadS", "MadW", "MadN" },
+        spWind = { "Wind2E", "Wind2S", "Wind2W", "Wind2N" },
+        spWound = { "Wound2E", "Wound2S", "Wound2W", "Wound2N" },
+        spFlash = { "FlashE", "FlashS", "FlashW", "FlashN" },
+        spReady = { "ReadyE", "ReadyS", "ReadyW", "ReadyN" },
+        spRush = { "RushE", "RushS", "RushW", "RushN" },
+        spPunch = { "PunchE", "PunchS", "PunchW", "PunchN" },
+        spOra = { "OraE", "OraS", "OraW", "OraN" },
+        spParticle = { "ParticleE", "ParticleS", "ParticleW", "ParticleN" },
+    },
+
+    stats = stats,
+
+    sounds = {
+        punchlight = Isaac.GetSoundIdByName("Stand_PunchLight"),
+        punchheavy = Isaac.GetSoundIdByName("Stand_PunchHeavy"),
+        punchready = Isaac.GetSoundIdByName("Stand_PunchReady"),
+        whoosh = Isaac.GetSoundIdByName("Stand_Whoosh"),
+        cryStart = Isaac.GetSoundIdByName("StarPlatinum_Cry_Start"),
+        cryMid = Isaac.GetSoundIdByName("StarPlatinum_Cry_Mid"),
+        cryFinish = Isaac.GetSoundIdByName("StarPlatinum_Cry_Finish"),
+        cry = Isaac.GetSoundIdByName("StarPlatinum_Cry"),
+    },
+
+    linkedCharacters = {
+        character.Type,
+        character.Type2,
+    },
+
+    hooks = {
+        getMaxPunches = function(player, standDef)
+            if player:GetPlayerType() == character.Type2 then
+                return standDef.stats.Punches
+            end
+            return standDef.stats.Punches + math.ceil((player.ShotSpeed - 1) * 4)
+        end,
+        getFinisherDamageMult = function(player, standDef)
+            if player:GetPlayerType() == character.Type2 then
+                return standDef.stats.DamageBirthrightFinisherB
+            end
+            return standDef.stats.DamageBirthrightFinisher
+        end,
+    },
+}

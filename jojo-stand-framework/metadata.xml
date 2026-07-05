@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+    <name>JoJo Stand Framework</name>
+    <directory>jojo_stand_framework</directory>
+    <id>0</id>
+    <description>Core framework for JoJo stand mods. Provides stand combat, meter, disc swapping, and RegisterStand API. Required by JoJo stand content mods.</description>
+    <version>2.0</version>
+    <visibility>Public</visibility>
+    <tag id="Lua"/>
+    <tag id="Familiars"/>
+</metadata>
