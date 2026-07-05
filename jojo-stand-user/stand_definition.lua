@@ -4,8 +4,8 @@ local stats = require("stand_stats")
 return {
     id = "generic_stand",
     discItem = Isaac.GetItemIdByName("Stand"),
-    familiarVariant = Isaac.GetEntityVariantByName("Stand"),
-    particleVariant = Isaac.GetEntityVariantByName("Stand Particle"),
+    familiarVariant = 13000,
+    particleVariant = 13001,
     floatOffset = Vector(0, -36),
 
     animations = {

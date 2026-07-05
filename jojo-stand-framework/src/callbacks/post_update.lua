@@ -1,4 +1,5 @@
 local Settings = require("src/constants/settings")
+local debug = require("src/debug")
 
 local StandUpdate = require("src/core/update")
 local SetStand = require("src/core/set")
@@ -14,6 +15,7 @@ return function(jsf)
 
         local standDef = jsf:GetActiveStand(player)
         if not standDef then
+            debug:LogEvery(60, "postUpdateNoStand", "post_update skip: GetActiveStand nil for player " .. tostring(index))
             return
         end
 
@@ -24,7 +26,19 @@ return function(jsf)
         StandSuper(player, standDef, jsfData)
     end
 
+    local function resetStandLinks()
+        for _, standDef in ipairs(jsf:GetAllStandDefs()) do
+            for _, en in ipairs(Isaac.GetRoomEntities()) do
+                if en.Type == EntityType.ENTITY_FAMILIAR and en.Variant == standDef.familiarVariant then
+                    en:GetData().linked = false
+                end
+            end
+        end
+    end
+
     local function PostUpdate()
+        debug:LogEvery(120, "postUpdateAlive", "post_update tick frame=" .. tostring(Game():GetFrameCount()))
+        resetStandLinks()
         utils:ForAllPlayers(ForEachPlayer)
         StandClear(jsf:GetAllStandDefs())
     end

@@ -64,14 +64,13 @@ return function(mod)
         local config = Isaac.GetItemConfig()
         for i = 0, Game():GetNumPlayers() - 1 do
             local player = Isaac.GetPlayer(i)
-            if player.BabySkin == -1 then
-                if player:GetPlayerType() == character.Type then
-                    player:AddNullCostume(character.Costume1)
-                elseif player:GetPlayerType() == character.Type2 then
-                    player:AddNullCostume(character.Costume2)
-                    local meat = config:GetCollectible(CollectibleType.COLLECTIBLE_MEAT)
-                    player:AddCostume(meat, false)
-                end
+            if not player or not player:Exists() then
+            elseif player:GetPlayerType() == character.Type then
+                player:AddNullCostume(character.Costume1)
+            elseif player:GetPlayerType() == character.Type2 then
+                player:AddNullCostume(character.Costume2)
+                local meat = config:GetCollectible(CollectibleType.COLLECTIBLE_MEAT)
+                player:AddCostume(meat, false)
             end
         end
     end)

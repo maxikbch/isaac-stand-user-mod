@@ -4,6 +4,7 @@ return {
 	ExtraSounds = true, --- remove sounds like stand crys if they are too annoying
 	ReapplyCostume = true, -- overrides other costumes which take the same layers as hair and clothes every room
 	VisibleTarget = true, -- shows a target to further assist with aiming
+	DebugStand = true, -- Isaac.DebugString logs for stand spawn debugging (disable when done)
 
 	--KEYS
 	KEY_PRIMARY = Keyboard.KEY_C, --Keyboard primary ability button

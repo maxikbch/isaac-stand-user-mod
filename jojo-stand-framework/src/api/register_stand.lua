@@ -1,5 +1,6 @@
 local defaultStats = require("src/constants/default_stats")
 local utils = require("src/utils")
+local debug = require("src/debug")
 
 local REQUIRED_FIELDS = { "id", "discItem", "familiarVariant" }
 
@@ -12,6 +13,10 @@ local function validateStandDef(def)
 
     if def.discItem == CollectibleType.COLLECTIBLE_NULL or def.discItem == -1 then
         error("[JoJoStandFramework] RegisterStand invalid discItem for stand: " .. tostring(def.id))
+    end
+
+    if def.familiarVariant <= 0 then
+        error("[JoJoStandFramework] RegisterStand invalid familiarVariant for stand: " .. tostring(def.id))
     end
 end
 
@@ -50,5 +55,13 @@ return function(registry)
         for _, playerType in ipairs(def.linkedCharacters) do
             registry.characterToStand[playerType] = def.id
         end
+
+        debug:Log(string.format(
+            "RegisterStand ok id=%s disc=%s variant=%s linkedChars=%d",
+            def.id,
+            tostring(def.discItem),
+            tostring(def.familiarVariant),
+            #def.linkedCharacters
+        ))
     end
 end

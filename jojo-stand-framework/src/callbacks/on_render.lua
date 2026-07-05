@@ -3,6 +3,7 @@ local RenderMeter = require("src/meter/bar")
 local RenderStandHead = require("src/meter/stand_head")
 local RenderButton = require("src/meter/button")
 local utils = require("src/utils")
+local debug = require("src/debug")
 
 local x1 = 36
 local x2 = 360
@@ -39,6 +40,7 @@ return function(jsf)
 
     return function()
         utils:ForAllPlayers(ForEachPlayer)
+        debug:Render()
         frame = frame + 1
     end
 end

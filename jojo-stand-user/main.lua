@@ -7,6 +7,7 @@ end
 local mod = RegisterMod("Maxo13:JoJoStandUser", 1)
 
 JSF:RegisterStand(require("stand_definition"))
+Isaac.DebugString("[JSF-User] RegisterStand finished")
 
 local registerCharacterCallbacks = require("character_callbacks")
 registerCharacterCallbacks(mod)

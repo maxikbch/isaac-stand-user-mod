@@ -6,6 +6,9 @@ initApi(mod)
 local jsf = _G.JoJoStandFramework
 local utils = require("src/utils")
 local data = require("src/data")
+local debug = require("src/debug")
+
+debug:Log("Framework main loaded API v" .. tostring(jsf.API_VERSION))
 
 local PostUpdate = require("src/callbacks/post_update")(jsf)
 mod:AddCallback(ModCallbacks.MC_POST_UPDATE, PostUpdate)

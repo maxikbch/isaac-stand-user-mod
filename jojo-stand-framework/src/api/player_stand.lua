@@ -1,4 +1,5 @@
 local utils = require("src/utils")
+local debug = require("src/debug")
 
 local function ensurePlayerData(player)
     local playerData = player:GetData()
@@ -51,10 +52,21 @@ return function(registry)
             if player:HasCollectible(discItem) then
                 jsf.activeStandId = standId
                 jsf.activeDiscItem = discItem
+                debug:LogEvery(60, "activeStandResolved", string.format(
+                    "GetActiveStandId resolved=%s disc=%s playerType=%s",
+                    standId,
+                    tostring(discItem),
+                    tostring(player:GetPlayerType())
+                ))
                 return standId
             end
         end
 
+        debug:LogEvery(60, "activeStandMissing", string.format(
+            "GetActiveStandId nil playerType=%s hasDisc=%s",
+            tostring(player:GetPlayerType()),
+            tostring(jsf.activeDiscItem)
+        ))
         return nil
     end
 
@@ -120,21 +132,35 @@ return function(registry)
         local standId = registry.characterToStand[playerType]
 
         if not standId then
+            debug:Log(string.format(
+                "EnsureLinkedStandDisc skip playerType=%s (not linked)",
+                tostring(playerType)
+            ))
             return
         end
 
         local standDef = registry.stands[standId]
         if not standDef then
+            debug:Log("EnsureLinkedStandDisc missing standDef for " .. tostring(standId))
             return
         end
 
-        if not player:HasCollectible(standDef.discItem) then
+        local hadDisc = player:HasCollectible(standDef.discItem)
+        if not hadDisc then
             player:AddCollectible(standDef.discItem, 0, false)
         end
 
         local jsf = ensurePlayerData(player)
         jsf.activeStandId = standId
         jsf.activeDiscItem = standDef.discItem
+
+        debug:Log(string.format(
+            "EnsureLinkedStandDisc ok stand=%s disc=%s hadDisc=%s nowHas=%s",
+            standId,
+            tostring(standDef.discItem),
+            tostring(hadDisc),
+            tostring(player:HasCollectible(standDef.discItem))
+        ))
     end
 
     function api:GetAllStandDefs()
