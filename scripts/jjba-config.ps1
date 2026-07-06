@@ -1,6 +1,7 @@
 $script:JJBA_FamilyPrefix = "JJBA+"
 $script:JJBA_AuthorNamespace = "Maxo13:JJBAPlus"
-$script:JJBA_BaseVariant = 13000
+$script:JJBA_ModTag = 13
+$script:JJBA_MaxModVariant = 99
 $script:JJBA_RepoRoot = Split-Path -Parent $PSScriptRoot
 $script:JJBA_VariantIdsPath = Join-Path $JJBA_RepoRoot "docs\variant_ids.json"
 $script:JJBA_TemplatePath = Join-Path $JJBA_RepoRoot "template"
@@ -22,17 +23,40 @@ function Save-JJBAVariantRegistry {
     Set-Content -Path $JJBA_VariantIdsPath -Value $json -Encoding UTF8
 }
 
-function Get-JJBANextVariantPair {
+function Resolve-JJBAVariant {
+    param(
+        [int]$ModTag,
+        [int]$ModVariant
+    )
+    if ($ModVariant -lt 0 -or $ModVariant -gt $JJBA_MaxModVariant) {
+        throw "modVariant out of range (0..$JJBA_MaxModVariant): $ModVariant"
+    }
+    return $ModTag * 100 + $ModVariant
+}
+
+function Get-JJBANextStandIndex {
     param($Registry)
-    $maxVariant = $JJBA_BaseVariant - 2
+    $maxIndex = -1
     foreach ($mod in $Registry.mods) {
-        if ($null -ne $mod.familiarVariant -and $mod.familiarVariant -gt $maxVariant) {
-            $maxVariant = [int]$mod.familiarVariant
+        if ($null -eq $mod.standIndex) {
+            continue
+        }
+        $index = [int]$mod.standIndex
+        if ($index -lt 0) {
+            continue
+        }
+        if ($index -gt $maxIndex) {
+            $maxIndex = $index
         }
     }
+    return $maxIndex + 1
+}
+
+function Get-JJBAStandEntityDefaults {
+    param([int]$ModTag = $JJBA_ModTag)
     return @{
-        Familiar = $maxVariant + 2
-        Particle = $maxVariant + 3
+        StandVariant = Resolve-JJBAVariant -ModTag $ModTag -ModVariant 0
+        ParticleVariant = Resolve-JJBAVariant -ModTag $ModTag -ModVariant 1
     }
 }
 

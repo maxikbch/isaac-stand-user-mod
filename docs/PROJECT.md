@@ -197,14 +197,25 @@ Expuesta al cargar el framework. Versión: `JSF.API_VERSION = 1`.
 
 ### Schema de `stand_definition.lua`
 
-Ver ejemplo en [`template/stand_definition.lua`](../template/stand_definition.lua).
+Ver ejemplo en [`template/mod/stand_definition.lua`](../template/mod/stand_definition.lua).
 
 ```lua
 {
     id = "star_platinum",
     discItem = Isaac.GetItemIdByName("Star Platinum Disc"),
-    familiarVariant = 13000,
-    particleVariant = 13001,
+    standIndex = 0,
+    entities = {
+        stand = {
+            name = "Star Platinum",
+            type = 3,
+            modVariant = 0,
+        },
+        particle = {
+            name = "Star Platinum Particle",
+            type = 1000,
+            modVariant = 1,
+        },
+    },
     floatOffset = Vector(0, -36),
     animations = { spIdle = {...}, spMad = {...}, ... },
     stats = { ChargeLength = 7, Punches = 5, ... },
@@ -240,17 +251,32 @@ El **`+`** solo aparece en el nombre visible del launcher. Carpetas e ids Lua ev
 | Sonidos combate | `{Personaje}_PunchLight` | `Jotaro_PunchLight` |
 | Sonidos cry | `{StandPascal}_Cry_Start` | `StarPlatinum_Cry_Start` |
 
-### Variant IDs de entidades
+### Entity IDs (stands y VFX)
 
-Asignados automáticamente por el scaffold. Fuente de verdad: `variant_ids.json`.
+Fuente de verdad: `variant_ids.json`. El framework resuelve IDs al registrar el stand.
 
-| Personaje (orden) | Familiar | Partícula |
-|-------------------|----------|-----------|
-| 1.º | 13000 | 13001 |
-| 2.º | 13002 | 13003 |
-| n.º | `13000 + 2*(n-1)` | `+ 1` |
+| Campo | Rol | Ejemplo |
+|-------|-----|---------|
+| `modTag` | Bloque del pack (global) | `13` → rango `1300–1399` |
+| `modVariant` | Slot de entidad dentro del pack | `0` stand, `1` partícula |
+| `standIndex` | Stand/personaje → `SubType` en Isaac | `0` Jotaro, `-1` UI Debug (`255`) |
+| `type` | Clase de entidad (`entities2.xml`) | `3` familiar, `1000` effect |
 
-`entities2.xml` debe usar **`version="5"`** (Repentance+).
+**Fórmulas:**
+
+- `variant = modTag * 100 + modVariant` (máx. Isaac: `4095`)
+- `subtype = standIndex` para personajes (`0..254`); `standIndex = -1` → `subtype 255` (slot debug)
+
+**Spawn runtime:** `(type, variant, subtype)`  
+**Match/clear en framework:** `(variant, subtype)`
+
+| Personaje | standIndex | Stand (type, variant, subtype) | Partícula |
+|-----------|------------|--------------------------------|-----------|
+| Jotaro | `0` | `(3, 1300, 0)` | `(1000, 1301, 0)` |
+| UI Debug | `-1` | `(3, 1300, 255)` | `(1000, 1301, 255)` |
+| n.º | `0..254` | `(3, 1300, n)` | `(1000, 1301, n)` |
+
+`modVariant` `2+` queda reservado para entidades extra del stand. `entities2.xml` debe usar **`version="5"`** (Repentance+).
 
 ### Behaviors
 

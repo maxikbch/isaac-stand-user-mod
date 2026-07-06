@@ -5,8 +5,19 @@ local timeStop = require("jotaro.time_stop")
 return {
     id = "star_platinum",
     discItem = Isaac.GetItemIdByName("Star Platinum Disc"),
-    familiarVariant = 13000,
-    particleVariant = 13001,
+    standIndex = 0,
+    entities = {
+        stand = {
+            name = "Star Platinum",
+            type = 3,
+            modVariant = 0,
+        },
+        particle = {
+            name = "Star Platinum Particle",
+            type = 1000,
+            modVariant = 1,
+        },
+    },
     floatOffset = Vector(0, -36),
 
     animations = {

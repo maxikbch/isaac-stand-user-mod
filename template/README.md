@@ -32,8 +32,10 @@ Los `.anm2` de menú deben usar una animación llamada igual que `<player name="
 | `{{STAND_ID}}` | star_platinum |
 | `{{STAND_NAME}}` | Star Platinum |
 | `{{DISC_NAME}}` | Star Platinum Disc |
-| `{{FAMILIAR_VARIANT}}` | 13002 |
-| `{{PARTICLE_VARIANT}}` | 13003 |
+| `{{STAND_INDEX}}` | 0 |
+| `{{MOD_TAG}}` | 13 |
+| `{{STAND_VARIANT}}` | 1300 |
+| `{{PARTICLE_VARIANT}}` | 1301 |
 | `{{GFX_NAMESPACE}}` | jotaro |
 | `{{SOUND_PREFIX}}` | Jotaro |
 | `{{STAND_NAME_PASCAL}}` | StarPlatinum |

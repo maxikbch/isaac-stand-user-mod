@@ -1,8 +1,11 @@
 local defaultStats = require("src/constants/default_stats")
+local entityIds = require("src/constants/entity_ids")
+local entities = require("src/core/entities")
 local utils = require("src/utils")
 local debug = require("src/debug")
 
-local REQUIRED_FIELDS = { "id", "discItem", "familiarVariant" }
+local REQUIRED_FIELDS = { "id", "discItem", "standIndex", "entities" }
+local REQUIRED_ENTITY_KINDS = { entityIds.KIND_STAND, entityIds.KIND_PARTICLE }
 
 local SLOT_NAMES = { "skill1", "skill2" }
 
@@ -99,6 +102,49 @@ local function normalizeSkills(def)
     end
 end
 
+local function normalizeEntities(def)
+    def.modTag = def.modTag or entityIds.DEFAULT_MOD_TAG
+    entities.ValidateModTag(def.modTag)
+    entities.ValidateStandIndex(def.standIndex)
+
+    for _, kind in ipairs(REQUIRED_ENTITY_KINDS) do
+        local defaults = entityIds.DEFAULT_ENTITIES[kind]
+        local entityDef = def.entities[kind] or {}
+        def.entities[kind] = entityDef
+
+        if entityDef.type == nil then
+            entityDef.type = defaults.type
+        end
+        if entityDef.modVariant == nil then
+            entityDef.modVariant = defaults.modVariant
+        end
+
+        entities.ValidateModVariant(entityDef.modVariant)
+
+        local resolved = entities.ResolveEntity(def.modTag, def.standIndex, entityDef)
+        for key, value in pairs(resolved) do
+            entityDef[key] = value
+        end
+    end
+
+    for kind, entityDef in pairs(def.entities) do
+        local isRequired = false
+        for _, requiredKind in ipairs(REQUIRED_ENTITY_KINDS) do
+            if kind == requiredKind then
+                isRequired = true
+                break
+            end
+        end
+        if not isRequired and entityDef.modVariant ~= nil and not entityDef.variant then
+            entities.ValidateModVariant(entityDef.modVariant)
+            local resolved = entities.ResolveEntity(def.modTag, def.standIndex, entityDef)
+            for key, value in pairs(resolved) do
+                entityDef[key] = value
+            end
+        end
+    end
+end
+
 local function validateStandDef(def)
     for _, field in ipairs(REQUIRED_FIELDS) do
         if def[field] == nil then
@@ -110,8 +156,10 @@ local function validateStandDef(def)
         error("[JoJoStandFramework] RegisterStand invalid discItem for stand: " .. tostring(def.id))
     end
 
-    if def.familiarVariant <= 0 then
-        error("[JoJoStandFramework] RegisterStand invalid familiarVariant for stand: " .. tostring(def.id))
+    for _, kind in ipairs(REQUIRED_ENTITY_KINDS) do
+        if def.entities[kind] == nil then
+            error("[JoJoStandFramework] RegisterStand missing entities." .. kind .. " for stand: " .. tostring(def.id))
+        end
     end
 end
 
@@ -127,10 +175,10 @@ local function normalizeStandDef(def)
         end
     end
 
-    def.particleVariant = def.particleVariant or (def.familiarVariant + 1)
     def.floatOffset = def.floatOffset or Vector(0, -36)
     def.meterGfx = def.meterGfx or {}
 
+    normalizeEntities(def)
     normalizeChargePools(def)
     normalizeSlots(def)
     normalizeSkills(def)
@@ -161,11 +209,15 @@ return function(registry)
             skillCount = skillCount + 1
         end
 
+        local standEntity = def.entities[entityIds.KIND_STAND]
         debug:Log(string.format(
-            "RegisterStand ok id=%s disc=%s variant=%s linkedChars=%d skills=%d",
+            "RegisterStand ok id=%s disc=%s standIndex=%s stand=(%s,%s,%s) linkedChars=%d skills=%d",
             def.id,
             tostring(def.discItem),
-            tostring(def.familiarVariant),
+            tostring(def.standIndex),
+            tostring(standEntity.type),
+            tostring(standEntity.variant),
+            tostring(standEntity.subtype),
             #def.linkedCharacters,
             skillCount
         ))

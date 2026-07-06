@@ -9,7 +9,7 @@ template/
 ├── *.lua, metadata.xml          → raíz del mod generado (tokens expandidos)
 ├── content/
 │   ├── *.xml                    → content/ del mod (tokens expandidos)
-│   └── gfx/                     → menú (content/gfx/); .anm2 con Jotaro
+│   └── gfx/                     → menú (content/gfx/); .anm2 con {{CHARACTER_NAME}}
 └── resources/
     ├── gfx/
     │   ├── character/           → resources/gfx/{slug}/ (gameplay)
@@ -26,17 +26,19 @@ Los `.anm2` de menú deben usar una animación llamada igual que `<player name="
 
 | Token | Ejemplo |
 |-------|---------|
-| `JJBA+ Jotaro` | JJBA+ Jotaro |
-| `Maxo13:JJBAPlus_Jotaro` | Maxo13:JJBAPlus_Jotaro |
-| `Jotaro` | Jotaro |
-| `star_platinum` | star_platinum |
-| `Star Platinum` | Star Platinum |
-| `Star Platinum Disc` | Star Platinum Disc |
-| `13000` | 13002 |
-| `13001` | 13003 |
-| `jotaro` | jotaro |
-| `Jotaro` | Jotaro |
-| `StarPlatinum` | StarPlatinum |
-| `jjbaplus_jotaro` | jjbaplus_jotaro |
+| `{{DISPLAY_NAME}}` | JJBA+ Jotaro |
+| `{{REGISTER_MOD}}` | Maxo13:JJBAPlus_Jotaro |
+| `{{CHARACTER_NAME}}` | Jotaro |
+| `{{STAND_ID}}` | star_platinum |
+| `{{STAND_NAME}}` | Star Platinum |
+| `{{DISC_NAME}}` | Star Platinum Disc |
+| `{{STAND_INDEX}}` | 0 |
+| `{{MOD_TAG}}` | 13 |
+| `{{STAND_VARIANT}}` | 1300 |
+| `{{PARTICLE_VARIANT}}` | 1301 |
+| `{{GFX_NAMESPACE}}` | jotaro |
+| `{{SOUND_PREFIX}}` | Jotaro |
+| `{{STAND_NAME_PASCAL}}` | StarPlatinum |
+| `{{METADATA_DIRECTORY}}` | jjbaplus_jotaro |
 
 Los sonidos placeholder se copian desde `template/resources/sounds/character/` al generar el mod.

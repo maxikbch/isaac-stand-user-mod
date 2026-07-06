@@ -1,5 +1,7 @@
 local Settings = require("src/constants/settings")
 local debug = require("src/debug")
+local entities = require("src/core/entities")
+local entityIds = require("src/constants/entity_ids")
 
 local StandInput = require("src/core/input")
 local StandUpdate = require("src/core/update")
@@ -31,7 +33,7 @@ return function(jsf)
     local function resetStandLinks()
         for _, standDef in ipairs(jsf:GetAllStandDefs()) do
             for _, en in ipairs(Isaac.GetRoomEntities()) do
-                if en.Type == EntityType.ENTITY_FAMILIAR and en.Variant == standDef.familiarVariant then
+                if entities.Matches(standDef, entityIds.KIND_STAND, en) then
                     en:GetData().linked = false
                 end
             end

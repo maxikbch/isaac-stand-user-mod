@@ -1,4 +1,6 @@
 local debug = require("src/debug")
+local entities = require("src/core/entities")
+local entityIds = require("src/constants/entity_ids")
 
 local function SetStand(player, standDef, jsf)
     if not player:HasCollectible(standDef.discItem) then
@@ -15,13 +17,14 @@ local function SetStand(player, standDef, jsf)
     end
 
     if player:HasCollectible(standDef.discItem) and (not jsf.standEntity or not jsf.standEntity:Exists()) then
-        local standEntity = Isaac.Spawn(EntityType.ENTITY_FAMILIAR, standDef.familiarVariant, 0, player.Position, Vector(0, 0), player)
+        local standEntity = entities.Spawn(standDef, entityIds.KIND_STAND, player.Position, Vector(0, 0), player)
         jsf.standEntity = standEntity
         standEntity.Parent = player
         standEntity:GetData().linked = true
         debug:Log(string.format(
-            "SetStand spawned variant=%s type=%s exists=%s idx=%s",
-            tostring(standDef.familiarVariant),
+            "SetStand spawned variant=%s subtype=%s type=%s exists=%s idx=%s",
+            tostring(standEntity.Variant),
+            tostring(standEntity.SubType),
             tostring(standEntity.Type),
             tostring(standEntity:Exists()),
             tostring(standEntity.InitSeed or "na")
@@ -29,8 +32,9 @@ local function SetStand(player, standDef, jsf)
     elseif jsf.standEntity and jsf.standEntity:Exists() then
         jsf.standEntity:GetData().linked = true
         debug:LogEvery(120, "setStandKeep", string.format(
-            "SetStand keep entity variant=%s alpha=%s behavior=%s",
+            "SetStand keep entity variant=%s subtype=%s alpha=%s behavior=%s",
             tostring(jsf.standEntity.Variant),
+            tostring(jsf.standEntity.SubType),
             tostring(jsf.standEntity:GetData().alpha),
             tostring(jsf.standEntity:GetData().behavior)
         ))

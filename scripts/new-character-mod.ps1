@@ -56,7 +56,9 @@ if (-not $DiscName) {
     $DiscName = "$StandName Disc"
 }
 
-$variants = Get-JJBANextVariantPair -Registry $registry
+$standIndex = Get-JJBANextStandIndex -Registry $registry
+$modTag = if ($registry.modTag) { [int]$registry.modTag } else { $JJBA_ModTag }
+$entityVariants = Get-JJBAStandEntityDefaults -ModTag $modTag
 $gfxNamespace = $Id
 $soundPrefix = ConvertTo-PascalCase -Value $CharacterName
 $standNamePascal = ConvertTo-PascalCase -Value $StandName
@@ -73,8 +75,10 @@ $tokens = @{
     "{{STAND_NAME}}" = $StandName
     "{{DISC_NAME}}" = $DiscName
     "{{DISC_DESCRIPTION}}" = $DiscDescription
-    "{{FAMILIAR_VARIANT}}" = [string]$variants.Familiar
-    "{{PARTICLE_VARIANT}}" = [string]$variants.Particle
+    "{{STAND_INDEX}}" = [string]$standIndex
+    "{{MOD_TAG}}" = [string]$modTag
+    "{{STAND_VARIANT}}" = [string]$entityVariants.StandVariant
+    "{{PARTICLE_VARIANT}}" = [string]$entityVariants.ParticleVariant
     "{{GFX_NAMESPACE}}" = $gfxNamespace
     "{{SOUND_PREFIX}}" = $soundPrefix
     "{{STAND_NAME_PASCAL}}" = $standNamePascal
@@ -152,8 +156,19 @@ $newEntry = [ordered]@{
     standName = $StandName
     discName = $DiscName
     gfxNamespace = $gfxNamespace
-    familiarVariant = $variants.Familiar
-    particleVariant = $variants.Particle
+    standIndex = $standIndex
+    entities = [ordered]@{
+        stand = [ordered]@{
+            name = $StandName
+            type = 3
+            modVariant = 0
+        }
+        particle = [ordered]@{
+            name = "$StandName Particle"
+            type = 1000
+            modVariant = 1
+        }
+    }
 }
 
 $registry.mods += [pscustomobject]$newEntry
@@ -168,7 +183,8 @@ Write-Host "  Mod slug:     $Id (folder $modFolder)"
 Write-Host "  Stand name:   $StandName"
 Write-Host "  Stand id:     $StandId"
 Write-Host "  RegisterMod:  $registerMod"
-Write-Host "  Variants:     $($variants.Familiar) / $($variants.Particle)"
+Write-Host "  Stand index:  $standIndex (subtype)"
+Write-Host "  Variants:     $($entityVariants.StandVariant) / $($entityVariants.ParticleVariant) (modTag $modTag)"
 Write-Host ""
 Write-Host "Next steps:"
 Write-Host "  1. Run .\install-mods.cmd (or .\scripts\install-mods.ps1)"

@@ -1,6 +1,8 @@
 local Settings = require("src/constants/settings")
 local utils = require("src/utils")
 local debug = require("src/debug")
+local entities = require("src/core/entities")
+local entityIds = require("src/constants/entity_ids")
 
 return function(jsf)
     local function ForEachPlayer(player, index)
@@ -13,10 +15,15 @@ return function(jsf)
         local jsfData = jsf:GetPlayerData(player)
 
         if not jsfData.standEntity or not jsfData.standEntity:Exists() then
-            jsfData.standEntity = Isaac.Spawn(EntityType.ENTITY_FAMILIAR, standDef.familiarVariant, 0, player.Position, Vector(0, 0), player)
+            jsfData.standEntity = entities.Spawn(standDef, entityIds.KIND_STAND, player.Position, Vector(0, 0), player)
             jsfData.standEntity.Parent = player
             jsfData.standEntity:GetData().linked = true
-            debug:Log("on_room_enter spawned stand variant=" .. tostring(standDef.familiarVariant))
+            local standEntity = standDef.entities[entityIds.KIND_STAND]
+            debug:Log(string.format(
+                "on_room_enter spawned stand variant=%s subtype=%s",
+                tostring(standEntity.variant),
+                tostring(standEntity.subtype)
+            ))
         else
             jsfData.standEntity:GetData().linked = true
             debug:Log("on_room_enter reused existing stand entity")

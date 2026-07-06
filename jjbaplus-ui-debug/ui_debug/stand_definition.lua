@@ -4,8 +4,19 @@ local stats = require("ui_debug.stand_stats")
 return {
     id = "ui_debug",
     discItem = Isaac.GetItemIdByName("UI Debug Disc"),
-    familiarVariant = 12998,
-    particleVariant = 12999,
+    standIndex = -1,
+    entities = {
+        stand = {
+            name = "UI Debug Stand",
+            type = 3,
+            modVariant = 0,
+        },
+        particle = {
+            name = "UI Debug Stand Particle",
+            type = 1000,
+            modVariant = 1,
+        },
+    },
     floatOffset = Vector(0, -36),
 
     animations = {

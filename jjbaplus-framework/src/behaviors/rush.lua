@@ -1,6 +1,8 @@
 local standChecks = require("src/core/checks")
 local utils = require("src/utils")
 local Settings = require("src/constants/settings")
+local entities = require("src/core/entities")
+local entityIds = require("src/constants/entity_ids")
 
 return function(player, standDef, jsf, shootDir)
     local playerData = player:GetData()
@@ -64,7 +66,7 @@ return function(player, standDef, jsf, shootDir)
         standData.behavior = 'attack'
     end
 
-    local fade = Isaac.Spawn(1000, standDef.particleVariant, 0, standEntity.Position, Vector(0, 0), nil)
+    local fade = entities.Spawn(standDef, entityIds.KIND_PARTICLE, standEntity.Position, Vector(0, 0), nil)
     local fadeSprite = fade:GetSprite()
     fade.PositionOffset = standEntity.PositionOffset
     if standData.launchdir.Y == -1 then

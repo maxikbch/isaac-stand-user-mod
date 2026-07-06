@@ -4,8 +4,19 @@ local stats = require("{{ID}}.stand_stats")
 return {
     id = "{{STAND_ID}}",
     discItem = Isaac.GetItemIdByName("{{DISC_NAME}}"),
-    familiarVariant = {{FAMILIAR_VARIANT}},
-    particleVariant = {{PARTICLE_VARIANT}},
+    standIndex = {{STAND_INDEX}},
+    entities = {
+        stand = {
+            name = "{{STAND_NAME}}",
+            type = 3,
+            modVariant = 0,
+        },
+        particle = {
+            name = "{{STAND_NAME}} Particle",
+            type = 1000,
+            modVariant = 1,
+        },
+    },
     floatOffset = Vector(0, -36),
 
     animations = {

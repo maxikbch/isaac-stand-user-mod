@@ -61,7 +61,7 @@ Los `.anm2` de menú deben declarar una animación con el mismo nombre que el pe
 
 El `+` solo aparece en el nombre visible del launcher; carpetas usan `jjbaplus-` e ids Lua `Maxo13:JJBAPlus_*`.
 
-Variant IDs: [docs/variant_ids.json](docs/variant_ids.json) (primer personaje: `13000` / `13001`).
+Variant IDs: [docs/variant_ids.json](docs/variant_ids.json) (`modTag` 13 → variants `1300`/`1301`, `standIndex` por personaje).
 
 ## API v1 (`_G.JoJoStandFramework`)
 
@@ -70,7 +70,7 @@ local JSF = _G.JoJoStandFramework
 JSF:RegisterStand(require("stand_definition"))
 ```
 
-Referencia de definición: `template/stand_definition.lua`
+Referencia de definición: `template/mod/stand_definition.lua`
 
 ## Scripts
 
