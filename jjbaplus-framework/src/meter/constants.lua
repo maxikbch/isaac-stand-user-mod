@@ -1,8 +1,8 @@
 return {
     PATHS = {
-        verticalLarge = "gfx/ui/ui_chargebar.anm2",
-        verticalSmall = "gfx/ui/ui_chargebar_small.anm2",
-        circular = "gfx/ui/chargebar.anm2",
+        verticalLarge = "gfx/ui/jjbaplus_ui_chargebar.anm2",
+        verticalSmall = "gfx/ui/jjbaplus_ui_chargebar_small.anm2",
+        circular = "gfx/ui/jjbaplus_chargebar.anm2",
     },
 
     BAR_HEIGHT_LARGE = 32,

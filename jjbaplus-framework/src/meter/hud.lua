@@ -100,13 +100,9 @@ end
 
 return function(frame, anchor, player, standState, standDef, meterGfx)
     local root = anchor + Constants.HUD_ORIGIN
-
-    renderChargeBars(root, standState, standDef)
-
-    local headPos = root + Constants.STAND_HEAD
-    RenderStandHead(headPos, standState, meterGfx)
-
     local slots = standDef.slots or {}
+
+    -- Ability slots first so charge bars and stand head draw on top.
     renderSkillSlot(root, 0, frame, player, standState, standDef, "skill1", slots.skill1)
     renderSkillSlot(
         root,
@@ -118,4 +114,9 @@ return function(frame, anchor, player, standState, standDef, meterGfx)
         "skill2",
         slots.skill2
     )
+
+    renderChargeBars(root, standState, standDef)
+
+    local headPos = root + Constants.STAND_HEAD
+    RenderStandHead(headPos, standState, meterGfx)
 end

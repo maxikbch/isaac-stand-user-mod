@@ -2,7 +2,7 @@
 	<Info CreatedBy="robot" CreatedOn="5/19/2014 11:39:29 AM" Version="103" Fps="30"/>
 	<Content>
 		<Spritesheets>
-			<Spritesheet Path="chargebar.png" Id="0"/>
+			<Spritesheet Path="jjbaplus_chargebar.png" Id="0"/>
 		</Spritesheets>
 		<Layers>
 			<Layer Name="bg" Id="0" SpritesheetId="0"/>
