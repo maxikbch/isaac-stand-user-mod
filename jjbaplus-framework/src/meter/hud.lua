@@ -34,6 +34,16 @@ local function getSlotSkillDef(standDef, slotDef, player, standState)
     return skillId, standDef.skills and standDef.skills[skillId]
 end
 
+local function resolveFillColor(skillDef, poolDef)
+    if skillDef and skillDef.fillColor then
+        return skillDef.fillColor
+    end
+    if poolDef and poolDef.fillColor then
+        return poolDef.fillColor
+    end
+    return nil
+end
+
 local function renderChargeBars(anchor, standState, standDef)
     local meterPools = getMeterPools(standDef)
     if #meterPools == 0 then
@@ -51,7 +61,8 @@ local function renderChargeBars(anchor, standState, standDef)
             SkillState.getCharge(standState, poolId),
             poolDef.maxCharge,
             #meterPools == 1,
-            poolDef.fillColor
+            poolDef.fillColor,
+            poolDef.divisions
         )
     end
 end
@@ -71,7 +82,7 @@ local function renderSkillSlot(anchor, yOffset, frame, player, standState, stand
     local duration = skillId and SkillState.getDuration(standState, skillId) or 0
     local maxDuration = skillDef and skillDef.duration or 0
 
-    local fillColor = poolDef and poolDef.fillColor
+    local fillColor = resolveFillColor(skillDef, poolDef)
 
     if requiresCharge then
         RenderCircularMeter.render(

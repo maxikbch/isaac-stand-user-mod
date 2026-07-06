@@ -47,6 +47,7 @@ return {
             chargePool = "secondary",
             useCost = stats.AltMaxCharge,
             cooldown = 0,
+            fillColor = Color(1, 0.85, 0.2, 1, 0, 0, 0),
         },
         test_free = {
             kind = "instant",

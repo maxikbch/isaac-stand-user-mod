@@ -4,7 +4,7 @@ local PRESETS = {
     {
         name = "1 bar + skill1 (charge)",
         pools = {
-            primary = { maxCharge = 80, gainOnHit = true },
+            primary = { maxCharge = 80, gainOnHit = true, divisions = 4 },
         },
         skill1 = { enabled = true, skill = "test_active", requiresCharge = true, chargePool = "primary" },
         skill2 = { enabled = false },
@@ -12,8 +12,8 @@ local PRESETS = {
     {
         name = "2 bars + skill1+skill2 (charge)",
         pools = {
-            primary = { maxCharge = 80, gainOnHit = true },
-            secondary = { maxCharge = 40, gainOnHit = false },
+            primary = { maxCharge = 80, gainOnHit = true, divisions = 4, fillColor = Color(0.2, 0.5, 1, 1, 0, 0, 0) },
+            secondary = { maxCharge = 40, gainOnHit = false, divisions = 2, fillColor = Color(1, 0.3, 0.1, 1, 0, 0, 0) },
         },
         skill1 = { enabled = true, skill = "test_active", requiresCharge = true, chargePool = "primary" },
         skill2 = { enabled = true, skill = "test_instant", requiresCharge = true, chargePool = "secondary" },
@@ -89,6 +89,8 @@ local function applyPreset(standDef, index)
             maxCharge = poolDef.maxCharge,
             gainOnHit = poolDef.gainOnHit,
             meter = poolDef.meter,
+            divisions = poolDef.divisions,
+            fillColor = poolDef.fillColor,
         }
     end
 

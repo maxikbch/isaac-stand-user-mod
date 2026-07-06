@@ -14,6 +14,8 @@ return {
     },
     CHARGE_BAR_SPACING = 15,
     ABILITY_SLOT_SPACING = 14,
+    -- Vanilla BarOverlay{N} animations available in vertical bar anm2 files.
+    BAR_OVERLAY_DIVISIONS = { 1, 2, 3, 4, 5, 6, 8, 12 },
     CIRCULAR_SCALE = 1,
     CIRCULAR_BG = {
         skill1 = "BgSkill1",
@@ -25,10 +27,10 @@ return {
     SPRITE_COLOR_WHITE = Color(1, 1, 1, 1, 0, 0, 0),
 
     -- Move the entire stand meter block on screen (coop slot offsets stay in utils).
-    HUD_ORIGIN = Vector(0, 4),
+    HUD_ORIGIN = Vector(12, 22),
 
     -- Offsets from HUD_ORIGIN (layout between bar, head, ability slots).
-    CHARGE_BAR = Vector(44, 17),
-    STAND_HEAD = Vector(18, 8),
-    ABILITY_COLUMN = Vector(56, 9),
+    CHARGE_BAR = Vector(26, 9),
+    STAND_HEAD = Vector(0, 0),
+    ABILITY_COLUMN = Vector(38, 1),
 }
