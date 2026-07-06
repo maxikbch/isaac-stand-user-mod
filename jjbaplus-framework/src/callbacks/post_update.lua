@@ -1,6 +1,7 @@
 local Settings = require("src/constants/settings")
 local debug = require("src/debug")
 
+local StandInput = require("src/core/input")
 local StandUpdate = require("src/core/update")
 local SetStand = require("src/core/set")
 local StandClear = require("src/core/clear")
@@ -38,6 +39,7 @@ return function(jsf)
     end
 
     local function PostUpdate()
+        StandInput:OnPostUpdate()
         debug:LogEvery(120, "postUpdateAlive", "post_update tick frame=" .. tostring(Game():GetFrameCount()))
         LocalControllers:Update()
         resetStandLinks()

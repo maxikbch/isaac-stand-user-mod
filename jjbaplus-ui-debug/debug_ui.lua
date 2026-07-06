@@ -143,26 +143,29 @@ return function(JSF)
                 return
             end
 
-            if Input.IsButtonTriggered(Keyboard.KEY_F7, 0) then
+            JSF:OnInputUpdate()
+            local controllerIndex = player.ControllerIndex
+
+            if JSF:WasButtonPressedEdge(controllerIndex, Keyboard.KEY_F7) then
                 presetIndex = presetIndex % #PRESETS + 1
                 applyCurrentPreset(player)
-            elseif Input.IsButtonTriggered(Keyboard.KEY_F6, 0) then
+            elseif JSF:WasButtonPressedEdge(controllerIndex, Keyboard.KEY_F6) then
                 presetIndex = presetIndex - 1
                 if presetIndex < 1 then
                     presetIndex = #PRESETS
                 end
                 applyCurrentPreset(player)
-            elseif Input.IsButtonTriggered(Keyboard.KEY_F8, 0) then
+            elseif JSF:WasButtonPressedEdge(controllerIndex, Keyboard.KEY_F8) then
                 standState.charges = standState.charges or {}
                 for poolId, poolDef in pairs(standDef.chargePools or {}) do
                     standState.charges[poolId] = math.floor((poolDef.maxCharge or 0) * 0.5)
                 end
-            elseif Input.IsButtonTriggered(Keyboard.KEY_F9, 0) then
+            elseif JSF:WasButtonPressedEdge(controllerIndex, Keyboard.KEY_F9) then
                 standState.charges = standState.charges or {}
                 for poolId, poolDef in pairs(standDef.chargePools or {}) do
                     standState.charges[poolId] = poolDef.maxCharge or 0
                 end
-            elseif Input.IsButtonTriggered(Keyboard.KEY_F10, 0) then
+            elseif JSF:WasButtonPressedEdge(controllerIndex, Keyboard.KEY_F10) then
                 local skillId = standDef.slots.skill1.skill
                 local skillDef = standDef.skills[skillId]
                 if skillDef and skillDef.duration and skillDef.duration > 0 then

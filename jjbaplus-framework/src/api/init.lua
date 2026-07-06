@@ -1,5 +1,6 @@
 local registerStandFactory = require("src/api/register_stand")
 local playerStandFactory = require("src/api/player_stand")
+local StandInput = require("src/core/input")
 
 return function(mod)
     local registry = {
@@ -52,6 +53,14 @@ return function(mod)
 
     mod.GetAllStandDefs = function(_)
         return playerApi:GetAllStandDefs()
+    end
+
+    mod.OnInputUpdate = function(_)
+        StandInput:OnPostUpdate()
+    end
+
+    mod.WasButtonPressedEdge = function(_, controllerIndex, button)
+        return StandInput:WasButtonPressedEdge(controllerIndex, button)
     end
 
     mod._playerApi = playerApi

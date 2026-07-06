@@ -1,6 +1,7 @@
 local StandInput = require("src/core/input")
 local SkillState = require("src/skills/state")
 local SkillResolve = require("src/skills/resolve")
+local utils = require("src/utils")
 
 local SLOT_BINDINGS = {
     skill1 = function(index) return StandInput:IsSkill1Triggered(index) end,
@@ -238,11 +239,13 @@ return function(player, standDef, jsf)
     jsf.standState = jsf.standState or {}
     SkillState.ensurePools(jsf.standState, standDef.chargePools)
 
-    local controllerIndex = player.ControllerIndex
+    if not Game():IsPaused() and utils:IsLocallyControlledPlayer(player) then
+        local controllerIndex = player.ControllerIndex
 
-    for slotName, isTriggered in pairs(SLOT_BINDINGS) do
-        if isTriggered(controllerIndex) then
-            tryActivateSlot(slotName, player, standDef, jsf)
+        for slotName, isTriggered in pairs(SLOT_BINDINGS) do
+            if isTriggered(controllerIndex) then
+                tryActivateSlot(slotName, player, standDef, jsf)
+            end
         end
     end
 
