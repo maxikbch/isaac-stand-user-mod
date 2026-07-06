@@ -27,11 +27,13 @@ return {
         return get(Constants.PATHS.verticalSmall, "vertical_small_fill")
     end,
 
-    getCircularBar = function()
-        return get(Constants.PATHS.circular, "circular")
+    getCircularBar = function(slotName)
+        local key = "circular_" .. (slotName or "skill1")
+        return get(Constants.PATHS.circular, key)
     end,
 
-    getButtons = function()
-        return get(Constants.PATHS.buttons, "buttons")
+    getCircularBg = function(slotName)
+        local key = "circular_bg_" .. (slotName or "skill1")
+        return get(Constants.PATHS.circular, key)
     end,
 }

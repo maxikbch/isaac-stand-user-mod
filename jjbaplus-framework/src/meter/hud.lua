@@ -1,7 +1,6 @@
 local Constants = require("src/meter/constants")
 local RenderVerticalBar = require("src/meter/vertical_bar")
 local RenderCircularMeter = require("src/meter/circular_meter")
-local RenderButtonGlyph = require("src/meter/button_glyph")
 local RenderStandHead = require("src/meter/stand_head")
 local SkillState = require("src/skills/state")
 local SkillResolve = require("src/skills/resolve")
@@ -71,26 +70,19 @@ local function renderSkillSlot(anchor, yOffset, frame, player, standState, stand
     local duration = skillId and SkillState.getDuration(standState, skillId) or 0
     local maxDuration = skillDef and skillDef.duration or 0
 
-    local glyphCenter = Vector(16, 8)
     if requiresCharge then
-        local meterCenter = RenderCircularMeter.render(
+        RenderCircularMeter.render(
             slotPos,
             charge,
             useCost,
             duration,
             maxDuration,
-            frame
+            frame,
+            slotName
         )
-        if meterCenter then
-            glyphCenter = meterCenter
-        end
+    else
+        RenderCircularMeter.renderBg(slotPos, slotName)
     end
-
-    RenderButtonGlyph.render(
-        slotPos + glyphCenter,
-        player.ControllerIndex,
-        slotName
-    )
 end
 
 return function(frame, anchor, player, standState, standDef, meterGfx)
