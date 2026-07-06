@@ -9,5 +9,8 @@ Write-Host "Linked JJBA+ Framework -> jjbaplus-framework"
 cmd /c mklink /J "$mods\jjbaplus-jotaro" "$repo\jjbaplus-jotaro"
 Write-Host "Linked JJBA+ Jotaro -> jjbaplus-jotaro"
 
+cmd /c mklink /J "$mods\jjbaplus-ui-debug" "$repo\jjbaplus-ui-debug"
+Write-Host "Linked JJBA+ UI Debug -> jjbaplus-ui-debug"
+
 Write-Host ""
 Write-Host "JJBA+ mods linked. Enable Framework first, then character mods."

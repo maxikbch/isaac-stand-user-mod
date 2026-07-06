@@ -15,16 +15,17 @@ local function renderBg(position, slotName, scale)
     bg.Scale = Vector(1, 1)
 end
 
-local function render(position, charge, maxCharge, duration, maxDuration, frame, slotName)
+local function render(position, charge, maxCharge, duration, maxDuration, frame, slotName, fillColor)
     slotName = slotName or "skill1"
     local sprite = Sprites.getCircularBar(slotName)
     local scale = Constants.CIRCULAR_SCALE
     local center = Vector(16 * scale, 16 * scale)
     local renderPos = position
+    local tint = fillColor or Constants.DEFAULT_CHARGE_COLOR
 
     if duration and duration > 0 and maxDuration and maxDuration > 0 then
         local pct = duration / maxDuration
-        local chargingFrame = math.floor((1 - pct) * (CHARGING_FRAMES - 1))
+        local chargingFrame = math.floor(pct * (CHARGING_FRAMES - 1))
         sprite:SetFrame("Charging", chargingFrame)
     elseif maxCharge > 0 and charge >= maxCharge then
         if not sprite:IsPlaying("Charged") then
@@ -38,8 +39,10 @@ local function render(position, charge, maxCharge, duration, maxDuration, frame,
     renderBg(renderPos, slotName, scale)
 
     sprite.Scale = Vector(scale, scale)
+    sprite.Color = tint
     sprite:RenderLayer(CHARGE_LAYER, renderPos, Vector(0, 0), Vector(0, 0))
     sprite:RenderLayer(PULSE_LAYER, renderPos, Vector(0, 0), Vector(0, 0))
+    sprite.Color = Constants.SPRITE_COLOR_WHITE
     sprite.Scale = Vector(1, 1)
 
     if not Game():IsPaused() then

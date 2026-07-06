@@ -1,0 +1,3 @@
+<players root="gfx/character/characters/players/" portraitroot="gfx/character/ui/boss/" nameimageroot="gfx/character/ui/boss/" bigportraitroot="gfx/character/ui/stage/">
+	<player name="UI Debug" skin="character.png" hp="6" coins="99" skinColor="-1" nameimage="playername.png" portrait="playerportrait.png" bigportrait="playerportrait.png" birthright="UI test character" />
+</players>

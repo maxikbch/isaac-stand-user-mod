@@ -20,6 +20,10 @@ return {
         skill2 = "BgSkill2",
     },
 
+    -- Default green tint for grayscale charge sprites (vertical + circular fill).
+    DEFAULT_CHARGE_COLOR = Color(0.28, 1, 0.22, 1, 0, 0, 0),
+    SPRITE_COLOR_WHITE = Color(1, 1, 1, 1, 0, 0, 0),
+
     -- Move the entire stand meter block on screen (coop slot offsets stay in utils).
     HUD_ORIGIN = Vector(0, 0),
 

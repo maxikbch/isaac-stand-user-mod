@@ -1,0 +1,84 @@
+local character = require("character_definition")
+local stats = require("stand_stats")
+
+return {
+    id = "ui_debug",
+    discItem = Isaac.GetItemIdByName("UI Debug Disc"),
+    familiarVariant = 12998,
+    particleVariant = 12999,
+    floatOffset = Vector(0, -36),
+
+    animations = {
+        spIdle = { "IdleE", "IdleS", "IdleW", "IdleN" },
+        spMad = { "MadE", "MadS", "MadW", "MadN" },
+        spWind = { "Wind2E", "Wind2S", "Wind2W", "Wind2N" },
+        spWound = { "Wound2E", "Wound2S", "Wound2W", "Wound2N" },
+        spFlash = { "FlashE", "FlashS", "FlashW", "FlashN" },
+        spReady = { "ReadyE", "ReadyS", "ReadyW", "ReadyN" },
+        spRush = { "RushE", "RushS", "RushW", "RushN" },
+        spPunch = { "PunchE", "PunchS", "PunchW", "PunchN" },
+        spOra = { "OraE", "OraS", "OraW", "OraN" },
+        spParticle = { "ParticleE", "ParticleS", "ParticleW", "ParticleN" },
+    },
+
+    stats = stats,
+
+    meterGfx = {
+        head = "gfx/character/ui/stand_head.anm2",
+    },
+
+    chargePools = {
+        primary = {
+            maxCharge = stats.SuperMaxCharge,
+            gainOnHit = true,
+        },
+    },
+
+    skills = {
+        test_active = {
+            kind = "active",
+            chargePool = "primary",
+            useCost = stats.SuperMaxCharge,
+            duration = stats.SuperDuration,
+            cooldown = 0,
+        },
+        test_instant = {
+            kind = "instant",
+            chargePool = "secondary",
+            useCost = stats.AltMaxCharge,
+            cooldown = 0,
+        },
+        test_free = {
+            kind = "instant",
+            cooldown = 0,
+        },
+    },
+
+    slots = {
+        skill1 = {
+            enabled = true,
+            skill = "test_active",
+            requiresCharge = true,
+            chargePool = "primary",
+        },
+        skill2 = {
+            enabled = false,
+        },
+    },
+
+    sounds = {
+        punchlight = Isaac.GetSoundIdByName("Character_PunchLight"),
+        punchheavy = Isaac.GetSoundIdByName("Character_PunchHeavy"),
+        punchready = Isaac.GetSoundIdByName("Character_PunchReady"),
+        whoosh = Isaac.GetSoundIdByName("Character_Whoosh"),
+        cryStart = Isaac.GetSoundIdByName("Character_Cry_Start"),
+        cryMid = Isaac.GetSoundIdByName("Character_Cry_Mid"),
+        cryFinish = Isaac.GetSoundIdByName("Character_Cry_Finish"),
+        cry = Isaac.GetSoundIdByName("Character_Cry"),
+    },
+
+    linkedCharacters = {
+        character.Type,
+        character.Type2,
+    },
+}

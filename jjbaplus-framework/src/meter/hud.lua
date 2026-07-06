@@ -50,7 +50,8 @@ local function renderChargeBars(anchor, standState, standDef)
             barPos + Vector(0, yOffset),
             SkillState.getCharge(standState, poolId),
             poolDef.maxCharge,
-            #meterPools == 1
+            #meterPools == 1,
+            poolDef.fillColor
         )
     end
 end
@@ -70,6 +71,8 @@ local function renderSkillSlot(anchor, yOffset, frame, player, standState, stand
     local duration = skillId and SkillState.getDuration(standState, skillId) or 0
     local maxDuration = skillDef and skillDef.duration or 0
 
+    local fillColor = poolDef and poolDef.fillColor
+
     if requiresCharge then
         RenderCircularMeter.render(
             slotPos,
@@ -78,10 +81,20 @@ local function renderSkillSlot(anchor, yOffset, frame, player, standState, stand
             duration,
             maxDuration,
             frame,
-            slotName
+            slotName,
+            fillColor
         )
     else
-        RenderCircularMeter.renderBg(slotPos, slotName)
+        RenderCircularMeter.render(
+            slotPos,
+            1,
+            1,
+            duration,
+            maxDuration,
+            frame,
+            slotName,
+            fillColor
+        )
     end
 end
 

@@ -11,7 +11,7 @@ local function getTopLeftClamp(charge, maxCharge, large)
     return Vector(0, math.max(clipFull, meterClip))
 end
 
-local function renderFill(position, charge, maxCharge, large)
+local function renderFill(position, charge, maxCharge, large, fillColor)
     if maxCharge <= 0 then
         return
     end
@@ -26,7 +26,9 @@ local function renderFill(position, charge, maxCharge, large)
 
     local fill = Sprites.getVerticalBarFill(large)
     fill:SetFrame("BarFull", 0)
+    fill.Color = fillColor or Constants.DEFAULT_CHARGE_COLOR
     fill:Render(position, getTopLeftClamp(charge, maxCharge, large), Vector(0, 0))
+    fill.Color = Constants.SPRITE_COLOR_WHITE
 end
 
 return {

@@ -1,0 +1,15 @@
+return {
+    ChargeLength = 7,
+    RangeMult = 8,
+    MinimumRange = 60,
+    Punches = 3,
+    Damage = 0.4,
+    DamageLastHit = 1,
+    Knockback = 5,
+    KnockbackLastHitMult = 2,
+    PunchSize = 6,
+    SuperMaxCharge = 80,
+    SuperDuration = 120,
+    SuperCooldown = 0,
+    AltMaxCharge = 40,
+}

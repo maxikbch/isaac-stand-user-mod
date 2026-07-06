@@ -21,6 +21,19 @@
                      "gfxNamespace":  "jotaro",
                      "familiarVariant":  13000,
                      "particleVariant":  13001
+                 },
+                 {
+                     "folder":  "jjbaplus-ui-debug",
+                     "type":  "character",
+                     "displayName":  "UI Debug",
+                     "registerMod":  "Maxo13:JJBAPlus_UI_Debug",
+                     "characterName":  "UI Debug",
+                     "standId":  "ui_debug",
+                     "standName":  "UI Debug Stand",
+                     "discName":  "UI Debug Disc",
+                     "gfxNamespace":  "character",
+                     "familiarVariant":  12998,
+                     "particleVariant":  12999
                  }
              ]
 }
