@@ -3,12 +3,34 @@ $script:JJBA_AuthorNamespace = "Maxo13:JJBAPlus"
 $script:JJBA_ModTag = 13
 $script:JJBA_MaxModVariant = 99
 $script:JJBA_RepoRoot = Split-Path -Parent $PSScriptRoot
+$script:JJBA_IsaacModsPath = $null
+
+$localConfig = Join-Path $PSScriptRoot "jjba.local.ps1"
+if (Test-Path $localConfig) {
+    . $localConfig
+}
+
 $script:JJBA_VariantIdsPath = Join-Path $JJBA_RepoRoot "docs\variant_ids.json"
 $script:JJBA_TemplatePath = Join-Path $JJBA_RepoRoot "template"
 $script:JJBA_TemplateCharacterGfxPath = Join-Path $JJBA_TemplatePath "resources\gfx\character"
 $script:JJBA_TemplateMenuGfxPath = Join-Path $JJBA_TemplatePath "content\gfx"
 $script:JJBA_TemplateFrameworkGfxPath = Join-Path $JJBA_TemplatePath "resources\gfx\framework"
 $script:JJBA_TemplateCharacterSoundsPath = Join-Path $JJBA_TemplatePath "resources\sounds\character"
+
+function Get-JJBAIsaacModsPath {
+    if ($JJBA_IsaacModsPath) {
+        return $JJBA_IsaacModsPath
+    }
+    $parent = Split-Path -Parent $JJBA_RepoRoot
+    if ((Split-Path -Leaf $parent) -eq "mods") {
+        return $parent
+    }
+    throw @"
+JJBA Isaac mods path not configured.
+Copy scripts/jjba.local.ps1.example to scripts/jjba.local.ps1 and set:
+  `$script:JJBA_IsaacModsPath = "D:\...\The Binding of Isaac Rebirth\mods"
+"@
+}
 
 function Get-JJBAVariantRegistry {
     if (-not (Test-Path $JJBA_VariantIdsPath)) {

@@ -10,30 +10,6 @@
             "registerMod": "Maxo13:JJBAPlus_Framework"
         },
         {
-            "folder": "jjbaplus-jotaro",
-            "type": "character",
-            "displayName": "Jotaro",
-            "registerMod": "Maxo13:JJBAPlus_Jotaro",
-            "characterName": "Jotaro",
-            "standId": "star_platinum",
-            "standName": "Star Platinum",
-            "discName": "Star Platinum Disc",
-            "gfxNamespace": "jotaro",
-            "standIndex": 0,
-            "entities": {
-                "stand": {
-                    "name": "Star Platinum",
-                    "type": 3,
-                    "modVariant": 0
-                },
-                "particle": {
-                    "name": "Star Platinum Particle",
-                    "type": 1000,
-                    "modVariant": 1
-                }
-            }
-        },
-        {
             "folder": "jjbaplus-ui-debug",
             "type": "character",
             "displayName": "UI Debug",
@@ -52,6 +28,30 @@
                 },
                 "particle": {
                     "name": "UI Debug Stand Particle",
+                    "type": 1000,
+                    "modVariant": 1
+                }
+            }
+        },
+        {
+            "folder": "jjbaplus-jotaro",
+            "type": "character",
+            "displayName": "Jotaro",
+            "registerMod": "Maxo13:JJBAPlus_Jotaro",
+            "characterName": "Jotaro",
+            "standId": "star_platinum",
+            "standName": "Star Platinum",
+            "discName": "Star Platinum Disc",
+            "gfxNamespace": "jotaro",
+            "standIndex": 0,
+            "entities": {
+                "stand": {
+                    "name": "Star Platinum",
+                    "type": 3,
+                    "modVariant": 0
+                },
+                "particle": {
+                    "name": "Star Platinum Particle",
                     "type": 1000,
                     "modVariant": 1
                 }

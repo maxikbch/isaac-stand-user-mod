@@ -12,6 +12,14 @@ Documentación: [docs/PROJECT.md](docs/PROJECT.md) · Registro de IDs: [docs/var
 
 ## Instalación
 
+El repo puede vivir en cualquier carpeta (por ejemplo `D:\El Baul De Maxo\Proyectos\isaac-stand-user-mod`). Los junctions se crean en la carpeta `mods/` de Isaac apuntando al repo.
+
+Si el repo **no** está dentro de `.../The Binding of Isaac Rebirth/mods/`, copiá `scripts/jjba.local.ps1.example` a `scripts/jjba.local.ps1` y configurá la ruta de `mods`:
+
+```powershell
+$script:JJBA_IsaacModsPath = "D:\SteamLibrary\steamapps\common\The Binding of Isaac Rebirth\mods"
+```
+
 ```powershell
 .\install-mods.cmd
 ```
@@ -90,6 +98,7 @@ Referencia de definición: `template/mod/stand_definition.lua`
 | `setup-framework-assets.ps1` | Sincroniza sprites del HUD del framework desde `template/resources/gfx/framework/`. |
 | `update-install-mods.ps1` | Regenera `scripts/install-mods.ps1` a partir de `docs/variant_ids.json`. Lo llama `new-character-mod.ps1` al crear un personaje. |
 | `jjba-config.ps1` | Constantes y helpers compartidos (prefijo JJBA+, slugs, variant IDs). No se ejecuta solo; lo importan los otros scripts. |
+| `jjba.local.ps1` | Config local opcional: ruta a `mods/` de Isaac. Ver `jjba.local.ps1.example`. |
 
 ## Créditos
 

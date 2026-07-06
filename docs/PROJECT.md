@@ -66,6 +66,8 @@ isaac-stand-user-mod/              ← repo contenedor (NO es un mod de Isaac)
 ├── jjbaplus-{slug}/               ← mods de personaje (ej. jjbaplus-jotaro)
 ├── scripts/
 │   ├── jjba-config.ps1            ← constantes y helpers
+│   ├── jjba.local.ps1             ← opcional: ruta a mods/ de Isaac (gitignored)
+│   ├── jjba.local.ps1.example     ← plantilla de config local
 │   ├── new-character-mod.ps1      ← scaffold de personajes
 │   ├── install-mods.ps1           ← junctions (auto-generado)
 │   └── update-install-mods.ps1    ← regenera install-mods.ps1
@@ -75,18 +77,20 @@ isaac-stand-user-mod/              ← repo contenedor (NO es un mod de Isaac)
 └── credit.txt
 ```
 
-Isaac solo carga carpetas **directas** dentro de `mods/`. Cada mod jugable se expone con junction:
+Isaac solo carga carpetas **directas** dentro de `mods/`. Cada mod jugable se expone con junction hacia el repo (que puede vivir fuera de `mods/`):
 
 ```powershell
 .\install-mods.cmd
 # o: .\scripts\install-mods.ps1
 ```
 
+Si el repo no es hijo directo de `mods/`, copiar `scripts/jjba.local.ps1.example` → `scripts/jjba.local.ps1` y definir `JJBA_IsaacModsPath`.
+
 Ejemplo de junctions:
 
 ```
-mods/jjbaplus-framework  →  repo/jjbaplus-framework
-mods/jjbaplus-jotaro     →  repo/jjbaplus-jotaro
+<Isaac>/mods/jjbaplus-framework  →  <repo>/jjbaplus-framework
+<Isaac>/mods/jjbaplus-jotaro     →  <repo>/jjbaplus-jotaro
 ```
 
 ### Orden de carga
@@ -121,7 +125,8 @@ El scaffold copia desde `template/` a `resources/gfx/{slug}/`, `content/gfx/` (m
 | `scripts/install-mods.ps1` | Igual que `install-mods.cmd` (auto-generado). |
 | `scripts/update-install-mods.ps1` | Regenera `install-mods.ps1` desde `variant_ids.json`. |
 | `scripts/setup-framework-assets.ps1` | Sincroniza HUD del framework desde `template/resources/gfx/framework/`. |
-| `scripts/jjba-config.ps1` | Helpers compartidos (slugs, namespace, variants). |
+| `scripts/jjba-config.ps1` | Helpers compartidos (slugs, namespace, variants, ruta a `mods/`). |
+| `scripts/jjba.local.ps1` | Config local: `JJBA_IsaacModsPath` (opcional si el repo está en `mods/`). |
 
 ---
 
