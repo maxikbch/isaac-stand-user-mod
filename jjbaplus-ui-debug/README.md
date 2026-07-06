@@ -15,7 +15,7 @@ Personaje de prueba para recorrer layouts del stand meter.
 | **F9** | Carga al 100% |
 | **F10** | Simular descarga de skill1 (duración activa) |
 | **C / R3** | Activar skill1 (si tiene carga) |
-| **Shift / L3** | Activar skill2 |
+| **X / L3** | Activar skill2 |
 
 ## Presets (9)
 

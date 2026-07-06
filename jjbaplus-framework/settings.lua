@@ -10,8 +10,8 @@ return {
 	KEY_SKILL1 = Keyboard.KEY_C,
 	BUTTON_SKILL1 = 13, -- STICK_RIGHT (R3) on XInput layout
 
-	-- Skill2: Left Shift / L3 (left stick click)
-	KEY_SKILL2 = Keyboard.KEY_LEFT_SHIFT,
+	-- Skill2: X / L3 (left stick click)
+	KEY_SKILL2 = Keyboard.KEY_X,
 	BUTTON_SKILL2 = 10, -- STICK_LEFT (L3) on XInput layout
 
 }
