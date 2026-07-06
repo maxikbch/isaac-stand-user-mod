@@ -1,11 +1,12 @@
-local character = require("character_definition")
-local stats = require("stand_stats")
+local character = require("jotaro.character_definition")
+local stats = require("jotaro.stand_stats")
+local timeStop = require("jotaro.time_stop")
 
 return {
-    id = "{{STAND_ID}}",
-    discItem = Isaac.GetItemIdByName("{{DISC_NAME}}"),
-    familiarVariant = {{FAMILIAR_VARIANT}},
-    particleVariant = {{PARTICLE_VARIANT}},
+    id = "star_platinum",
+    discItem = Isaac.GetItemIdByName("Star Platinum Disc"),
+    familiarVariant = 13000,
+    particleVariant = 13001,
     floatOffset = Vector(0, -36),
 
     animations = {
@@ -24,7 +25,7 @@ return {
     stats = stats,
 
     meterGfx = {
-        head = "gfx/character/ui/stand_head.anm2",
+        head = "gfx/jotaro/ui/stand_head.anm2",
     },
 
     chargePools = {
@@ -35,20 +36,22 @@ return {
     },
 
     skills = {
-        -- Example active skill on skill1 (rename id and wire callbacks as needed)
-        example_skill = {
+        time_stop = {
             kind = "active",
             chargePool = "primary",
             useCost = stats.SuperMaxCharge,
             duration = stats.SuperDuration,
             cooldown = stats.SuperCooldown,
+            onActivate = function(ctx)
+                timeStop.onActivate(ctx.player, ctx.standDef)
+            end,
         },
     },
 
     slots = {
         skill1 = {
             enabled = true,
-            skill = "example_skill",
+            skill = "time_stop",
             requiresCharge = true,
             chargePool = "primary",
         },
@@ -58,14 +61,19 @@ return {
     },
 
     sounds = {
-        punchlight = Isaac.GetSoundIdByName("{{SOUND_PREFIX}}_PunchLight"),
-        punchheavy = Isaac.GetSoundIdByName("{{SOUND_PREFIX}}_PunchHeavy"),
-        punchready = Isaac.GetSoundIdByName("{{SOUND_PREFIX}}_PunchReady"),
-        whoosh = Isaac.GetSoundIdByName("{{SOUND_PREFIX}}_Whoosh"),
-        cryStart = Isaac.GetSoundIdByName("{{STAND_NAME_PASCAL}}_Cry_Start"),
-        cryMid = Isaac.GetSoundIdByName("{{STAND_NAME_PASCAL}}_Cry_Mid"),
-        cryFinish = Isaac.GetSoundIdByName("{{STAND_NAME_PASCAL}}_Cry_Finish"),
-        cry = Isaac.GetSoundIdByName("{{STAND_NAME_PASCAL}}_Cry"),
+        punchlight = Isaac.GetSoundIdByName("Jotaro_PunchLight"),
+        punchheavy = Isaac.GetSoundIdByName("Jotaro_PunchHeavy"),
+        punchready = Isaac.GetSoundIdByName("Jotaro_PunchReady"),
+        whoosh = Isaac.GetSoundIdByName("Jotaro_Whoosh"),
+        cryStart = Isaac.GetSoundIdByName("StarPlatinum_Cry_Start"),
+        cryMid = Isaac.GetSoundIdByName("StarPlatinum_Cry_Mid"),
+        cryFinish = Isaac.GetSoundIdByName("StarPlatinum_Cry_Finish"),
+        cry = Isaac.GetSoundIdByName("StarPlatinum_Cry"),
+        zaWarudo = Isaac.GetSoundIdByName("StarPlatinum_ZaWarudo"),
+        stopTime = Isaac.GetSoundIdByName("StarPlatinum_StopTime"),
+        resumeTime = Isaac.GetSoundIdByName("StarPlatinum_ResumeTime"),
+        tick5 = Isaac.GetSoundIdByName("StarPlatinum_Tick5"),
+        tick9 = Isaac.GetSoundIdByName("StarPlatinum_Tick9"),
     },
 
     linkedCharacters = {

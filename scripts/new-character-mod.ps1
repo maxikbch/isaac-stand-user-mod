@@ -67,6 +67,7 @@ $metadataDirectory = ($modFolder -replace '-', '_')
 $tokens = @{
     "{{DISPLAY_NAME}}" = $displayName
     "{{REGISTER_MOD}}" = $registerMod
+    "{{ID}}" = $Id
     "{{CHARACTER_NAME}}" = $CharacterName
     "{{STAND_ID}}" = $StandId
     "{{STAND_NAME}}" = $StandName
@@ -108,6 +109,12 @@ New-Item -ItemType Directory -Force -Path $modPath | Out-Null
 
 Get-ChildItem -Path $JJBA_TemplatePath -File | ForEach-Object {
     Write-JJBATemplateFile -Source $_.FullName -Destination (Join-Path $modPath $_.Name)
+}
+
+$modLuaPath = Join-Path $modPath $Id
+New-Item -ItemType Directory -Force -Path $modLuaPath | Out-Null
+Get-ChildItem -Path (Join-Path $JJBA_TemplatePath "mod") -File | ForEach-Object {
+    Write-JJBATemplateFile -Source $_.FullName -Destination (Join-Path $modLuaPath $_.Name)
 }
 
 Get-ChildItem -Path (Join-Path $JJBA_TemplatePath "content") -File | ForEach-Object {

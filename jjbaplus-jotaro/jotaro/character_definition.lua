@@ -1,4 +1,4 @@
-﻿return {
+return {
     Type = Isaac.GetPlayerTypeByName("Jotaro"),
     Type2 = Isaac.GetPlayerTypeByName("Jotaro", true),
     DamageMult = 6/7,

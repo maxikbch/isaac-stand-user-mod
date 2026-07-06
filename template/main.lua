@@ -6,7 +6,7 @@ end
 
 local mod = RegisterMod("{{REGISTER_MOD}}", 1)
 
-JSF:RegisterStand(require("stand_definition"))
+JSF:RegisterStand(require("{{ID}}.stand_definition"))
 
-local registerCharacterCallbacks = require("character_callbacks")
+local registerCharacterCallbacks = require("{{ID}}.character_callbacks")
 registerCharacterCallbacks(mod)

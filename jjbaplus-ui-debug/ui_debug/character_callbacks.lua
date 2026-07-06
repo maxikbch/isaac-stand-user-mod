@@ -1,4 +1,4 @@
-local character = require("character_definition")
+local character = require("ui_debug.character_definition")
 
 local JSF = _G.JoJoStandFramework
 

@@ -1,5 +1,5 @@
-local character = require("character_definition")
-local stats = require("stand_stats")
+local character = require("ui_debug.character_definition")
+local stats = require("ui_debug.stand_stats")
 
 return {
     id = "ui_debug",

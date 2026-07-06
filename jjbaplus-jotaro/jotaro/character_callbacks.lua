@@ -1,5 +1,6 @@
-local character = require("character_definition")
-local settings = require("settings")
+local character = require("jotaro.character_definition")
+local settings = require("jotaro.settings")
+local timeStop = require("jotaro.time_stop")
 
 local JSF = _G.JoJoStandFramework
 
@@ -73,5 +74,21 @@ return function(mod)
                 player:AddCostume(meat, false)
             end
         end
+    end)
+
+    mod:AddCallback(ModCallbacks.MC_POST_UPDATE, function()
+        timeStop.postUpdate(JSF)
+    end)
+
+    mod:AddCallback(ModCallbacks.MC_GET_SHADER_PARAMS, function(_, name)
+        return timeStop.onShader(name, JSF)
+    end)
+
+    mod:AddCallback(ModCallbacks.MC_POST_PROJECTILE_UPDATE, function(_, tear)
+        timeStop.onProjectileUpdate(tear, JSF)
+    end)
+
+    mod:AddCallback(ModCallbacks.MC_ENTITY_TAKE_DMG, function(_, entity, damageAmount, damageFlags, source, countdownFrames)
+        return timeStop.onEntityTakeDamage(entity, damageFlags, source, JSF)
     end)
 end

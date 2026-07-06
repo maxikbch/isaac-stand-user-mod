@@ -6,8 +6,8 @@ end
 
 local mod = RegisterMod("Maxo13:JJBAPlus_UI_Debug", 1)
 
-JSF:RegisterStand(require("stand_definition"))
+JSF:RegisterStand(require("ui_debug.stand_definition"))
 
-local registerCharacterCallbacks = require("character_callbacks")
+local registerCharacterCallbacks = require("ui_debug.character_callbacks")
 local debugUi = require("debug_ui")
 registerCharacterCallbacks(mod, debugUi)
