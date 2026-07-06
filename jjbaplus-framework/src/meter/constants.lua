@@ -12,8 +12,8 @@ return {
         large = { fillHeight = 24, clipEmpty = 26 },
         small = { fillHeight = 12, clipEmpty = 13 },
     },
-    CHARGE_BAR_SPACING = 18,
-    ABILITY_SLOT_SPACING = 20,
+    CHARGE_BAR_SPACING = 15,
+    ABILITY_SLOT_SPACING = 14,
     CIRCULAR_SCALE = 1,
     CIRCULAR_BG = {
         skill1 = "BgSkill1",
@@ -25,10 +25,10 @@ return {
     SPRITE_COLOR_WHITE = Color(1, 1, 1, 1, 0, 0, 0),
 
     -- Move the entire stand meter block on screen (coop slot offsets stay in utils).
-    HUD_ORIGIN = Vector(0, 0),
+    HUD_ORIGIN = Vector(0, 4),
 
     -- Offsets from HUD_ORIGIN (layout between bar, head, ability slots).
-    CHARGE_BAR = Vector(44, 16),
+    CHARGE_BAR = Vector(44, 17),
     STAND_HEAD = Vector(18, 8),
-    ABILITY_COLUMN = Vector(120, 4),
+    ABILITY_COLUMN = Vector(56, 9),
 }
