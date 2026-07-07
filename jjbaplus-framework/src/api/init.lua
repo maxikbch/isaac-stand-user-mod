@@ -1,6 +1,9 @@
 local registerStandFactory = require("src/api/register_stand")
 local playerStandFactory = require("src/api/player_stand")
 local StandInput = require("src/core/input")
+local Combat = require("src/core/combat/init")
+local entities = require("src/core/entities")
+local entityIds = require("src/constants/entity_ids")
 
 return function(mod)
     local registry = {
@@ -10,7 +13,13 @@ return function(mod)
     }
 
     mod._registry = registry
-    mod.API_VERSION = 1
+    mod.API_VERSION = 2
+    mod.Combat = Combat
+    mod.Entities = {
+        Spawn = entities.Spawn,
+        KIND_STAND = entityIds.KIND_STAND,
+        KIND_PARTICLE = entityIds.KIND_PARTICLE,
+    }
 
     local playerApi = playerStandFactory(registry)
     local registerStand = registerStandFactory(registry)

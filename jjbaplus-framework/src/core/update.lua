@@ -1,6 +1,6 @@
 local Settings = require("src/constants/settings")
 local utils = require("src/utils")
-local StandBehaviors = require("src/behaviors/main")
+local Combat = require("src/core/combat/init")
 
 function StandUpdate(player, standDef, jsf)
     if not jsf.standEntity or not jsf.standEntity:Exists() then
@@ -14,25 +14,9 @@ function StandUpdate(player, standDef, jsf)
     local standSprite = standEntity:GetSprite()
     local playerPosition = player.Position
     local shootDir = utils:GetShootDir(player)
-    local STATS = standDef.stats
 
     if standData.behavior == nil then
-        standEntity.PositionOffset = standDef.floatOffset
-        playerData.releasedir = Vector(0, 0)
-        standData.tgttimer = 0
-        standData.charge = player.MaxFireDelay * STATS.ChargeLength
-        standData.maxcharge = player.MaxFireDelay * STATS.ChargeLength
-        standData.range = 150
-        standData.launchdir = Vector(0, 0)
-        standData.launchto = standEntity.Position
-        standData.behavior = 'idle'
-        standData.behaviorlast = 'none'
-        standData.statetime = 0
-        standData.posrate = .08
-        standData.alpha = -3
-        standData.alphagoal = -3
-        standData.TargetEntity = true
-        standData.TargetGrid = true
+        Combat.initStandData(standDef, standData, player, standEntity)
     end
 
     playerData.shootpress = false
@@ -65,7 +49,7 @@ function StandUpdate(player, standDef, jsf)
         standData.punchtear:Remove()
     end
 
-    StandBehaviors(player, standDef, jsf, shootDir)
+    Combat.runBehaviorModule(standDef.behaviorModule, player, standDef, jsf, shootDir)
 
     if standData.alpha < standData.alphagoal then
         standData.alpha = math.min(standData.alphagoal, standData.alpha + .35)

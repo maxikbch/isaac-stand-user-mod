@@ -152,6 +152,10 @@ local function validateStandDef(def)
         end
     end
 
+    if def.behaviorModule == nil then
+        error("[JoJoStandFramework] RegisterStand missing required field: behaviorModule for stand: " .. tostring(def.id))
+    end
+
     if def.discItem == CollectibleType.COLLECTIBLE_NULL or def.discItem == -1 then
         error("[JoJoStandFramework] RegisterStand invalid discItem for stand: " .. tostring(def.id))
     end

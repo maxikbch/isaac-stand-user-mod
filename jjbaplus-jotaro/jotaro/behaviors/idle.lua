@@ -1,6 +1,8 @@
-local standChecks = require("src/core/checks")
-local utils = require("src/utils")
-local setStat = require("src/core/set_stat")
+local JSF = _G.JoJoStandFramework
+local Combat = JSF.Combat
+local standChecks = Combat.checks
+local setStat = Combat.setStat
+local utils = Combat.utils
 
 local game = Game()
 local sfx = SFXManager()
@@ -14,7 +16,7 @@ return function(player, standDef, jsf, shootDir)
     local STATS = standDef.stats
     local sounds = standDef.sounds
 
-    if standData.behavior ~= 'idle' then
+    if standData.behavior ~= "idle" then
         return
     end
 
@@ -84,7 +86,7 @@ return function(player, standDef, jsf, shootDir)
         end
         if standData.charge == 0 then
             standData.charge = maxcharge
-            standData.behavior = 'rush'
+            standData.behavior = "rush"
             standData.launchdir = playerData.releasedir
             if standData.launchdir.X == 0 and standData.launchdir.Y == 0 then standData.launchdir = Vector(1, 0) end
         end

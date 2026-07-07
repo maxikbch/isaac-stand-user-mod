@@ -2,38 +2,32 @@ local JSF = _G.JoJoStandFramework
 local Combat = JSF.Combat
 local standChecks = Combat.checks
 local utils = Combat.utils
-
-local sfx = SFXManager()
+local Settings = Combat.Settings
 
 return function(player, standDef, jsf, shootDir)
     local playerData = player:GetData()
     local standEntity = jsf.standEntity
     local standData = standEntity:GetData()
     local standSprite = standEntity:GetSprite()
-    local sounds = standDef.sounds
 
     if standData.behavior ~= "rush" then
         return
     end
 
     standData.alphagoal = 1
-
     if standData.statetime == 0 then
         standData.launchpos = standEntity.Position
         standData.launchtgt = standData.launchto
-        if sounds.emerald then
-            sfx:Play(sounds.emerald, 2, 0, false, 1)
-        end
         if standData.launchdir.Y == -1 then
-            standSprite:Play("IdleN")
+            standSprite:Play("RushN")
         elseif standData.launchdir.X == 1 then
-            standSprite:Play("IdleE")
+            standSprite:Play("RushE")
         elseif standData.launchdir.Y == 1 then
-            standSprite:Play("IdleS")
+            standSprite:Play("RushS")
         elseif standData.launchdir.X == -1 then
-            standSprite:Play("IdleW")
+            standSprite:Play("RushW")
         else
-            standSprite:Play("IdleW")
+            standSprite:Play("RushW")
         end
     end
 
@@ -51,29 +45,40 @@ return function(player, standDef, jsf, shootDir)
     if not (standChecks:IsValidEnemy(standData.tgt, player, standEntity) or standChecks:IsTargetable(standData.tgt, player, standEntity)) then
         standData.tgt = nil
     end
+    if not standData.tgt and Settings.TargetGridEntities then
+        local frontGrid = standData.launchdir * 50
+        local gridEntity = standChecks:IsValidGridEntity(standEntity.Position + frontGrid, player, standEntity)
+        if gridEntity then
+            standData.tgt = gridEntity
+        end
+    end
 
     if standData.tgt then
-        standData.launchto = utils:AdjPos(-standData.launchdir, standData.tgt)
+        local dest2 = utils:AdjPos(-standData.launchdir, standData.tgt)
+        standData.launchto = dest2
     else
         standData.launchto = standData.launchtgt
     end
 
     local diff2 = standData.launchto - standEntity.Position
     standEntity.Velocity = diff2:Normalized() * math.min(25, diff2:Length())
-
-    if diff2:Length() < 15 then
-        if standData.superRush then
-            standData.superRush = false
-            if standData.tgt then
-                standData.behavior = "radio"
-                standData.radioFrames = standDef.stats.RadioBurstFrames
-            else
-                standData.behavior = "idle"
-            end
-        else
-            standData.behavior = "return"
-        end
+    if diff2:Length() < 15 or (standData.tgt and standData.tgt.CollisionClass) then
+        standData.behavior = "attack"
     end
+
+    local fade = JSF.Entities.Spawn(standDef, JSF.Entities.KIND_PARTICLE, standEntity.Position, Vector(0, 0), nil)
+    local fadeSprite = fade:GetSprite()
+    fade.PositionOffset = standEntity.PositionOffset
+    if standData.launchdir.Y == -1 then
+        fadeSprite:Play("ParticleN")
+    elseif standData.launchdir.X == 1 then
+        fadeSprite:Play("ParticleE")
+    elseif standData.launchdir.Y == 1 then
+        fadeSprite:Play("ParticleS")
+    elseif standData.launchdir.X == -1 then
+        fadeSprite:Play("ParticleW")
+    end
+    fadeSprite.Color = Color(1, 1, 1, .25, 0, 0, 0)
 
     if playerData.mytgt and playerData.mytgt:Exists() then
         playerData.mytgt.Position = standData.launchto

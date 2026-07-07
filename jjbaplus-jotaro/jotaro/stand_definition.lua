@@ -20,6 +20,8 @@ return {
     },
     floatOffset = Vector(0, -36),
 
+    behaviorModule = require("jotaro.behaviors.main"),
+
     animations = {
         spIdle = { "IdleE", "IdleS", "IdleW", "IdleN" },
         spMad = { "MadE", "MadS", "MadW", "MadN" },

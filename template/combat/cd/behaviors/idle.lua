@@ -13,14 +13,14 @@ return function(player, standDef, jsf, shootDir)
     local standData = standEntity:GetData()
     local standSprite = standEntity:GetSprite()
     local playerPosition = player.Position
+    local STATS = standDef.stats
     local sounds = standDef.sounds
-    local anims = standDef.animations
 
     if standData.behavior ~= "idle" then
         return
     end
 
-    standData.alphagoal = 0.5
+    standData.alphagoal = .5
 
     local cdang = ((playerPosition + Vector(0, -1) - standEntity.Position):GetAngleDegrees() + 180 % 360)
     local tgtang = player:GetHeadDirection() * 90
@@ -29,14 +29,13 @@ return function(player, standDef, jsf, shootDir)
     end
     if cdang - 180 > tgtang then cdang = cdang - 360 end
     if tgtang - 180 > cdang then tgtang = tgtang - 360 end
-    if playerData.shoot then standData.posrate = 0.2 end
+    if playerData.shoot then standData.posrate = .2 end
     local nextang = utils:Lerp(cdang, tgtang, standData.posrate)
-    standData.posrate = 0.08
+    standData.posrate = .08
     local nextpos = playerPosition + Vector(0, -1) + (Vector.FromAngle(nextang) * 45)
 
     standEntity.Velocity = nextpos - standEntity.Position
 
-    local STATS = standDef.stats
     local closedist = (-player.TearHeight * STATS.RangeMult) + 40
     local found = false
     for _, en in ipairs(Isaac.GetRoomEntities()) do
@@ -74,55 +73,49 @@ return function(player, standDef, jsf, shootDir)
     local maxcharge = setStat:MaxCharge(player, standDef)
 
     local faceSpriteIndex = ((player:GetHeadDirection() + 2) % 4) + 1
-    local aimIndex = faceSpriteIndex
+    local aimIndex = ((player:GetHeadDirection() + 2) % 4) + 1
     if player:HasCollectible(CollectibleType.COLLECTIBLE_LUDOVICO_TECHNIQUE) then
         faceSpriteIndex = utils:VecDir(shootDir) + 1
-        aimIndex = faceSpriteIndex
+        aimIndex = utils:VecDir(shootDir) + 1
     end
-
     if not playerData.shoot then
-        standSprite:Play(anims.spIdle[faceSpriteIndex])
+        if game:GetRoom():IsClear() then
+            standSprite:Play(standDef.spIdle[faceSpriteIndex])
+        else
+            standSprite:Play(standDef.spMad[faceSpriteIndex])
+        end
         if standData.charge == 0 then
             standData.charge = maxcharge
-            standData.behavior = "splash"
+            standData.behavior = "rush"
             standData.launchdir = playerData.releasedir
-            if standData.launchdir.X == 0 and standData.launchdir.Y == 0 then
-                standData.launchdir = Vector(1, 0)
-            end
-        else
-            standData.charge = maxcharge
+            if standData.launchdir.X == 0 and standData.launchdir.Y == 0 then standData.launchdir = Vector(1, 0) end
         end
+        standData.charge = math.min(maxcharge, standData.charge + (maxcharge / 90))
         standData.ready = false
         if game:GetRoom():GetFrameCount() < 1 or not player:HasCollectible(CollectibleType.COLLECTIBLE_LUDOVICO_TECHNIQUE) then
-            standData.launchto = game:GetRoom():GetClampedPosition(
-                playerPosition + ((playerData.releasedir * standData.range) + (player:GetTearMovementInheritance(playerData.releasedir) * 10)),
-                20
-            )
+            standData.launchto = game:GetRoom():GetClampedPosition(playerPosition + ((playerData.releasedir * standData.range) + (player:GetTearMovementInheritance(playerData.releasedir) * 10)), 20)
         end
     else
         setStat:Range(player, standDef, standEntity)
-        standData.launchto = game:GetRoom():GetClampedPosition(
-            playerPosition + ((playerData.releasedir * standData.range) + (player:GetTearMovementInheritance(shootDir) * 10)),
-            20
-        )
-        if standData.charge == maxcharge then
-            standSprite:Play(anims.spWind[aimIndex])
+        standData.launchto = game:GetRoom():GetClampedPosition(playerPosition + ((playerData.releasedir * standData.range) + (player:GetTearMovementInheritance(shootDir) * 10)), 20)
+        if standData.charge > 0 then
+            standSprite:Play(standDef.spWind[aimIndex])
         elseif standSprite:IsEventTriggered("WindEnd") then
-            standSprite:Play(anims.spWound[aimIndex])
+            standSprite:Play(standDef.spWound[aimIndex])
         elseif standData.charge == 0 and not standData.ready then
-            standSprite:Play(anims.spFlash[aimIndex])
+            standSprite:Play(standDef.spFlash[aimIndex])
             standData.ready = true
             if sounds.punchready then
-                sfx:Play(sounds.punchready, 0.35, 0, false, 0.98)
+                sfx:Play(sounds.punchready, .35, 0, false, .98)
             end
         elseif standSprite:IsEventTriggered("FlashEnd") then
-            standSprite:Play(anims.spReady[aimIndex])
+            standSprite:Play(standDef.spReady[aimIndex])
         end
-        if standSprite:IsPlaying("WoundS") or standSprite:IsPlaying("WoundN") or standSprite:IsPlaying("WoundE") or standSprite:IsPlaying("WoundW") then
-            standSprite:Play(anims.spWound[aimIndex])
+        if standSprite:IsPlaying("Wound2E") or standSprite:IsPlaying("Wound2S") or standSprite:IsPlaying("Wound2W") or standSprite:IsPlaying("Wound2N") then
+            standSprite:Play(standDef.spWound[aimIndex])
         end
-        if standSprite:IsPlaying("ReadyS") or standSprite:IsPlaying("ReadyN") or standSprite:IsPlaying("ReadyE") or standSprite:IsPlaying("ReadyW") then
-            standSprite:Play(anims.spReady[aimIndex])
+        if standSprite:IsPlaying("ReadyE") or standSprite:IsPlaying("ReadyS") or standSprite:IsPlaying("ReadyW") or standSprite:IsPlaying("ReadyN") then
+            standSprite:Play(standDef.spReady[aimIndex])
         end
 
         standData.charge = math.max(0, standData.charge - 1)

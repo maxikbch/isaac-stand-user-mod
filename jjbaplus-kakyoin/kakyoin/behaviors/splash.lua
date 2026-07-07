@@ -1,5 +1,6 @@
 local emeraldEntities = require("kakyoin.emerald_entities")
-local setStat = require("kakyoin.set_stat")
+local JSF = _G.JoJoStandFramework
+local setStat = JSF.Combat.setStat
 
 local sfx = SFXManager()
 

@@ -1,8 +1,8 @@
-local standChecks = require("src/core/checks")
-local utils = require("src/utils")
-local Settings = require("src/constants/settings")
-local entities = require("src/core/entities")
-local entityIds = require("src/constants/entity_ids")
+local JSF = _G.JoJoStandFramework
+local Combat = JSF.Combat
+local standChecks = Combat.checks
+local utils = Combat.utils
+local Settings = Combat.Settings
 
 return function(player, standDef, jsf, shootDir)
     local playerData = player:GetData()
@@ -10,7 +10,7 @@ return function(player, standDef, jsf, shootDir)
     local standData = standEntity:GetData()
     local standSprite = standEntity:GetSprite()
 
-    if standData.behavior ~= 'rush' then
+    if standData.behavior ~= "rush" then
         return
     end
 
@@ -63,10 +63,10 @@ return function(player, standDef, jsf, shootDir)
     local diff2 = standData.launchto - standEntity.Position
     standEntity.Velocity = diff2:Normalized() * math.min(25, diff2:Length())
     if diff2:Length() < 15 or (standData.tgt and standData.tgt.CollisionClass) then
-        standData.behavior = 'attack'
+        standData.behavior = "attack"
     end
 
-    local fade = entities.Spawn(standDef, entityIds.KIND_PARTICLE, standEntity.Position, Vector(0, 0), nil)
+    local fade = JSF.Entities.Spawn(standDef, JSF.Entities.KIND_PARTICLE, standEntity.Position, Vector(0, 0), nil)
     local fadeSprite = fade:GetSprite()
     fade.PositionOffset = standEntity.PositionOffset
     if standData.launchdir.Y == -1 then

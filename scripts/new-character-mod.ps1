@@ -121,6 +121,12 @@ Get-ChildItem -Path (Join-Path $JJBA_TemplatePath "mod") -File | ForEach-Object 
     Write-JJBATemplateFile -Source $_.FullName -Destination (Join-Path $modLuaPath $_.Name)
 }
 
+$behaviorsPath = Join-Path $modLuaPath "behaviors"
+New-Item -ItemType Directory -Force -Path $behaviorsPath | Out-Null
+Get-ChildItem -Path (Join-Path $JJBA_TemplatePath "combat\cd\behaviors") -File | ForEach-Object {
+    Write-JJBATemplateFile -Source $_.FullName -Destination (Join-Path $behaviorsPath $_.Name)
+}
+
 Get-ChildItem -Path (Join-Path $JJBA_TemplatePath "content") -File | ForEach-Object {
     Write-JJBATemplateFile -Source $_.FullName -Destination (Join-Path $modPath "content\$($_.Name)")
 }

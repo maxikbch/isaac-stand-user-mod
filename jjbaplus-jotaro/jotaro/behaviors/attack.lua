@@ -1,10 +1,11 @@
-local ITEM_MODIFIERS = require("src/constants/item_modifiers")
-local Settings = require("src/constants/settings")
-
-local standChecks = require("src/core/checks")
-local setStat = require("src/core/set_stat")
-local StandEffects = require("src/core/effects")
-local utils = require("src/utils")
+local JSF = _G.JoJoStandFramework
+local Combat = JSF.Combat
+local ITEM_MODIFIERS = Combat.ITEM_MODIFIERS
+local Settings = Combat.Settings
+local standChecks = Combat.checks
+local setStat = Combat.setStat
+local StandEffects = Combat.effects
+local utils = Combat.utils
 
 local sfx = SFXManager()
 local rng = RNG()
@@ -16,7 +17,7 @@ return function(player, standDef, jsf, shootDir)
     local STATS = standDef.stats
     local sounds = standDef.sounds
 
-    if standData.behavior ~= 'attack' then
+    if standData.behavior ~= "attack" then
         return
     end
 
@@ -189,6 +190,6 @@ return function(player, standDef, jsf, shootDir)
 
     if standSprite:IsFinished("PunchN") or standSprite:IsFinished("PunchE") or
         standSprite:IsFinished("PunchS") or standSprite:IsFinished("PunchW") then
-        standData.behavior = 'return'
+        standData.behavior = "return"
     end
 end

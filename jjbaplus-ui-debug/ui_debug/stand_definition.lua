@@ -19,6 +19,8 @@ return {
     },
     floatOffset = Vector(0, -36),
 
+    behaviorModule = require("ui_debug.behaviors.main"),
+
     animations = {
         spIdle = { "IdleE", "IdleS", "IdleW", "IdleN" },
         spMad = { "MadE", "MadS", "MadW", "MadN" },

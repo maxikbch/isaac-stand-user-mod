@@ -12,7 +12,7 @@ Why a framework? I want to go next level with this tboi JJBA mods, so this frame
 - Broken Stand Arrow: Same as the above item, but as a trinket.
 - Many more...
 
-Whats next? I will be polishing the framework at the same time i fix and polishing Jotaro and Kakyion characters, so i can have a good base for it. Once i feel the proyect base line its fine, i will share the github repo so anybody can use it (maybe you can already work with this mod a little, but i dont recomend doing so till the 1.0 release). My idea is to talk and ask permision to migrate other characters to JJBA+ framework or even allow other people to add their own ones to the repo, just to keep trac of them and keep compabilities.
+Whats next? I will be polishing the framework at the same time i fix and polishing Jotaro and Kakyion (next to be released), so i can have a good base for it. Once i feel the proyect base line its fine, i will share the github repo so anybody can use it (maybe you can already work with this mod a little, but i dont recomend doing so till the 1.0 release). My idea is to talk and ask permision to migrate other characters to JJBA+ framework or even allow other people to add their own ones to the repo, just to keep trac of them and keep compabilities.
 
 Why now? I dunno, i just wanted. Anyways, this will be a side project i will be working on besides my job and studies, so dont be waiting for weekly updates or so. 
 
@@ -20,7 +20,7 @@ Why JJBA+? Its just an easy name to distinguish from other JJBA mods.
 
 Thanks to https://steamcommunity.com/sharedfiles/filedetails/?id=943074431 creators, for being the base of this mod.
 </description>
-    <version>0.4</version>
+    <version>0.1</version>
     <visibility>Friends Only</visibility>
     <tag id="Lua"/>
 </metadata>
