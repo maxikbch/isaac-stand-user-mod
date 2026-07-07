@@ -1,4 +1,4 @@
-$script:JJBA_FamilyPrefix = "JJBA+"
+$script:JJBA_FamilyPrefix = "[JJBA+]"
 $script:JJBA_AuthorNamespace = "Maxo13:JJBAPlus"
 $script:JJBA_ModTag = 13
 $script:JJBA_MaxModVariant = 99
@@ -114,9 +114,46 @@ function Get-JJBAModFolderName {
     return "jjbaplus-$Slug"
 }
 
-function Get-JJBADisplayName {
+function Get-JJBAFrameworkDisplayName {
+    return "$JJBA_FamilyPrefix Framework"
+}
+
+function Get-JJBACharacterDisplayName {
+    param(
+        [string]$CharacterName,
+        [string]$StandName
+    )
+    return "$JJBA_FamilyPrefix $CharacterName and $StandName"
+}
+
+function Get-JJBAUtilityDisplayName {
     param([string]$Name)
     return "$JJBA_FamilyPrefix $Name"
+}
+
+function Get-JJBAMetadataName {
+    param($Mod)
+    if ($Mod.type -eq "framework") {
+        return Get-JJBAFrameworkDisplayName
+    }
+    if ($null -ne $Mod.standIndex -and [int]$Mod.standIndex -lt 0) {
+        return Get-JJBAUtilityDisplayName -Name $Mod.displayName
+    }
+    if ($Mod.characterName -and $Mod.standName) {
+        return Get-JJBACharacterDisplayName -CharacterName $Mod.characterName -StandName $Mod.standName
+    }
+    return Get-JJBAUtilityDisplayName -Name $Mod.displayName
+}
+
+function Get-JJBADisplayName {
+    param(
+        [string]$Name,
+        [string]$StandName
+    )
+    if ($StandName) {
+        return Get-JJBACharacterDisplayName -CharacterName $Name -StandName $StandName
+    }
+    return Get-JJBAUtilityDisplayName -Name $Name
 }
 
 function Copy-JJBAAssetTree {

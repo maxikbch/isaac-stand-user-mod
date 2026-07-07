@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+    <name>Kakyoin and Hierophant Green</name>
+    <directory>kakyoin</directory>
+    <id>1575678153</id>
+    <description>This mods add a new playable character, Kakyoin, and a new familiar, Hierophant Green, from JoJo's. You can attack with Hierophant Green using the arrows and charging. And if you have enought energy you can use shift to activate 20 Meters Radius Emeraldo Splash! (To use this you have to shoot to the direction that you want to do the attack and press shift not shooting. If Hierophant Green gets a target the attack will start, if not you keep the ability charged to try to use it again). Hierophant Green is affected by player stats and has some special synergies too, that gives him some varied effects.
+
+You can press the buttons 1, 2 and 3 for more sound effects (just for fun)
+
+To play with controller/joystick:
+You have to go to the mods folder (if you dont know where is it, go to savedatapath.txt in the game folder), and enter to jotaro's mod folder. Then you open main.lua with notepad or another similar program, and go to the first line &quot;ControlerOn =&quot; and set it on true. Then you can activite the time stop with the drop button.
+
+This mod adds a challenge too, that unallows you to shoot tears, making that you only can attack with Hierophant Green. Play it if you want.
+
+This mod couldn't be made if i dindn't use some of the following mods like guide, because i don't know too much of programming, so please, give them a like and, if you want, follow them.
+
+Josuke and Crazy Diamond:
+https://steamcommunity.com/sharedfiles/filedetails/?id=943074431
+
+If you like this mod you can see another of my mods here:
+
+https://steamcommunity.com/id/maxiproductions/myworkshopfiles/
+
+Note: This mod has a setting enabled by default (more details in the readme) which disables achievements due to a bug in the AB+ API which can cause modded characters to crash while achievements are enabled. If the mod doesn't generally work well at all for you, it's most likely because of an incompatibility with another installed mod.
+
+Note 2: English is not my main language, and i have studied it, but there could be some gramathical errors. So tell me if you see that something is wrong and i will change it.</description>
+    <version>1.6</version>
+    <visibility>Public</visibility>
+    <tag id="Lua"/>
+    <tag id="Player Characters"/>
+    <tag id="Familiars"/>
+</metadata>

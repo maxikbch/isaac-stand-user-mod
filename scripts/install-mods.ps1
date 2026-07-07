@@ -5,13 +5,16 @@ $repo = $JJBA_RepoRoot
 $mods = Get-JJBAIsaacModsPath
 
 cmd /c mklink /J "$mods\jjbaplus-framework" "$repo\jjbaplus-framework"
-Write-Host "Linked JJBA+ Framework -> jjbaplus-framework"
+Write-Host "Linked [JJBA+] Framework -> jjbaplus-framework"
 
 cmd /c mklink /J "$mods\jjbaplus-ui-debug" "$repo\jjbaplus-ui-debug"
-Write-Host "Linked JJBA+ UI Debug -> jjbaplus-ui-debug"
+Write-Host "Linked [JJBA+] UI Debug -> jjbaplus-ui-debug"
 
 cmd /c mklink /J "$mods\jjbaplus-jotaro" "$repo\jjbaplus-jotaro"
-Write-Host "Linked JJBA+ Jotaro -> jjbaplus-jotaro"
+Write-Host "Linked [JJBA+] Jotaro and Star Platinum -> jjbaplus-jotaro"
+
+cmd /c mklink /J "$mods\jjbaplus-kakyoin" "$repo\jjbaplus-kakyoin"
+Write-Host "Linked [JJBA+] Kakyoin and Hierophant Green -> jjbaplus-kakyoin"
 
 Write-Host ""
 Write-Host "JJBA+ mods linked. Enable Framework first, then character mods."

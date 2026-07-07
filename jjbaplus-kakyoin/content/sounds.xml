@@ -1,0 +1,38 @@
+﻿<sounds root="sounds/kakyoin/">
+	<sound name="Kakyoin_PunchLight">
+		<sample weight="1" path="punchlight.wav" />
+	</sound>
+	<sound name="Kakyoin_PunchHeavy">
+		<sample weight="1" path="punchheavy.wav" />
+	</sound>
+	<sound name="Kakyoin_Whoosh">
+		<sample weight="1" path="whoosh.wav" />
+	</sound>
+	<sound name="Kakyoin_PunchReady">
+		<sample weight="1" path="ready.wav" />
+	</sound>
+	<sound name="Kakyoin_Rage">
+		<sample weight="1" path="rage.wav" />
+	</sound>
+	<sound name="HierophantGreen_Cry_Start">
+		<sample weight="1" path="cry_start.wav" />
+	</sound>
+	<sound name="HierophantGreen_Cry_Mid">
+		<sample weight="1" path="cry_mid.wav" />
+	</sound>
+	<sound name="HierophantGreen_Cry_Finish">
+		<sample weight="1" path="cry_finish.wav" />
+	</sound>
+	<sound name="HierophantGreen_Cry">
+		<sample weight="1" path="cry_unique.wav" />
+	</sound>
+	<sound name="HierophantGreen_EmeraldSplash">
+		<sample weight="1" path="emerald_splash.wav" />
+	</sound>
+	<sound name="HierophantGreen_Emerald">
+		<sample weight="1" path="emerald.wav" />
+	</sound>
+	<sound name="HierophantGreen_Splash">
+		<sample weight="1" path="splash.wav" />
+	</sound>
+</sounds>

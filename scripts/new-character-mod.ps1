@@ -62,7 +62,7 @@ $entityVariants = Get-JJBAStandEntityDefaults -ModTag $modTag
 $gfxNamespace = $Id
 $soundPrefix = ConvertTo-PascalCase -Value $CharacterName
 $standNamePascal = ConvertTo-PascalCase -Value $StandName
-$displayName = Get-JJBADisplayName -Name $CharacterName
+$displayName = Get-JJBACharacterDisplayName -CharacterName $CharacterName -StandName $StandName
 $registerMod = Get-JJBARegisterModId -CharacterName $CharacterName
 $metadataDirectory = ($modFolder -replace '-', '_')
 
@@ -188,6 +188,6 @@ Write-Host "  Variants:     $($entityVariants.StandVariant) / $($entityVariants.
 Write-Host ""
 Write-Host "Next steps:"
 Write-Host "  1. Run .\install-mods.cmd (or .\scripts\install-mods.ps1)"
-Write-Host "  2. Enable JJBA+ Framework + $displayName in Isaac"
+Write-Host "  2. Enable [JJBA+] Framework + $displayName in Isaac"
 Write-Host "  3. Replace art in resources/gfx/$gfxNamespace/ (and content/gfx/ menu files if needed)"
 Write-Host "  4. Tune stand_stats.lua and stand_definition.lua hooks if needed"

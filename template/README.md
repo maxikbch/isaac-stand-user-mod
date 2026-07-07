@@ -26,7 +26,7 @@ Los `.anm2` de menú deben usar una animación llamada igual que `<player name="
 
 | Token | Ejemplo |
 |-------|---------|
-| `{{DISPLAY_NAME}}` | JJBA+ Jotaro |
+| `[JJBA+] {{CHARACTER_NAME}} and {{STAND_NAME}}` | [JJBA+] Jotaro and Star Platinum |
 | `{{REGISTER_MOD}}` | Maxo13:JJBAPlus_Jotaro |
 | `{{CHARACTER_NAME}}` | Jotaro |
 | `{{STAND_ID}}` | star_platinum |

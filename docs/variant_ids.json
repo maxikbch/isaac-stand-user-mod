@@ -1,61 +1,85 @@
 ﻿{
-    "familyPrefix": "JJBA+",
-    "authorNamespace": "Maxo13:JJBAPlus",
-    "modTag": 13,
-    "mods": [
-        {
-            "folder": "jjbaplus-framework",
-            "type": "framework",
-            "displayName": "Framework",
-            "registerMod": "Maxo13:JJBAPlus_Framework"
-        },
-        {
-            "folder": "jjbaplus-ui-debug",
-            "type": "character",
-            "displayName": "UI Debug",
-            "registerMod": "Maxo13:JJBAPlus_UI_Debug",
-            "characterName": "UI Debug",
-            "standId": "ui_debug",
-            "standName": "UI Debug Stand",
-            "discName": "UI Debug Disc",
-            "gfxNamespace": "character",
-            "standIndex": -1,
-            "entities": {
-                "stand": {
-                    "name": "UI Debug Stand",
-                    "type": 3,
-                    "modVariant": 0
-                },
-                "particle": {
-                    "name": "UI Debug Stand Particle",
-                    "type": 1000,
-                    "modVariant": 1
-                }
-            }
-        },
-        {
-            "folder": "jjbaplus-jotaro",
-            "type": "character",
-            "displayName": "Jotaro",
-            "registerMod": "Maxo13:JJBAPlus_Jotaro",
-            "characterName": "Jotaro",
-            "standId": "star_platinum",
-            "standName": "Star Platinum",
-            "discName": "Star Platinum Disc",
-            "gfxNamespace": "jotaro",
-            "standIndex": 0,
-            "entities": {
-                "stand": {
-                    "name": "Star Platinum",
-                    "type": 3,
-                    "modVariant": 0
-                },
-                "particle": {
-                    "name": "Star Platinum Particle",
-                    "type": 1000,
-                    "modVariant": 1
-                }
-            }
-        }
-    ]
+    "familyPrefix":  "[JJBA+]",
+    "authorNamespace":  "Maxo13:JJBAPlus",
+    "modTag":  13,
+    "mods":  [
+                 {
+                     "folder":  "jjbaplus-framework",
+                     "type":  "framework",
+                     "displayName":  "Framework",
+                     "registerMod":  "Maxo13:JJBAPlus_Framework"
+                 },
+                 {
+                     "folder":  "jjbaplus-ui-debug",
+                     "type":  "character",
+                     "displayName":  "UI Debug",
+                     "registerMod":  "Maxo13:JJBAPlus_UI_Debug",
+                     "characterName":  "UI Debug",
+                     "standId":  "ui_debug",
+                     "standName":  "UI Debug Stand",
+                     "discName":  "UI Debug Disc",
+                     "gfxNamespace":  "character",
+                     "standIndex":  -1,
+                     "entities":  {
+                                      "stand":  {
+                                                    "name":  "UI Debug Stand",
+                                                    "type":  3,
+                                                    "modVariant":  0
+                                                },
+                                      "particle":  {
+                                                       "name":  "UI Debug Stand Particle",
+                                                       "type":  1000,
+                                                       "modVariant":  1
+                                                   }
+                                  }
+                 },
+                 {
+                     "folder":  "jjbaplus-jotaro",
+                     "type":  "character",
+                     "displayName":  "Jotaro",
+                     "registerMod":  "Maxo13:JJBAPlus_Jotaro",
+                     "characterName":  "Jotaro",
+                     "standId":  "star_platinum",
+                     "standName":  "Star Platinum",
+                     "discName":  "Star Platinum Disc",
+                     "gfxNamespace":  "jotaro",
+                     "standIndex":  0,
+                     "entities":  {
+                                      "stand":  {
+                                                    "name":  "Star Platinum",
+                                                    "type":  3,
+                                                    "modVariant":  0
+                                                },
+                                      "particle":  {
+                                                       "name":  "Star Platinum Particle",
+                                                       "type":  1000,
+                                                       "modVariant":  1
+                                                   }
+                                  }
+                 },
+                 {
+                     "folder":  "jjbaplus-kakyoin",
+                     "type":  "character",
+                     "displayName":  "Kakyoin",
+                     "registerMod":  "Maxo13:JJBAPlus_Kakyoin",
+                     "characterName":  "Kakyoin",
+                     "standId":  "hierophant_green",
+                     "standName":  "Hierophant Green",
+                     "discName":  "Hierophant Green Disc",
+                     "gfxNamespace":  "kakyoin",
+                     "standIndex":  1,
+                     "entities":  {
+                                      "stand":  {
+                                                    "name":  "Hierophant Green",
+                                                    "type":  3,
+                                                    "modVariant":  0
+                                                },
+                                      "particle":  {
+                                                       "name":  "Hierophant Green Particle",
+                                                       "type":  1000,
+                                                       "modVariant":  1
+                                                   }
+                                  }
+                 }
+             ]
 }

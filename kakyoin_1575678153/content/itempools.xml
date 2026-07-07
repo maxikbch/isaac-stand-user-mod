@@ -1,0 +1,26 @@
+<ItemPools>
+	<Pool Name="treasure">
+		<Item Name="Hierophant Green" Weight="1" DecreaseBy="2.0" RemoveOn="0.1"/>
+	</Pool>
+	<Pool Name="bossrush">
+		<Item Name="Hierophant Green" Weight="1" DecreaseBy="2.0" RemoveOn="0.1"/>
+	</Pool>
+	<Pool Name="goldenChest">
+		<Item Name="Hierophant Green" Weight="1" DecreaseBy="2.0" RemoveOn="0.1"/>
+	</Pool>
+	<Pool Name="secret">
+		<Item Name="Hierophant Green" Weight="1" DecreaseBy="2.0" RemoveOn="0.1"/>
+	</Pool>
+	<Pool Name="greedTreasure">
+		<Item Name="Hierophant Green" Weight="1" DecreaseBy="2.0" RemoveOn="0.1"/>
+	</Pool>
+	<Pool Name="greedCurse">
+		<Item Name="Hierophant Green" Weight="1" DecreaseBy="2.0" RemoveOn="0.1"/>
+	</Pool>
+	<Pool Name="greedSecret">
+		<Item Name="Hierophant Green" Weight="1" DecreaseBy="2.0" RemoveOn="0.1"/>
+	</Pool>
+	<Pool Name="greedGoldenChest">
+		<Item Name="Hierophant Green" Weight="1" DecreaseBy="2.0" RemoveOn="0.1"/>
+	</Pool>
+</ItemPools>

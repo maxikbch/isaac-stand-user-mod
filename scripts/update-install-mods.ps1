@@ -14,11 +14,7 @@ $lines = @(
 )
 
 foreach ($mod in $registry.mods) {
-    $display = if ($mod.type -eq "framework") {
-        "JJBA+ Framework"
-    } else {
-        "JJBA+ $($mod.displayName)"
-    }
+    $display = Get-JJBAMetadataName -Mod $mod
     $lines += "cmd /c mklink /J `"`$mods\$($mod.folder)`" `"`$repo\$($mod.folder)`""
     $lines += "Write-Host `"Linked $display -> $($mod.folder)`""
     $lines += ""

@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metadata>
-    <name>JJBA+ Framework</name>
+    <name>[JJBA+] Framework</name>
     <directory>jjbaplus_framework</directory>
-    <id>0</id>
-    <description>JJBA+ core framework: stand combat, meter, disc swapping, and RegisterStand API. Required by all JJBA+ character mods.</description>
-    <version>2.0</version>
-    <visibility>Public</visibility>
+    <id>3759737623</id>
+    <description>[JJBA+] core framework. Required by all [JJBA+] character mods.
+
+Why a framework? I want to go next level with this tboi JJBA mods, so this framework will help creating new characters and adding new (future) mechanics like:
+- Stand Disc: An item for every stand.
+- Stand Disc Room: A room like planetary where any character can grab a stand disc from any of the installed JJBA+ character mods, gaining an stand or switching with one already equiped.
+- Stand Arrow: An item that gives the player a random stand from their installed JJBA+ characters mod. If player already has a stand, then this item will evolve the stand to a Requiem form (with custom ones for characters that dont have a cannon one).
+- Broken Stand Arrow: Same as the above item, but as a trinket.
+- Many more...
+
+Whats next? I will be polishing the framework at the same time i fix and polishing Jotaro and Kakyion characters, so i can have a good base for it. Once i feel the proyect base line its fine, i will share the github repo so anybody can use it (maybe you can already work with this mod a little, but i dont recomend doing so till the 1.0 release). My idea is to talk and ask permision to migrate other characters to JJBA+ framework or even allow other people to add their own ones to the repo, just to keep trac of them and keep compabilities.
+
+Why now? I dunno, i just wanted. Anyways, this will be a side project i will be working on besides my job and studies, so dont be waiting for weekly updates or so. 
+
+Why JJBA+? Its just an easy name to distinguish from other JJBA mods.
+
+Thanks to https://steamcommunity.com/sharedfiles/filedetails/?id=943074431 creators, for being the base of this mod.
+</description>
+    <version>0.4</version>
+    <visibility>Friends Only</visibility>
     <tag id="Lua"/>
-    <tag id="Familiars"/>
 </metadata>
