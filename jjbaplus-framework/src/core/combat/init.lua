@@ -1,6 +1,8 @@
 local checks = require("src/core/combat/checks")
 local setStat = require("src/core/combat/set_stat")
 local effects = require("src/core/combat/effects")
+local targeting = require("src/core/combat/targeting")
+local anim = require("src/core/combat/anim")
 local ITEM_MODIFIERS = require("src/constants/item_modifiers")
 local Settings = require("src/constants/settings")
 local utils = require("src/utils")
@@ -10,6 +12,8 @@ local Combat = {}
 Combat.checks = checks
 Combat.setStat = setStat
 Combat.effects = effects
+Combat.targeting = targeting
+Combat.anim = anim
 Combat.ITEM_MODIFIERS = ITEM_MODIFIERS
 Combat.Settings = Settings
 Combat.utils = {
@@ -24,6 +28,12 @@ Combat.utils = {
     end,
     hasbit = function(_, x, p)
         return utils:hasbit(x, p)
+    end,
+    dirSuffix = function(_, launchdir)
+        return anim.dirSuffix(launchdir)
+    end,
+    playDir = function(_, sprite, prefix, launchdir)
+        return anim.playDir(sprite, prefix, launchdir)
     end,
 }
 

@@ -1,39 +1,32 @@
 local emeraldEntities = require("kakyoin.emerald_entities")
 local JSF = _G.JoJoStandFramework
 local setStat = JSF.Combat.setStat
+local anim = JSF.Combat.anim
 
 local sfx = SFXManager()
 
 local EMERALD_SPEED = 25
 local MAX_PUNCHES = 30
 
+local TEAR_KIND = {
+    N = "ns",
+    E = "ew",
+    S = "ns",
+    W = "ew",
+}
+
 local function spawnSplashTear(standPos, launchdir, player, standData, stats)
-    local splashS = standPos + Vector(0, 20)
-    local splashN = standPos - Vector(0, 20)
-    local splashE = standPos - Vector(20, 0)
-    local splashO = standPos + Vector(20, 0)
-
-    if launchdir.Y == -1 then
-        emeraldEntities.spawnTear(player, splashN, Vector.FromAngle(270) * EMERALD_SPEED, standData.damage or 1, stats, "ns")
-    elseif launchdir.X == 1 then
-        emeraldEntities.spawnTear(player, splashO, Vector.FromAngle(0) * EMERALD_SPEED, standData.damage or 1, stats, "ew")
-    elseif launchdir.Y == 1 then
-        emeraldEntities.spawnTear(player, splashS, Vector.FromAngle(90) * EMERALD_SPEED, standData.damage or 1, stats, "ns")
-    elseif launchdir.X == -1 then
-        emeraldEntities.spawnTear(player, splashE, Vector.FromAngle(180) * EMERALD_SPEED, standData.damage or 1, stats, "ew")
-    end
-end
-
-local function playSplashAnim(standSprite, launchdir)
-    if launchdir.Y == -1 then
-        standSprite:Play("SplashN")
-    elseif launchdir.X == 1 then
-        standSprite:Play("SplashE")
-    elseif launchdir.Y == 1 then
-        standSprite:Play("SplashS")
-    elseif launchdir.X == -1 then
-        standSprite:Play("SplashW")
-    end
+    local suffix = anim.dirSuffix(launchdir)
+    local origin = standPos + anim.cardinalOffset(launchdir, 20)
+    local angle = anim.cardinalAngle(launchdir)
+    emeraldEntities.spawnTear(
+        player,
+        origin,
+        Vector.FromAngle(angle) * EMERALD_SPEED,
+        standData.damage or 1,
+        stats,
+        TEAR_KIND[suffix]
+    )
 end
 
 return function(player, standDef, jsf, shootDir)
@@ -53,7 +46,7 @@ return function(player, standDef, jsf, shootDir)
         if sounds.emeraldSplash then
             sfx:Play(sounds.emeraldSplash, 2, 0, false, 1)
         end
-        playSplashAnim(standSprite, standData.launchdir)
+        anim.playDir(standSprite, "Splash", standData.launchdir)
         setStat:AttackAmount(player, standDef, standEntity)
         setStat:AttackDamage(player, standDef, standEntity)
         standData.maxpunches = math.min(standData.maxpunches or stats.Punches, MAX_PUNCHES)

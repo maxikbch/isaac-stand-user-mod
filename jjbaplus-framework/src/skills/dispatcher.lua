@@ -15,7 +15,9 @@ local function makeContext(player, standDef, jsf, slotName, skillId)
         standDef = standDef,
         standEntity = jsf.standEntity,
         standState = jsf.standState,
-        jsf = jsf,
+        playerData = jsf,
+        framework = _G.JoJoStandFramework,
+        jsf = jsf, -- alias de playerData (compat)
         slot = slotName,
         skillId = skillId,
     }

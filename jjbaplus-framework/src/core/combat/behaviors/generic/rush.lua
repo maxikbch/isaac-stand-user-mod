@@ -1,8 +1,8 @@
-local standChecks = require("src/core/combat/checks")
-local utils = require("src/utils")
 local Settings = require("src/constants/settings")
 local entities = require("src/core/entities")
 local entityIds = require("src/constants/entity_ids")
+local targeting = require("src/core/combat/targeting")
+local anim = require("src/core/combat/anim")
 
 return function(player, standDef, jsf, shootDir)
     local playerData = player:GetData()
@@ -18,47 +18,12 @@ return function(player, standDef, jsf, shootDir)
     if standData.statetime == 0 then
         standData.launchpos = standEntity.Position
         standData.launchtgt = standData.launchto
-        if standData.launchdir.Y == -1 then
-            standSprite:Play("RushN")
-        elseif standData.launchdir.X == 1 then
-            standSprite:Play("RushE")
-        elseif standData.launchdir.Y == 1 then
-            standSprite:Play("RushS")
-        elseif standData.launchdir.X == -1 then
-            standSprite:Play("RushW")
-        else
-            standSprite:Play("RushW")
-        end
+        anim.playDir(standSprite, "Rush", standData.launchdir)
     end
 
-    for _, en in ipairs(Isaac.GetRoomEntities()) do
-        if standChecks:IsValidEnemy(en, player, standEntity) then
-            local dest = utils:AdjPos(-standData.launchdir, en)
-            local diff = standEntity.Position - dest
-            if diff:Length() < 45 and diff:Length() < (standEntity.Position - standData.launchto):Length() then
-                standData.tgt = en
-                standData.launchto = dest
-            end
-        end
-    end
-
-    if not (standChecks:IsValidEnemy(standData.tgt, player, standEntity) or standChecks:IsTargetable(standData.tgt, player, standEntity)) then
-        standData.tgt = nil
-    end
-    if not standData.tgt and Settings.TargetGridEntities then
-        local frontGrid = standData.launchdir * 50
-        local gridEntity = standChecks:IsValidGridEntity(standEntity.Position + frontGrid, player, standEntity)
-        if gridEntity then
-            standData.tgt = gridEntity
-        end
-    end
-
-    if standData.tgt then
-        local dest2 = utils:AdjPos(-standData.launchdir, standData.tgt)
-        standData.launchto = dest2
-    else
-        standData.launchto = standData.launchtgt
-    end
+    targeting.updateRushTarget(player, standDef, standEntity, standData, {
+        allowGrid = Settings.TargetGridEntities,
+    })
 
     local diff2 = standData.launchto - standEntity.Position
     standEntity.Velocity = diff2:Normalized() * math.min(25, diff2:Length())
@@ -69,15 +34,7 @@ return function(player, standDef, jsf, shootDir)
     local fade = entities.Spawn(standDef, entityIds.KIND_PARTICLE, standEntity.Position, Vector(0, 0), nil)
     local fadeSprite = fade:GetSprite()
     fade.PositionOffset = standEntity.PositionOffset
-    if standData.launchdir.Y == -1 then
-        fadeSprite:Play("ParticleN")
-    elseif standData.launchdir.X == 1 then
-        fadeSprite:Play("ParticleE")
-    elseif standData.launchdir.Y == 1 then
-        fadeSprite:Play("ParticleS")
-    elseif standData.launchdir.X == -1 then
-        fadeSprite:Play("ParticleW")
-    end
+    anim.playDir(fadeSprite, "Particle", standData.launchdir)
     fadeSprite.Color = Color(1, 1, 1, .25, 0, 0, 0)
 
     if playerData.mytgt and playerData.mytgt:Exists() then

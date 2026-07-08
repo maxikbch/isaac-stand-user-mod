@@ -1,22 +1,27 @@
 local debug = require("src/debug")
 local entities = require("src/core/entities")
 local entityIds = require("src/constants/entity_ids")
+local RoomEntities = require("src/core/room_entities")
 
-local function StandClear(standDefs)
+local function StandClear(standDefs, linkedHashes, roomEntities)
     local removed = 0
+    linkedHashes = linkedHashes or {}
+    roomEntities = roomEntities or RoomEntities.Get()
 
-    for _, en in ipairs(Isaac.GetRoomEntities()) do
+    for _, en in ipairs(roomEntities) do
         for _, standDef in ipairs(standDefs) do
-            if entities.Matches(standDef, entityIds.KIND_STAND, en) and not en:GetData().linked then
-                debug:Log(string.format(
-                    "StandClear remove stand variant=%s subtype=%s linked=%s frame=%s",
-                    tostring(en.Variant),
-                    tostring(en.SubType),
-                    tostring(en:GetData().linked),
-                    tostring(en.FrameCount)
-                ))
-                en:Remove()
-                removed = removed + 1
+            if entities.Matches(standDef, entityIds.KIND_STAND, en) then
+                local hash = GetPtrHash(en)
+                if not linkedHashes[hash] then
+                    debug:Log(string.format(
+                        "StandClear remove stand variant=%s subtype=%s frame=%s",
+                        tostring(en.Variant),
+                        tostring(en.SubType),
+                        tostring(en.FrameCount)
+                    ))
+                    en:Remove()
+                    removed = removed + 1
+                end
                 break
             end
 

@@ -1,7 +1,7 @@
 local JSF = _G.JoJoStandFramework
 local Combat = JSF.Combat
-local standChecks = Combat.checks
-local utils = Combat.utils
+local targeting = Combat.targeting
+local anim = Combat.anim
 
 local sfx = SFXManager()
 
@@ -24,39 +24,12 @@ return function(player, standDef, jsf, shootDir)
         if sounds.emerald then
             sfx:Play(sounds.emerald, 2, 0, false, 1)
         end
-        if standData.launchdir.Y == -1 then
-            standSprite:Play("IdleN")
-        elseif standData.launchdir.X == 1 then
-            standSprite:Play("IdleE")
-        elseif standData.launchdir.Y == 1 then
-            standSprite:Play("IdleS")
-        elseif standData.launchdir.X == -1 then
-            standSprite:Play("IdleW")
-        else
-            standSprite:Play("IdleW")
-        end
+        anim.playDir(standSprite, "Idle", standData.launchdir)
     end
 
-    for _, en in ipairs(Isaac.GetRoomEntities()) do
-        if standChecks:IsValidEnemy(en, player, standEntity) then
-            local dest = utils:AdjPos(-standData.launchdir, en)
-            local diff = standEntity.Position - dest
-            if diff:Length() < 45 and diff:Length() < (standEntity.Position - standData.launchto):Length() then
-                standData.tgt = en
-                standData.launchto = dest
-            end
-        end
-    end
-
-    if not (standChecks:IsValidEnemy(standData.tgt, player, standEntity) or standChecks:IsTargetable(standData.tgt, player, standEntity)) then
-        standData.tgt = nil
-    end
-
-    if standData.tgt then
-        standData.launchto = utils:AdjPos(-standData.launchdir, standData.tgt)
-    else
-        standData.launchto = standData.launchtgt
-    end
+    targeting.updateRushTarget(player, standDef, standEntity, standData, {
+        allowGrid = false,
+    })
 
     local diff2 = standData.launchto - standEntity.Position
     standEntity.Velocity = diff2:Normalized() * math.min(25, diff2:Length())

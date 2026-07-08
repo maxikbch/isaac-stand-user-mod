@@ -1,9 +1,45 @@
-local standChecks = require("src/core/combat/checks")
 local setStat = require("src/core/combat/set_stat")
+local targeting = require("src/core/combat/targeting")
 local utils = require("src/utils")
 
 local game = Game()
 local sfx = SFXManager()
+
+local function resolveCombat(standDef)
+    return standDef.combat or {}
+end
+
+local function resolveChargeReleaseBehavior(player, standDef, standData, combat, hooks)
+    if hooks.getChargeReleaseBehavior then
+        return hooks.getChargeReleaseBehavior(player, standDef, standData)
+    end
+    return combat.chargeReleaseBehavior or "rush"
+end
+
+local function resolveIdleFaceAnim(standDef, faceSpriteIndex, roomClear, combat, hooks)
+    if hooks.getIdleFaceAnim then
+        return hooks.getIdleFaceAnim(standDef, faceSpriteIndex, roomClear)
+    end
+    if combat.idleAnimMode == "idle_only" then
+        return standDef.spIdle[faceSpriteIndex]
+    end
+    if roomClear then
+        return standDef.spIdle[faceSpriteIndex]
+    end
+    return standDef.spMad[faceSpriteIndex]
+end
+
+local function applyPartialChargeRelease(standData, maxcharge, combat, hooks)
+    if hooks.onIdleReleasePartialCharge then
+        hooks.onIdleReleasePartialCharge(standData, maxcharge)
+        return
+    end
+    if combat.releasePartialCharge == "reset" then
+        standData.charge = maxcharge
+        return
+    end
+    standData.charge = math.min(maxcharge, standData.charge + (maxcharge / 90))
+end
 
 return function(player, standDef, jsf, shootDir)
     local playerData = player:GetData()
@@ -12,8 +48,9 @@ return function(player, standDef, jsf, shootDir)
     local standData = standEntity:GetData()
     local standSprite = standEntity:GetSprite()
     local playerPosition = player.Position
-    local STATS = standDef.stats
     local sounds = standDef.sounds
+    local hooks = standDef.hooks or {}
+    local combat = resolveCombat(standDef)
 
     if standData.behavior ~= "idle" then
         return
@@ -35,83 +72,54 @@ return function(player, standDef, jsf, shootDir)
 
     standEntity.Velocity = nextpos - standEntity.Position
 
-    local closedist = (-player.TearHeight * STATS.RangeMult) + 40
-    local found = false
-    for _, en in ipairs(Isaac.GetRoomEntities()) do
-        if standChecks:IsValidEnemy(en, player, standEntity) or standChecks:IsTargetable(en, player, standEntity) then
-            local xdif = en.Position.X - player.Position.X
-            local ydif = en.Position.Y - player.Position.Y
-            if input.releasedir.Y ~= 0 then
-                if input.releasedir.Y * ydif > 0 and math.abs(xdif) < STATS.LockonWidth then
-                    if math.abs(ydif) < closedist then
-                        found = true
-                        standData.tgt = en
-                        closedist = math.abs(ydif)
-                    end
-                end
-            else
-                if input.releasedir.X * xdif > 0 and math.abs(ydif) < STATS.LockonWidth then
-                    if math.abs(xdif) < closedist then
-                        found = true
-                        standData.tgt = en
-                        closedist = math.abs(xdif)
-                    end
-                end
-            end
-        end
-    end
-    if found then
-        standData.alphagoal = 1
-        standData.tgttimer = 10
-    elseif standData.tgttimer > 0 and (standChecks:IsValidEnemy(standData.tgt, player, standEntity) or standChecks:IsTargetable(standData.tgt, player, standEntity)) then
-        standData.tgttimer = standData.tgttimer - 1
-    else
-        standData.tgt = nil
-    end
+    targeting.updateIdleLockOn(player, standDef, standEntity, standData, input)
 
     local maxcharge = setStat:MaxCharge(player, standDef)
-    local hooks = standDef.hooks or {}
 
     local faceSpriteIndex = ((player:GetHeadDirection() + 2) % 4) + 1
-    local aimIndex = ((player:GetHeadDirection() + 2) % 4) + 1
+    local aimIndex = faceSpriteIndex
     if player:HasCollectible(CollectibleType.COLLECTIBLE_LUDOVICO_TECHNIQUE) then
         faceSpriteIndex = utils:VecDir(shootDir) + 1
-        aimIndex = utils:VecDir(shootDir) + 1
+        aimIndex = faceSpriteIndex
     end
 
-    local windSuffix = hooks.windAnimSuffix or "2"
+    local windSuffix = combat.windAnimSuffix
+    if windSuffix == nil then
+        windSuffix = hooks.windAnimSuffix or "2"
+    end
+
+    local windOnlyAtFull = combat.windOnlyAtFullCharge
+    if windOnlyAtFull == nil then
+        windOnlyAtFull = hooks.idleWindOnlyAtFullCharge == true
+    end
 
     if not input.shoot then
-        if hooks.getIdleFaceAnim then
-            standSprite:Play(hooks.getIdleFaceAnim(standDef, faceSpriteIndex, game:GetRoom():IsClear()))
-        elseif game:GetRoom():IsClear() then
-            standSprite:Play(standDef.spIdle[faceSpriteIndex])
-        else
-            standSprite:Play(standDef.spMad[faceSpriteIndex])
-        end
+        standSprite:Play(resolveIdleFaceAnim(standDef, faceSpriteIndex, game:GetRoom():IsClear(), combat, hooks))
         if standData.charge == 0 then
             standData.charge = maxcharge
-            if hooks.getChargeReleaseBehavior then
-                standData.behavior = hooks.getChargeReleaseBehavior(player, standDef, standData)
-            else
-                standData.behavior = "rush"
-            end
+            standData.behavior = resolveChargeReleaseBehavior(player, standDef, standData, combat, hooks)
             standData.launchdir = input.releasedir
-            if standData.launchdir.X == 0 and standData.launchdir.Y == 0 then standData.launchdir = Vector(1, 0) end
-        elseif hooks.onIdleReleasePartialCharge then
-            hooks.onIdleReleasePartialCharge(standData, maxcharge)
+            if standData.launchdir.X == 0 and standData.launchdir.Y == 0 then
+                standData.launchdir = Vector(1, 0)
+            end
         else
-            standData.charge = math.min(maxcharge, standData.charge + (maxcharge / 90))
+            applyPartialChargeRelease(standData, maxcharge, combat, hooks)
         end
         standData.ready = false
         if game:GetRoom():GetFrameCount() < 1 or not player:HasCollectible(CollectibleType.COLLECTIBLE_LUDOVICO_TECHNIQUE) then
-            standData.launchto = game:GetRoom():GetClampedPosition(playerPosition + ((input.releasedir * standData.range) + (player:GetTearMovementInheritance(input.releasedir) * 10)), 20)
+            standData.launchto = game:GetRoom():GetClampedPosition(
+                playerPosition + ((input.releasedir * standData.range) + (player:GetTearMovementInheritance(input.releasedir) * 10)),
+                20
+            )
         end
     else
         setStat:Range(player, standDef, standEntity)
-        standData.launchto = game:GetRoom():GetClampedPosition(playerPosition + ((input.releasedir * standData.range) + (player:GetTearMovementInheritance(shootDir) * 10)), 20)
-        local showWind = hooks.idleWindOnlyAtFullCharge and standData.charge == maxcharge
-            or not hooks.idleWindOnlyAtFullCharge and standData.charge > 0
+        standData.launchto = game:GetRoom():GetClampedPosition(
+            playerPosition + ((input.releasedir * standData.range) + (player:GetTearMovementInheritance(shootDir) * 10)),
+            20
+        )
+        local showWind = windOnlyAtFull and standData.charge == maxcharge
+            or not windOnlyAtFull and standData.charge > 0
         if showWind then
             standSprite:Play(standDef.spWind[aimIndex])
         elseif standSprite:IsEventTriggered("WindEnd") then

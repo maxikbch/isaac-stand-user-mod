@@ -1,7 +1,5 @@
 local Settings = require("src/constants/settings")
 local debug = require("src/debug")
-local entities = require("src/core/entities")
-local entityIds = require("src/constants/entity_ids")
 
 local StandInput = require("src/core/input")
 local StandUpdate = require("src/core/update")
@@ -9,6 +7,7 @@ local SetStand = require("src/core/set")
 local StandClear = require("src/core/clear")
 local SkillDispatcher = require("src/skills/dispatcher")
 local LocalControllers = require("src/core/local_controllers")
+local RoomEntities = require("src/core/room_entities")
 local utils = require("src/utils")
 
 return function(jsf)
@@ -30,23 +29,28 @@ return function(jsf)
         SkillDispatcher(player, standDef, jsfData)
     end
 
-    local function resetStandLinks()
-        for _, standDef in ipairs(jsf:GetAllStandDefs()) do
-            for _, en in ipairs(Isaac.GetRoomEntities()) do
-                if entities.Matches(standDef, entityIds.KIND_STAND, en) then
-                    en:GetData().linked = false
-                end
+    local function collectLinkedStandHashes()
+        local linkedHashes = {}
+        utils:ForAllPlayers(function(player)
+            local jsfData = jsf:GetPlayerData(player)
+            local standEntity = jsfData and jsfData.standEntity
+            if standEntity and standEntity:Exists() then
+                linkedHashes[GetPtrHash(standEntity)] = true
+                standEntity:GetData().linked = true
             end
-        end
+        end)
+        return linkedHashes
     end
 
     local function PostUpdate()
         StandInput:OnPostUpdate()
         debug:LogEvery(120, "postUpdateAlive", "post_update tick frame=" .. tostring(Game():GetFrameCount()))
         LocalControllers:Update()
-        resetStandLinks()
         utils:ForAllPlayers(ForEachPlayer)
-        StandClear(jsf:GetAllStandDefs())
+
+        local roomEntities = RoomEntities.Get()
+        local linkedHashes = collectLinkedStandHashes()
+        StandClear(jsf:GetAllStandDefs(), linkedHashes, roomEntities)
     end
 
     return PostUpdate

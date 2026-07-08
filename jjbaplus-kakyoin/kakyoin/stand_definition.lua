@@ -22,6 +22,14 @@ return {
 
     behaviorModule = require("kakyoin.behaviors.main"),
 
+    combat = {
+        chargeReleaseBehavior = "splash",
+        idleAnimMode = "idle_only",
+        releasePartialCharge = "reset",
+        windOnlyAtFullCharge = true,
+        windAnimSuffix = "",
+    },
+
     animations = {
         spIdle = { "IdleE", "IdleS", "IdleW", "IdleN" },
         spWind = { "WindE", "WindS", "WindW", "WindN" },
@@ -99,16 +107,5 @@ return {
             end
             return punches
         end,
-        getChargeReleaseBehavior = function()
-            return "splash"
-        end,
-        getIdleFaceAnim = function(standDef, faceSpriteIndex)
-            return standDef.spIdle[faceSpriteIndex]
-        end,
-        onIdleReleasePartialCharge = function(standData, maxcharge)
-            standData.charge = maxcharge
-        end,
-        idleWindOnlyAtFullCharge = true,
-        windAnimSuffix = "",
     },
 }

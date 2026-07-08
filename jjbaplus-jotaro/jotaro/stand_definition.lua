@@ -56,19 +56,23 @@ return {
             duration = stats.SuperDuration,
             cooldown = stats.SuperCooldown,
             onActivate = function(ctx)
-                ctx.jsf.Events.emit("global_time_frozen", {
-                    player = ctx.player,
-                    standDef = ctx.standDef,
-                    active = true,
-                })
+                if ctx.framework and ctx.framework.Events then
+                    ctx.framework.Events.emit("global_time_frozen", {
+                        player = ctx.player,
+                        standDef = ctx.standDef,
+                        active = true,
+                    })
+                end
                 timeStop.onActivate(ctx.player, ctx.standDef)
             end,
             onDeactivate = function(ctx)
-                ctx.jsf.Events.emit("global_time_frozen", {
-                    player = ctx.player,
-                    standDef = ctx.standDef,
-                    active = false,
-                })
+                if ctx.framework and ctx.framework.Events then
+                    ctx.framework.Events.emit("global_time_frozen", {
+                        player = ctx.player,
+                        standDef = ctx.standDef,
+                        active = false,
+                    })
+                end
             end,
         },
     },

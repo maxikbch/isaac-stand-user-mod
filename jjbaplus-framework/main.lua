@@ -10,6 +10,8 @@ local debug = require("src/debug")
 
 debug:Log("Framework main loaded API v" .. tostring(jsf.API_VERSION))
 
+require("src/events/debug_subscribers")(jsf)
+
 local OnNewGame = require("src/callbacks/on_new_game")(mod, jsf, data)
 local OnEntityTakeDamage = require("src/callbacks/on_entity_take_damage")(jsf)
 local OnPickupCollision = require("src/callbacks/on_pickup_collision")(jsf)

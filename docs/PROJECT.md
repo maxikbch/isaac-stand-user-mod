@@ -200,8 +200,10 @@ Expuesta al cargar el framework. Versión: `JSF.API_VERSION = 1`.
 | `SwapStandDisc(player, discItemId)` | Cambiar disco (`MC_PRE_PICKUP_COLLISION`) |
 | `EnsureLinkedStandDisc(player)` | Auto-disco si el personaje está en `linkedCharacters` |
 | `GetAllStandDefs()` | Lista de stands registrados |
-| `Combat` | Facade de combate: `checks`, `setStat`, `effects`, `behaviors.generic`, etc. |
+| `Combat` | Facade de combate: `checks`, `setStat`, `effects`, `targeting`, `anim`, `behaviors.generic` / `compose` |
 | `Entities.Spawn` | Spawn de entidades stand/partícula por definición |
+| `Skills` | Facade de charge/duration/cooldown (`getDuration`, `setDuration`, …) |
+| `Events` | Bus cross-mod: `subscribe(event, handler, priority?)`, `emit(event, payload)` |
 
 ### Skills, slots y charge pools (API v1)
 
@@ -214,6 +216,75 @@ Expuesta al cargar el framework. Versión: `JSF.API_VERSION = 1`.
 Estado persistido en `playerData.JSF.standState`: `charges`, `skillDurations`, `skillCooldowns`, `toggles`.
 
 Skills `custom`: `onPress(ctx)` retorna `true` si activó; el dispatcher gestiona charge. Cooldown en activación salvo `cooldownStartsOn = "complete"`.
+
+#### Skill `ctx` (callbacks `onActivate` / `onPress` / …)
+
+| Campo | Qué es |
+|-------|--------|
+| `player` | `EntityPlayer` |
+| `standDef` | Definición del stand |
+| `standEntity` | Familiar stand (si existe) |
+| `standState` | Estado de skills/charges |
+| `playerData` | Tabla `playerData.JSF` |
+| `framework` | `_G.JoJoStandFramework` (usar `ctx.framework.Events`) |
+| `jsf` | Alias de `playerData` (compat) |
+| `slot` / `skillId` | Slot y skill activos |
+
+#### `JSF.Skills`
+
+```lua
+JSF.Skills.getDuration(player, skillId)
+JSF.Skills.setDuration(player, skillId, value)
+JSF.Skills.getCooldown(player, skillId)
+JSF.Skills.setCooldown(player, skillId, value)
+JSF.Skills.getCharge(player, poolId)
+JSF.Skills.setCharge(player, poolId, value)
+```
+
+#### `JSF.Events` — contratos actuales
+
+| Evento | Emisor | Payload |
+|--------|--------|---------|
+| `skill_activate` | dispatcher | `{ player, standDef, skillId, skillDef, ctx }` |
+| `skill_deactivate` | dispatcher | igual |
+| `stand_disc_swapped` | `SwapStandDisc` | `{ player, oldDisc, newDisc, newStandId }` |
+| `global_time_frozen` | Jotaro Time Stop | `{ player, standDef, active }` |
+
+Con `DebugOverlay = true` en `jjbaplus-framework/settings.lua`, el framework loguea estos eventos a consola/overlay.
+
+### Combate composable
+
+```lua
+behaviorModule = JSF.Combat.behaviors.compose({
+    base = JSF.Combat.behaviors.generic,
+    states = {
+        rush = require("slug.behaviors.rush"),
+        splash = require("slug.behaviors.splash"),
+    },
+})
+```
+
+El módulo retorna una tabla `{ update, states }` (no una función: en Lua de Isaac no se indexan functions).
+
+#### `standDef.combat` (perfil idle / charge)
+
+Flags leídos por el idle genérico (Kakyoin los usa):
+
+| Campo | Default | Efecto |
+|-------|---------|--------|
+| `chargeReleaseBehavior` | `"rush"` | Estado al soltar carga completa |
+| `idleAnimMode` | mad/idle según sala | `"idle_only"` fuerza `spIdle` |
+| `releasePartialCharge` | `"regen"` | `"reset"` = vuelve a max al soltar mid-charge |
+| `windOnlyAtFullCharge` | `false` | Wind solo con barra llena |
+| `windAnimSuffix` | `"2"` | Sufijo de Wound (`""` = WoundE sin `2`) |
+
+Hooks equivalentes (`getChargeReleaseBehavior`, etc.) siguen funcionando si se necesitan.
+
+#### Helpers
+
+- `JSF.Combat.targeting` — lock-on idle / re-target rush / attack
+- `JSF.Combat.anim.playDir(sprite, "Rush", launchdir)` — `RushN/E/S/W`
+- Lista de entidades de sala: cache por frame (`src/core/room_entities.lua`)
 
 ### Schema de `stand_definition.lua`
 
@@ -238,6 +309,9 @@ Ver ejemplo en [`template/mod/stand_definition.lua`](../template/mod/stand_defin
     },
     floatOffset = Vector(0, -36),
     behaviorModule = _G.JoJoStandFramework.Combat.behaviors.generic, -- obligatorio
+    combat = { -- opcional; quirks de idle
+        -- chargeReleaseBehavior = "splash",
+    },
     animations = { spIdle = {...}, spMad = {...}, ... },
     stats = { ChargeLength = 7, Punches = 5, ... },
     chargePools = { primary = { maxCharge = 100, gainOnHit = true } },
@@ -406,7 +480,7 @@ Ver checklist completo en [`docs/TESTING.md`](TESTING.md).
 - Mod pre-framework [`kakyoin_1575678153/`](../kakyoin_1575678153/) — ver [`docs/legacy/README.md`](legacy/README.md).
 - Sonidos en `content/sounds.xml` requieren `.wav` en `resources/sounds/{slug}/`. El scaffold copia placeholders desde `template/resources/sounds/character/`.
 - Swap de discos: `MC_PRE_PICKUP_COLLISION` (vanilla); disco anterior va al pedestal vacío más cercano o al suelo.
-- Debug del framework: `jjbaplus-framework/settings.lua` → `DebugStand = true` (overlay `[JSF]` en pantalla).
+- Debug del framework: `jjbaplus-framework/settings.lua` → `DebugOverlay = true` (overlay + logs de `JSF.Events`).
 
 ---
 
@@ -431,3 +505,4 @@ Ver [credit.txt](../credit.txt).
 | 2026-07-05 | Carpetas `jjbaplus-*`; `RegisterMod` `Maxo13:JJBAPlus_*`; solo `content/` (sin sync) |
 | 2026-07-05 | Slugs auto; scripts `.cmd`; fix spawn stand (`ForAllPlayers`, entities2 v5) |
 | 2026-07-05 | Assets en `resources/`; plantilla unificada en `template/` |
+| 2026-07-08 | Skills/Events/compose/`combat` flags; targeting + anim; room entity cache |
