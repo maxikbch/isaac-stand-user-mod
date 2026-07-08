@@ -49,8 +49,9 @@ return {
             chargePool = "primary",
             useCost = stats.SuperMaxCharge,
             cooldown = stats.SuperCooldown,
+            cooldownStartsOn = "complete",
             onPress = function(ctx)
-                emeraldSplash.tryActivate(ctx)
+                return emeraldSplash.tryActivate(ctx)
             end,
         },
     },

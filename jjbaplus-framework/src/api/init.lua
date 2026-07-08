@@ -13,7 +13,7 @@ return function(mod)
     }
 
     mod._registry = registry
-    mod.API_VERSION = 2
+    mod.API_VERSION = 1
     mod.Combat = Combat
     mod.Entities = {
         Spawn = entities.Spawn,
@@ -73,6 +73,10 @@ return function(mod)
     end
 
     mod._playerApi = playerApi
+
+    mod.Character = {
+        registerCallbacks = require("src/character/base_callbacks"),
+    }
 
     _G.JoJoStandFramework = mod
 end

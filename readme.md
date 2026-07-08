@@ -78,6 +78,9 @@ local JSF = _G.JoJoStandFramework
 JSF:RegisterStand(require("stand_definition"))
 ```
 
+- `behaviorModule` es obligatorio; combate default: `JSF.Combat.behaviors.generic`
+- Skills/slots/chargePools: ver [`docs/PROJECT.md`](docs/PROJECT.md)
+
 Referencia de definición: `template/mod/stand_definition.lua`
 
 ## Scripts
@@ -98,6 +101,7 @@ Referencia de definición: `template/mod/stand_definition.lua`
 | `setup-framework-assets.ps1` | Sincroniza sprites del HUD del framework desde `template/resources/gfx/framework/`. |
 | `update-install-mods.ps1` | Regenera `scripts/install-mods.ps1` a partir de `docs/variant_ids.json`. Lo llama `new-character-mod.ps1` al crear un personaje. |
 | `jjba-config.ps1` | Constantes y helpers compartidos (prefijo JJBA+, slugs, variant IDs). No se ejecuta solo; lo importan los otros scripts. |
+| `validate-stands.ps1` | Valida schemas de `stand_definition.lua` contra `variant_ids.json`. |
 | `jjba.local.ps1` | Config local opcional: ruta a `mods/` de Isaac. Ver `jjba.local.ps1.example`. |
 
 ## Créditos

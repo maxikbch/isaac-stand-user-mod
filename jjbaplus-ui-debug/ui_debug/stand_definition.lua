@@ -19,7 +19,7 @@ return {
     },
     floatOffset = Vector(0, -36),
 
-    behaviorModule = require("ui_debug.behaviors.main"),
+    behaviorModule = _G.JoJoStandFramework.Combat.behaviors.generic,
 
     animations = {
         spIdle = { "IdleE", "IdleS", "IdleW", "IdleN" },
@@ -44,6 +44,10 @@ return {
         primary = {
             maxCharge = stats.SuperMaxCharge,
             gainOnHit = true,
+        },
+        secondary = {
+            maxCharge = stats.AltMaxCharge,
+            gainOnHit = false,
         },
     },
 

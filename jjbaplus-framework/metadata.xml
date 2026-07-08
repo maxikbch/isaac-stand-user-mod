@@ -3,7 +3,7 @@
     <name>[JJBA+] Framework</name>
     <directory>jjbaplus_framework</directory>
     <id>3759737623</id>
-    <description>[JJBA+] core framework. Required by all [JJBA+] character mods.
+    <description>[JJBA+] core framework (API v1). Required by all [JJBA+] character mods.
 
 Why a framework? I want to go next level with this tboi JJBA mods, so this framework will help creating new characters and adding new (future) mechanics like:
 - Stand Disc: An item for every stand.

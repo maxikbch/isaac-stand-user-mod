@@ -20,7 +20,7 @@ return {
     },
     floatOffset = Vector(0, -36),
 
-    behaviorModule = require("jotaro.behaviors.main"),
+    behaviorModule = _G.JoJoStandFramework.Combat.behaviors.generic,
 
     animations = {
         spIdle = { "IdleE", "IdleS", "IdleW", "IdleN" },

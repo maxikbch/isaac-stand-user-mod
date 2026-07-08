@@ -137,6 +137,30 @@ local function tryToggle(player, standDef, jsf, slotName, skillId, skillDef, ctx
     end
 end
 
+local function tryCustom(player, standDef, jsf, slotName, skillId, skillDef, ctx, requiresCharge)
+    local standState = jsf.standState
+
+    if requiresCharge and not canPayCost(standState, skillDef, standDef) then
+        return
+    end
+
+    local activated = false
+    if skillDef.onPress then
+        activated = skillDef.onPress(ctx) == true
+    end
+
+    if not activated then
+        return
+    end
+
+    payCost(standState, skillDef, standDef)
+
+    local cooldown = skillDef.cooldown or 0
+    if cooldown > 0 and skillDef.cooldownStartsOn ~= "complete" then
+        SkillState.setCooldown(standState, skillId, cooldown)
+    end
+end
+
 local function tryActivateSlot(slotName, player, standDef, jsf)
     local slotDef = standDef.slots and standDef.slots[slotName]
     if not slotDef or not slotDef.enabled then
@@ -182,9 +206,7 @@ local function tryActivateSlot(slotName, player, standDef, jsf)
     end
 
     if kind == "custom" then
-        if skillDef.onPress then
-            skillDef.onPress(ctx)
-        end
+        tryCustom(player, standDef, jsf, slotName, skillId, skillDef, ctx, requiresCharge)
         return
     end
 

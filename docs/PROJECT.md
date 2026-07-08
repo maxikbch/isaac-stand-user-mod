@@ -44,7 +44,7 @@ La meta no es un solo mod gigante, sino un **ecosistema de mods compatibles**:
 
 No hay mod jugable “Stand User” en el repo: solo la plantilla en `template/`.
 
-Comportamiento de combate por defecto: **punch flurry de Crazy Diamond** (`idle → rush → attack → return`).
+Comportamiento de combate por defecto: **punch flurry genérico** (`idle → rush → attack → return`), expuesto como `JSF.Combat.behaviors.generic`.
 
 **Dependencias:** solo API vanilla de Repentance.
 
@@ -126,6 +126,7 @@ El scaffold copia desde `template/` a `resources/gfx/{slug}/`, `content/gfx/` (m
 | `scripts/update-install-mods.ps1` | Regenera `install-mods.ps1` desde `variant_ids.json`. |
 | `scripts/setup-framework-assets.ps1` | Sincroniza HUD del framework desde `template/resources/gfx/framework/`. |
 | `scripts/jjba-config.ps1` | Helpers compartidos (slugs, namespace, variants, ruta a `mods/`). |
+| `scripts/validate-stands.ps1` | Valida `stand_definition.lua` de mods registrados. |
 | `scripts/jjba.local.ps1` | Config local: `JJBA_IsaacModsPath` (opcional si el repo está en `mods/`). |
 
 ---
@@ -137,7 +138,7 @@ flowchart TD
     subgraph framework [jjbaplus-framework]
         API["RegisterStand / GetActiveStand"]
         CB[callbacks MC_*]
-        DEF[behaviors default CD]
+        DEF[behaviors.generic]
         CORE[set update clear super]
         METER[HUD meter]
     end
@@ -160,7 +161,7 @@ flowchart TD
 | Capa | Framework | Content mod (personaje) |
 |------|-----------|-------------------------|
 | Callbacks del juego | Sí | Solo personaje (stats, costume) |
-| FSM combate default | Sí | No (salvo `behaviorModule`) |
+| FSM combate generic | Sí (`JSF.Combat.behaviors.generic`) | `behaviorModule` obligatorio; usar generic o custom |
 | Meter / HUD | Sí (`resources/gfx/stand_framework/`) | Sprites propios opcionales en `resources/gfx/` |
 | Save/load (`playerData.JSF`) | Sí | No |
 | Swap de discos | Sí | Define el ítem disco en `items.xml` |
@@ -199,6 +200,20 @@ Expuesta al cargar el framework. Versión: `JSF.API_VERSION = 1`.
 | `SwapStandDisc(player, discItemId)` | Cambiar disco (`MC_PRE_PICKUP_COLLISION`) |
 | `EnsureLinkedStandDisc(player)` | Auto-disco si el personaje está en `linkedCharacters` |
 | `GetAllStandDefs()` | Lista de stands registrados |
+| `Combat` | Facade de combate: `checks`, `setStat`, `effects`, `behaviors.generic`, etc. |
+| `Entities.Spawn` | Spawn de entidades stand/partícula por definición |
+
+### Skills, slots y charge pools (API v1)
+
+| Concepto | Descripción |
+|----------|-------------|
+| `chargePools` | Barras de carga (`primary`, `secondary`, …) con `maxCharge`, `gainOnHit`, etc. |
+| `skills` | Habilidades por id; `kind`: `active`, `instant`, `toggle`, `custom` |
+| `slots.skill1` / `skill2` | Botones del meter (C/R3, X/L3) vinculados a un skill |
+
+Estado persistido en `playerData.JSF.standState`: `charges`, `skillDurations`, `skillCooldowns`, `toggles`.
+
+Skills `custom`: `onPress(ctx)` retorna `true` si activó; el dispatcher gestiona charge. Cooldown en activación salvo `cooldownStartsOn = "complete"`.
 
 ### Schema de `stand_definition.lua`
 
@@ -222,10 +237,13 @@ Ver ejemplo en [`template/mod/stand_definition.lua`](../template/mod/stand_defin
         },
     },
     floatOffset = Vector(0, -36),
+    behaviorModule = _G.JoJoStandFramework.Combat.behaviors.generic, -- obligatorio
     animations = { spIdle = {...}, spMad = {...}, ... },
     stats = { ChargeLength = 7, Punches = 5, ... },
+    chargePools = { primary = { maxCharge = 100, gainOnHit = true } },
+    skills = { example_skill = { kind = "active", chargePool = "primary", ... } },
+    slots = { skill1 = { enabled = true, skill = "example_skill", ... } },
     sounds = { punchlight = ..., ... },
-    behaviorModule = nil,
     hooks = {
         getMaxPunches = function(player, standDef) ... end,
         getFinisherDamageMult = function(player, standDef) ... end,
@@ -285,8 +303,9 @@ Fuente de verdad: `variant_ids.json`. El framework resuelve IDs al registrar el 
 
 ### Behaviors
 
-- El framework incluye **un solo default**: punch flurry CD.
-- Combate distinto: `behaviorModule` propio o behaviors copiados/adaptados en el mod del personaje.
+- El framework incluye **`JSF.Combat.behaviors.generic`**: punch flurry (`idle → rush → attack → return`).
+- `behaviorModule` es **obligatorio** en `RegisterStand`.
+- Combate distinto: `behaviorModule` propio en el mod del personaje (ej. Kakyoin: splash, radio).
 
 ### Nombres de ítems
 
@@ -369,6 +388,8 @@ jjbaplus-jotaro/
 
 ## Checklist de prueba manual
 
+Ver checklist completo en [`docs/TESTING.md`](TESTING.md).
+
 - [ ] Solo framework activo → no crashea
 - [ ] Framework + personaje → disco y familiar visibles
 - [ ] Combate: carga → rush → punch flurry
@@ -382,6 +403,7 @@ jjbaplus-jotaro/
 ## Deuda técnica / notas
 
 - Puede quedar código legacy en la raíz del repo (`src/`, `content/`). **No activar** `isaac-stand-user-mod` como mod en Isaac.
+- Mod pre-framework [`kakyoin_1575678153/`](../kakyoin_1575678153/) — ver [`docs/legacy/README.md`](legacy/README.md).
 - Sonidos en `content/sounds.xml` requieren `.wav` en `resources/sounds/{slug}/`. El scaffold copia placeholders desde `template/resources/sounds/character/`.
 - Swap de discos: `MC_PRE_PICKUP_COLLISION` (vanilla); disco anterior va al pedestal vacío más cercano o al suelo.
 - Debug del framework: `jjbaplus-framework/settings.lua` → `DebugStand = true` (overlay `[JSF]` en pantalla).

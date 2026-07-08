@@ -31,7 +31,11 @@ function Combat.defaultInitStandData(standData, player, standDef, standEntity)
     local STATS = standDef.stats
 
     standEntity.PositionOffset = standDef.floatOffset
-    player:GetData().releasedir = Vector(0, 0)
+    local jsf = _G.JoJoStandFramework:GetPlayerData(player)
+    if jsf then
+        jsf.input = jsf.input or {}
+        jsf.input.releasedir = Vector(0, 0)
+    end
     standData.tgttimer = 0
     standData.charge = player.MaxFireDelay * STATS.ChargeLength
     standData.maxcharge = player.MaxFireDelay * STATS.ChargeLength
@@ -70,5 +74,9 @@ function Combat.runBehaviorModule(behaviorModule, player, standDef, jsf, shootDi
         behaviorModule.update(player, standDef, jsf, shootDir)
     end
 end
+
+Combat.behaviors = {
+    generic = require("src/core/combat/behaviors/generic/main"),
+}
 
 return Combat

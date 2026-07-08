@@ -1,34 +1,7 @@
+local SkillState = require("src/skills/state")
+
 local STAND_ID = "hierophant_green"
 local SKILL_ID = "emerald_splash"
-
-local function getSkillDef(standDef)
-    return standDef.skills and standDef.skills[SKILL_ID]
-end
-
-local function getPoolCharge(standState, standDef)
-    local poolId = "primary"
-    local skillDef = getSkillDef(standDef)
-    if skillDef and skillDef.chargePool then
-        poolId = skillDef.chargePool
-    end
-    local charges = standState.charges or {}
-    return charges[poolId] or 0, poolId
-end
-
-local function setPoolCharge(standState, poolId, value)
-    standState.charges = standState.charges or {}
-    standState.charges[poolId] = value
-end
-
-local function getCooldown(standState)
-    local cooldowns = standState.skillCooldowns or {}
-    return cooldowns[SKILL_ID] or 0
-end
-
-local function setCooldown(standState, value)
-    standState.skillCooldowns = standState.skillCooldowns or {}
-    standState.skillCooldowns[SKILL_ID] = value
-end
 
 local function normalizeDir(dir, player)
     if dir and dir:Length() > 0 then
@@ -43,29 +16,13 @@ function emeraldSplash.tryActivate(ctx)
     local player = ctx.player
     local standDef = ctx.standDef
     local jsf = ctx.jsf
-    local standState = ctx.standState
+    local input = jsf.input or {}
 
     if standDef.id ~= STAND_ID then
         return false
     end
 
-    local skillDef = getSkillDef(standDef)
-    if not skillDef then
-        return false
-    end
-
-    if getCooldown(standState) > 0 then
-        return false
-    end
-
-    local charge, poolId = getPoolCharge(standState, standDef)
-    local useCost = skillDef.useCost or standDef.stats.SuperMaxCharge
-    if charge < useCost then
-        return false
-    end
-
-    local playerData = player:GetData()
-    if playerData.shoot then
+    if input.shoot then
         return false
     end
 
@@ -83,22 +40,24 @@ function emeraldSplash.tryActivate(ctx)
         return false
     end
 
-    setPoolCharge(standState, poolId, charge - useCost)
-
     standData.superRush = true
-    standData.launchdir = normalizeDir(playerData.releasedir, player)
+    standData.launchdir = normalizeDir(input.releasedir, player)
     standData.launchto = standData.tgt.Position
     standData.behavior = "rush"
 
     return true
 end
 
-function emeraldSplash.onSuperComplete(player, jsf)
-    local standDef = jsf:GetStand(STAND_ID)
-    local jsfData = jsf:GetPlayerData(player)
-    local standState = jsfData and jsfData.standState
+function emeraldSplash.onSuperComplete(player, jsfPlayerData)
+    local framework = _G.JoJoStandFramework
+    if not framework then
+        return
+    end
+
+    local standDef = framework:GetStand(STAND_ID)
+    local standState = jsfPlayerData and jsfPlayerData.standState
     if standDef and standState then
-        setCooldown(standState, standDef.stats.SuperCooldown)
+        SkillState.setCooldown(standState, SKILL_ID, standDef.stats.SuperCooldown)
     end
 end
 
@@ -115,25 +74,6 @@ function emeraldSplash.cleanupStandState(standEntity)
     standData.radioOrigin = nil
     standData.radioFrames = nil
     standData.superRush = false
-end
-
-function emeraldSplash.postUpdate(JSF)
-    for i = 0, Game():GetNumPlayers() - 1 do
-        local player = Isaac.GetPlayer(i)
-        if player and player:Exists() then
-            local standDef = JSF:GetActiveStand(player)
-            if standDef and standDef.id == STAND_ID then
-                local jsfData = JSF:GetPlayerData(player)
-                local standState = jsfData and jsfData.standState
-                if standState then
-                    local cooldown = getCooldown(standState)
-                    if cooldown > 0 then
-                        setCooldown(standState, cooldown - 1)
-                    end
-                end
-            end
-        end
-    end
 end
 
 return emeraldSplash

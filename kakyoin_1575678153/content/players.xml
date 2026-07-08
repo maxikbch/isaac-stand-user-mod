@@ -1,3 +1,0 @@
-<players root="gfx/characters/players/" portraitroot="gfx/ui/boss/" nameimageroot="gfx/ui/boss/" bigportraitroot="gfx/ui/stage/"> 
-	<player name="Kakyoin" skin="character_kakyoin.png" hp="4" coins="0" keys="2" skinColor="-1" nameimage="playername_kakyoin.png" portrait="playerportrait_kakyoin.png" bigportrait="playerportrait_kakyoin.png"/> 
-</players>

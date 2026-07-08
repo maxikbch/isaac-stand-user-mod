@@ -17,6 +17,15 @@ local function ensurePlayerData(player)
         playerData.JSF.standState = {}
     end
 
+    if not playerData.JSF.input then
+        playerData.JSF.input = {
+            shoot = false,
+            shootpress = false,
+            shootrelease = false,
+            releasedir = Vector(0, 0),
+        }
+    end
+
     return playerData.JSF
 end
 
