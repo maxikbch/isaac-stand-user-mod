@@ -8,10 +8,10 @@ local RADIO_RADIUS = 200
 local vec = emeraldEntities.vecFromAngle
 
 local RADIO_BURST = {
-    { kinds = { "d1", "ns", "d2" }, angles = { 75, 90, 105 } },
-    { kinds = { "d1", "ns", "d2" }, angles = { 345, 0, 15 } },
-    { kinds = { "d1", "ns", "d2" }, angles = { 255, 270, 285 } },
-    { kinds = { "d1", "ns", "d2" }, angles = { 165, 180, 195 } },
+    { angles = { 75, 90, 105 } },
+    { angles = { 345, 0, 15 } },
+    { angles = { 255, 270, 285 } },
+    { angles = { 165, 180, 195 } },
 }
 
 local function spawnRadioBurst(origin, player, standData, stats)
@@ -24,14 +24,13 @@ local function spawnRadioBurst(origin, player, standData, stats)
 
     for i, burst in ipairs(RADIO_BURST) do
         local basePos = origin + origins[i]
-        for j, angle in ipairs(burst.angles) do
+        for _, angle in ipairs(burst.angles) do
             emeraldEntities.spawnTear(
                 player,
                 basePos,
                 vec(angle, EMERALD_SPEED),
                 standData.damage or 1,
-                stats,
-                burst.kinds[j]
+                stats
             )
         end
     end

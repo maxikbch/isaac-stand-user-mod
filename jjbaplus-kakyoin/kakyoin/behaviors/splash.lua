@@ -8,15 +8,7 @@ local sfx = SFXManager()
 local EMERALD_SPEED = 25
 local MAX_PUNCHES = 30
 
-local TEAR_KIND = {
-    N = "ns",
-    E = "ew",
-    S = "ns",
-    W = "ew",
-}
-
 local function spawnSplashTear(standPos, launchdir, player, standData, stats)
-    local suffix = anim.dirSuffix(launchdir)
     local origin = standPos + anim.cardinalOffset(launchdir, 20)
     local angle = anim.cardinalAngle(launchdir)
     emeraldEntities.spawnTear(
@@ -24,8 +16,7 @@ local function spawnSplashTear(standPos, launchdir, player, standData, stats)
         origin,
         Vector.FromAngle(angle) * EMERALD_SPEED,
         standData.damage or 1,
-        stats,
-        TEAR_KIND[suffix]
+        stats
     )
 end
 

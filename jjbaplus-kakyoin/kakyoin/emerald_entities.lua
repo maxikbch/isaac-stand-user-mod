@@ -1,16 +1,15 @@
 local game = Game()
 
 local TEAR_SUBTYPE = 0
+local EMERALD_NAME = "HG Emerald"
+local RADIO_NAME = "HG Emerald Radio"
+--- Base art (`emeralds.anm2`) points toward North (screen up); Isaac 0° is East.
+local SPRITE_ANGLE_OFFSET = 90
 
-local VARIANT_NAMES = {
-    ns = "HG Emerald NS",
-    ew = "HG Emerald EW",
-    d1 = "HG Emerald D1",
-    d2 = "HG Emerald D2",
-    radio = "HG Emerald Radio",
+local variants = {
+    emerald = -1,
+    radio = -1,
 }
-
-local variants = {}
 local initialized = false
 
 local function ensureVariants()
@@ -19,12 +18,14 @@ local function ensureVariants()
     end
     initialized = true
 
-    for key, name in pairs(VARIANT_NAMES) do
-        local variant = Isaac.GetEntityVariantByName(name)
-        variants[key] = variant
-        if variant < 0 then
-            Isaac.DebugString("[JJBA+ Kakyoin] missing entity variant: " .. name)
-        end
+    variants.emerald = Isaac.GetEntityVariantByName(EMERALD_NAME)
+    variants.radio = Isaac.GetEntityVariantByName(RADIO_NAME)
+
+    if variants.emerald < 0 then
+        Isaac.DebugString("[JJBA+ Kakyoin] missing entity variant: " .. EMERALD_NAME)
+    end
+    if variants.radio < 0 then
+        Isaac.DebugString("[JJBA+ Kakyoin] missing entity variant: " .. RADIO_NAME)
     end
 end
 
@@ -32,12 +33,17 @@ local function vecFromAngle(angle, speed)
     return Vector.FromAngle(angle) * speed
 end
 
-local function spawnEmeraldTear(player, position, velocity, damageMult, stats, kind)
+local function applySpriteRotation(tear)
+    local sprite = tear:GetSprite()
+    sprite.Rotation = tear.Velocity:GetAngleDegrees() + SPRITE_ANGLE_OFFSET
+end
+
+local function spawnEmeraldTear(player, position, velocity, damageMult, stats)
     ensureVariants()
 
-    local variant = variants[kind or "ns"]
+    local variant = variants.emerald
     if not variant or variant < 0 then
-        Isaac.DebugString("[JJBA+ Kakyoin] fallback tear variant for kind: " .. tostring(kind))
+        Isaac.DebugString("[JJBA+ Kakyoin] fallback tear variant for emerald")
         variant = 0
     end
 
@@ -51,6 +57,8 @@ local function spawnEmeraldTear(player, position, velocity, damageMult, stats, k
     tear.CollisionDamage = player.Damage * damageMult * stats.Damage
     tear.Scale = stats.PunchSize
     tear.Height = -8
+    applySpriteRotation(tear)
+    tear:GetData().jjbaEmerald = true
 
     return entity
 end
@@ -66,9 +74,16 @@ local function spawnRadioEffect(position)
     return Isaac.Spawn(EntityType.ENTITY_EFFECT, variant, TEAR_SUBTYPE, position, Vector(0, 0), nil)
 end
 
+local function onTearUpdate(tear)
+    if tear:GetData().jjbaEmerald then
+        applySpriteRotation(tear)
+    end
+end
+
 return {
     vecFromAngle = vecFromAngle,
     spawnTear = spawnEmeraldTear,
     spawnRadioEffect = spawnRadioEffect,
+    onTearUpdate = onTearUpdate,
     init = ensureVariants,
 }
