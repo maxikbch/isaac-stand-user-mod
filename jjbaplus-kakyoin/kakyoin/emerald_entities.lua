@@ -1,4 +1,5 @@
 local game = Game()
+local roomLayout = require("kakyoin.room_layout")
 
 local TEAR_SUBTYPE = 0
 local EMERALD_NAME = "HG Emerald"
@@ -38,8 +39,14 @@ local function applySpriteRotation(tear)
     sprite.Rotation = tear.Velocity:GetAngleDegrees() + SPRITE_ANGLE_OFFSET
 end
 
-local function spawnEmeraldTear(player, position, velocity, damageMult, stats)
+--- Native crop size of `emerald_radio.anm2` layer art.
+local RADIO_BASE_W = 399
+local RADIO_BASE_H = 318
+
+---@param opts { clampSpawn?: boolean, spectral?: boolean, piercing?: boolean, scaleMult?: number }|nil
+local function spawnEmeraldTear(player, position, velocity, damageMult, stats, opts)
     ensureVariants()
+    opts = opts or {}
 
     local variant = variants.emerald
     if not variant or variant < 0 then
@@ -47,7 +54,11 @@ local function spawnEmeraldTear(player, position, velocity, damageMult, stats)
         variant = 0
     end
 
-    local spawnPos = game:GetRoom():GetClampedPosition(position, 20)
+    local spawnPos = position
+    if opts.clampSpawn ~= false then
+        spawnPos = game:GetRoom():GetClampedPosition(position, 20)
+    end
+
     local entity = Isaac.Spawn(EntityType.ENTITY_TEAR, variant, TEAR_SUBTYPE, spawnPos, velocity, nil)
     if not entity or not entity:Exists() then
         return nil
@@ -55,23 +66,64 @@ local function spawnEmeraldTear(player, position, velocity, damageMult, stats)
 
     local tear = entity:ToTear()
     tear.CollisionDamage = player.Damage * damageMult * stats.Damage
-    tear.Scale = stats.PunchSize
-    tear.Height = -8
+    tear.Scale = stats.PunchSize * (opts.scaleMult or 1)
+    -- Start near ground level; fall quickly so they don't float high above the shadow.
+    tear.Height = stats.EmeraldHeight or -22
+    tear.FallingSpeed = 0
+    tear.FallingAcceleration = stats.EmeraldFallingAcceleration or 0.1
+
+    if opts.spectral then
+        tear:AddTearFlags(TearFlags.TEAR_SPECTRAL)
+    end
+    if opts.piercing then
+        tear:AddTearFlags(TearFlags.TEAR_PIERCING)
+    end
+
     applySpriteRotation(tear)
     tear:GetData().jjbaEmerald = true
 
     return entity
 end
 
+local function fitRadioTelegraph(effect)
+    if not effect or not effect:Exists() then
+        return
+    end
+
+    local topLeft, bottomRight = roomLayout.getEffectiveRoomRect()
+    local size = bottomRight - topLeft
+    local sprite = effect:GetSprite()
+    -- Stretch to the effective room rect (deformation OK).
+    sprite.Scale = Vector((size.X / RADIO_BASE_W) * 1.05, (size.Y / RADIO_BASE_H) * 1.05)
+    -- Use effective-rect center (not GetCenterPos) so L / thin rooms don't skew the overlay.
+    effect.Position = (topLeft + bottomRight) * 0.5
+    effect.Velocity = Vector.Zero
+end
+
+local function setRadioTelegraphAlpha(effect, alpha)
+    if not effect or not effect:Exists() then
+        return
+    end
+    local sprite = effect:GetSprite()
+    sprite.Color = Color(1, 1, 1, alpha)
+end
+
 local function spawnRadioEffect(position)
     ensureVariants()
 
+    local room = game:GetRoom()
+    local spawnPos = position or room:GetCenterPos()
     local variant = variants.radio
+    local entity
     if not variant or variant < 0 then
-        return Isaac.Spawn(EntityType.ENTITY_EFFECT, EffectVariant.NULL, 0, position, Vector(0, 0), nil)
+        entity = Isaac.Spawn(EntityType.ENTITY_EFFECT, EffectVariant.NULL, 0, spawnPos, Vector(0, 0), nil)
+    else
+        entity = Isaac.Spawn(EntityType.ENTITY_EFFECT, variant, TEAR_SUBTYPE, spawnPos, Vector(0, 0), nil)
     end
 
-    return Isaac.Spawn(EntityType.ENTITY_EFFECT, variant, TEAR_SUBTYPE, position, Vector(0, 0), nil)
+    fitRadioTelegraph(entity)
+    setRadioTelegraphAlpha(entity, 0)
+    return entity
 end
 
 local function onTearUpdate(tear)
@@ -84,6 +136,8 @@ return {
     vecFromAngle = vecFromAngle,
     spawnTear = spawnEmeraldTear,
     spawnRadioEffect = spawnRadioEffect,
+    fitRadioTelegraph = fitRadioTelegraph,
+    setRadioTelegraphAlpha = setRadioTelegraphAlpha,
     onTearUpdate = onTearUpdate,
     init = ensureVariants,
 }

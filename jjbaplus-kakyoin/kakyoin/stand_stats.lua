@@ -19,5 +19,35 @@
     SuperMaxCharge = 80,
     SuperDuration = 0,
     PowerCost = 10,
-    RadioBurstFrames = 15,
+    -- 20m Emerald Splash phases (kurae → layout → rain)
+    -- WAV lengths: ~0.53s / ~1.19s / ~1.75s — scaled to ~5s total at 30 tps.
+    RadioKuraeFrames = 18,
+    RadioLayoutFrames = 34,
+    RadioRainFrames = 65,
+    RadioEmeraldsPerFrame = 3,
+    RadioRainShakeTimeout = 10,
+    RadioSpawnMargin = 80,
+    RadioTargetHpFloor = 1,
+    RadioTrailCount = 6,
+    RadioTrailSpeed = 28,
+    -- Frames at full opacity, then frames to fade out (independent of kurae phase length).
+    RadioTrailHoldFrames = 5,
+    RadioTrailFadeFrames = 5,
+    -- Edge trails: layout construction + rain muzzle flashes.
+    RadioEdgeTrailMax = 6,
+    RadioLayoutEdgeTrailsPerTick = 1,
+    RadioLayoutEdgeInterval = 3,
+    RadioLayoutEdgeHoldFrames = 8,
+    RadioLayoutEdgeFadeFrames = 14,
+    RadioLayoutEdgeOscAmplitude = 22,
+    RadioLayoutEdgeOscSpeed = 0.8,
+    RadioRainEdgeTrailChance = 0.45,
+    RadioRainEdgeHoldFrames = 3,
+    RadioRainEdgeFadeFrames = 5,
+    -- Emerald projectile flight / Emerald Splash scatter
+    EmeraldHeight = -30,
+    EmeraldFallingAcceleration = 0.01,
+    SplashAngleSpread = 11,
+    SplashPositionJitter = 9,
+    SplashForwardJitter = 6,
 }

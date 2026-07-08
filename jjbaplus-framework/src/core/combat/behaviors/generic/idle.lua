@@ -79,10 +79,19 @@ return function(player, standDef, jsf, shootDir)
     local maxcharge = setStat:MaxCharge(player, standDef)
 
     local faceSpriteIndex = ((player:GetHeadDirection() + 2) % 4) + 1
-    local aimIndex = faceSpriteIndex
     if player:HasCollectible(CollectibleType.COLLECTIBLE_LUDOVICO_TECHNIQUE) then
         faceSpriteIndex = utils:VecDir(shootDir) + 1
-        aimIndex = faceSpriteIndex
+    end
+    -- While charging, face shoot aim (releasedir), not head direction.
+    local aimIndex = faceSpriteIndex
+    if input.shoot then
+        local aimDir = input.releasedir
+        if aimDir.X == 0 and aimDir.Y == 0 then
+            aimDir = shootDir
+        end
+        if aimDir.X ~= 0 or aimDir.Y ~= 0 then
+            aimIndex = utils:VecDir(aimDir) + 1
+        end
     end
 
     local windSuffix = combat.windAnimSuffix
@@ -93,6 +102,19 @@ return function(player, standDef, jsf, shootDir)
     local windOnlyAtFull = combat.windOnlyAtFullCharge
     if windOnlyAtFull == nil then
         windOnlyAtFull = hooks.idleWindOnlyAtFullCharge == true
+    end
+
+    local function isPlayingCardinal(prefix)
+        return standSprite:IsPlaying(prefix .. "E")
+            or standSprite:IsPlaying(prefix .. "S")
+            or standSprite:IsPlaying(prefix .. "W")
+            or standSprite:IsPlaying(prefix .. "N")
+    end
+
+    local function reorientIfPlaying(prefix, animList)
+        if isPlayingCardinal(prefix) and not standSprite:IsPlaying(animList[aimIndex]) then
+            standSprite:Play(animList[aimIndex])
+        end
     end
 
     if not input.shoot then
@@ -135,21 +157,13 @@ return function(player, standDef, jsf, shootDir)
         elseif standSprite:IsEventTriggered("FlashEnd") then
             standSprite:Play(anims.spReady[aimIndex])
         end
-        if windSuffix == "2" then
-            if standSprite:IsPlaying("Wound2E") or standSprite:IsPlaying("Wound2S") or standSprite:IsPlaying("Wound2W") or standSprite:IsPlaying("Wound2N") then
-                standSprite:Play(anims.spWound[aimIndex])
-            end
-            if standSprite:IsPlaying("ReadyE") or standSprite:IsPlaying("ReadyS") or standSprite:IsPlaying("ReadyW") or standSprite:IsPlaying("ReadyN") then
-                standSprite:Play(anims.spReady[aimIndex])
-            end
-        else
-            if standSprite:IsPlaying("WoundS") or standSprite:IsPlaying("WoundN") or standSprite:IsPlaying("WoundE") or standSprite:IsPlaying("WoundW") then
-                standSprite:Play(anims.spWound[aimIndex])
-            end
-            if standSprite:IsPlaying("ReadyS") or standSprite:IsPlaying("ReadyN") or standSprite:IsPlaying("ReadyE") or standSprite:IsPlaying("ReadyW") then
-                standSprite:Play(anims.spReady[aimIndex])
-            end
-        end
+
+        local woundPrefix = windSuffix == "2" and "Wound2" or "Wound"
+        reorientIfPlaying("Wind", anims.spWind)
+        reorientIfPlaying("Wind2", anims.spWind)
+        reorientIfPlaying(woundPrefix, anims.spWound)
+        reorientIfPlaying("Flash", anims.spFlash)
+        reorientIfPlaying("Ready", anims.spReady)
 
         standData.charge = math.max(0, standData.charge - 1)
         if game:GetRoom():GetFrameCount() <= 1 then

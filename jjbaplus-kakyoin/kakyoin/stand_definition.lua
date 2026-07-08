@@ -1,6 +1,9 @@
 ﻿local character = require("kakyoin.character_definition")
+local settings = require("kakyoin.settings")
 local stats = require("kakyoin.stand_stats")
 local emeraldSplash = require("kakyoin.emerald_splash")
+
+local freeSkill1 = settings.FreeSkill1 == true
 
 return {
     id = "hierophant_green",
@@ -55,8 +58,8 @@ return {
         emerald_splash = {
             kind = "custom",
             chargePool = "primary",
-            useCost = stats.SuperMaxCharge,
-            cooldown = stats.SuperCooldown,
+            useCost = freeSkill1 and 0 or stats.SuperMaxCharge,
+            cooldown = freeSkill1 and 0 or stats.SuperCooldown,
             cooldownStartsOn = "complete",
             onPress = function(ctx)
                 return emeraldSplash.tryActivate(ctx)
@@ -68,7 +71,7 @@ return {
         skill1 = {
             enabled = true,
             skill = "emerald_splash",
-            requiresCharge = true,
+            requiresCharge = not freeSkill1,
             chargePool = "primary",
         },
         skill2 = {
@@ -89,6 +92,9 @@ return {
         emeraldSplash = Isaac.GetSoundIdByName("HierophantGreen_EmeraldSplash"),
         emerald = Isaac.GetSoundIdByName("HierophantGreen_Emerald"),
         splash = Isaac.GetSoundIdByName("HierophantGreen_Splash"),
+        kurae = Isaac.GetSoundIdByName("HierophantGreen_Kurae"),
+        twentyMeters = Isaac.GetSoundIdByName("HierophantGreen_20Meters"),
+        emeraldoSplashuo = Isaac.GetSoundIdByName("HierophantGreen_EmeraldoSplashuo"),
     },
 
     linkedCharacters = {

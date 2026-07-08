@@ -7,16 +7,33 @@ local sfx = SFXManager()
 
 local EMERALD_SPEED = 25
 local MAX_PUNCHES = 30
+--- Degrees of random yaw so the stream fans out instead of a straight line.
+local ANGLE_SPREAD = 11
+--- Perpendicular / forward spawn jitter (pixels).
+local POSITION_JITTER = 9
+local FORWARD_JITTER = 6
 
 local function spawnSplashTear(standPos, launchdir, player, standData, stats)
-    local origin = standPos + anim.cardinalOffset(launchdir, 20)
-    local angle = anim.cardinalAngle(launchdir)
+    local baseAngle = anim.cardinalAngle(launchdir)
+    local angleSpread = stats.SplashAngleSpread or ANGLE_SPREAD
+    local posJitter = stats.SplashPositionJitter or POSITION_JITTER
+    local fwdJitter = stats.SplashForwardJitter or FORWARD_JITTER
+
+    local angle = baseAngle + ((math.random() * 2) - 1) * angleSpread
+    local lateral = ((math.random() * 2) - 1) * posJitter
+    local forward = math.random() * fwdJitter
+    local origin = standPos
+        + anim.cardinalOffset(launchdir, 20)
+        + Vector.FromAngle(baseAngle + 90) * lateral
+        + Vector.FromAngle(baseAngle) * forward
+
     emeraldEntities.spawnTear(
         player,
         origin,
         Vector.FromAngle(angle) * EMERALD_SPEED,
         standData.damage or 1,
-        stats
+        stats,
+        { spectral = true }
     )
 end
 

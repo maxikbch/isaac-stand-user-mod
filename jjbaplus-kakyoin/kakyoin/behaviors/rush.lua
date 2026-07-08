@@ -35,17 +35,7 @@ return function(player, standDef, jsf, shootDir)
     standEntity.Velocity = diff2:Normalized() * math.min(25, diff2:Length())
 
     if diff2:Length() < 15 then
-        if standData.superRush then
-            standData.superRush = false
-            if standData.tgt then
-                standData.behavior = "radio"
-                standData.radioFrames = standDef.stats.RadioBurstFrames
-            else
-                standData.behavior = "idle"
-            end
-        else
-            standData.behavior = "return"
-        end
+        standData.behavior = "return"
     end
 
     if playerData.mytgt and playerData.mytgt:Exists() then

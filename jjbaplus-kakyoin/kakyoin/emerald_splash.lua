@@ -1,19 +1,12 @@
 local SkillState = require("src/skills/state")
+local settings = require("kakyoin.settings")
 
 local STAND_ID = "hierophant_green"
 local SKILL_ID = "emerald_splash"
 
-local function normalizeDir(dir, player)
-    if dir and dir:Length() > 0 then
-        return dir
-    end
-    return Vector.FromAngle(player:GetHeadDirection() * 90)
-end
-
 local emeraldSplash = {}
 
 function emeraldSplash.tryActivate(ctx)
-    local player = ctx.player
     local standDef = ctx.standDef
     local jsf = ctx.jsf
     local input = jsf.input or {}
@@ -36,19 +29,20 @@ function emeraldSplash.tryActivate(ctx)
         return false
     end
 
-    if not standData.tgt then
-        return false
-    end
-
-    standData.superRush = true
-    standData.launchdir = normalizeDir(input.releasedir, player)
-    standData.launchto = standData.tgt.Position
-    standData.behavior = "rush"
+    local s = standDef.stats
+    standData.behavior = "radio"
+    standData.radioFrames = (s.RadioKuraeFrames or 23) + (s.RadioLayoutFrames or 51) + (s.RadioRainFrames or s.RadioBurstFrames or 76)
+    standData.radioMaxFrames = standData.radioFrames
+    standData.radioPhase = nil
 
     return true
 end
 
 function emeraldSplash.onSuperComplete(player, jsfPlayerData)
+    if settings.FreeSkill1 then
+        return
+    end
+
     local framework = _G.JoJoStandFramework
     if not framework then
         return
@@ -70,9 +64,27 @@ function emeraldSplash.cleanupStandState(standEntity)
     if standData.radioEntity and standData.radioEntity:Exists() then
         standData.radioEntity:Remove()
     end
+    if standData.radioTrails then
+        for _, entity in ipairs(standData.radioTrails) do
+            if entity and entity:Exists() then
+                entity:Remove()
+            end
+        end
+    end
+    if standData.radioEdgeTrails then
+        for _, entity in ipairs(standData.radioEdgeTrails) do
+            if entity and entity:Exists() then
+                entity:Remove()
+            end
+        end
+    end
     standData.radioEntity = nil
     standData.radioOrigin = nil
     standData.radioFrames = nil
+    standData.radioMaxFrames = nil
+    standData.radioPhase = nil
+    standData.radioTrails = nil
+    standData.radioEdgeTrails = nil
     standData.superRush = false
 end
 

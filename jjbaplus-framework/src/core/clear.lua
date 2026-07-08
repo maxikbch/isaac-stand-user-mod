@@ -26,6 +26,10 @@ local function StandClear(standDefs, linkedHashes, roomEntities)
             end
 
             if entities.Matches(standDef, entityIds.KIND_PARTICLE, en) then
+                local particleData = en:GetData()
+                if particleData.jjbaManagedParticle then
+                    break
+                end
                 en:GetSprite().Color = Color(1, 1, 1, .3 * (1 / en.FrameCount), 0, 0, 0)
                 if en.FrameCount >= 3 then
                     en:Remove()

@@ -35,4 +35,13 @@
 	<sound name="HierophantGreen_Splash">
 		<sample weight="1" path="splash.wav" />
 	</sound>
+	<sound name="HierophantGreen_Kurae">
+		<sample weight="1" path="kurae.wav" />
+	</sound>
+	<sound name="HierophantGreen_20Meters">
+		<sample weight="1" path="20_meters.wav" />
+	</sound>
+	<sound name="HierophantGreen_EmeraldoSplashuo">
+		<sample weight="1" path="emeraldo_splashuo.wav" />
+	</sound>
 </sounds>
