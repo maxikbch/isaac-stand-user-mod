@@ -167,6 +167,27 @@ local function validateStandDef(def)
     end
 end
 
+local function normalizeTargeting(def)
+    local targeting = def.targeting or {}
+    def.targeting = targeting
+
+    if targeting.entities == nil then
+        targeting.entities = true
+    end
+    if targeting.enemies == nil then
+        targeting.enemies = true
+    end
+    if targeting.grid == nil then
+        targeting.grid = true
+    end
+    if targeting.pushBombs == nil then
+        targeting.pushBombs = true
+    end
+    if targeting.targetBombs == nil then
+        targeting.targetBombs = true
+    end
+end
+
 local function normalizeStandDef(def)
     def.stats = utils:TableMerge(utils:TableMerge({}, defaultStats), def.stats or {})
     def.hooks = def.hooks or {}
@@ -178,6 +199,7 @@ local function normalizeStandDef(def)
     def.meterGfx = def.meterGfx or {}
 
     normalizeEntities(def)
+    normalizeTargeting(def)
     normalizeChargePools(def)
     normalizeSlots(def)
     normalizeSkills(def)

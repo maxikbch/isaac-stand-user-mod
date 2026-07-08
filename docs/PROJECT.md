@@ -280,6 +280,31 @@ Flags leídos por el idle genérico (Kakyoin los usa):
 
 Hooks equivalentes (`getChargeReleaseBehavior`, etc.) siguen funcionando si se necesitan.
 
+#### `standDef.targeting` (qué se puede lockear)
+
+Política declarativa leída por `Combat.checks` (defaults = comportamiento clásico):
+
+| Campo | Default | Efecto |
+|-------|---------|--------|
+| `entities` | `true` | Master switch de lock a entidades |
+| `enemies` | `true` | Enemigos vulnerables |
+| `grid` | `true` | Fireplace / TNT / poop (o `gridTypes`) |
+| `pushBombs` | `true` | Bombas empujables (`CanPush`) |
+| `targetBombs` | `true` | Bombas como target no-enemigo |
+| `entityTypes` | — | Lista extra de `EntityType` no-enemigo |
+| `gridTypes` | fireplace, TNT, poop | Override de tipos de grid |
+
+```lua
+targeting = {
+    enemies = true,
+    grid = false,
+    pushBombs = false,
+    targetBombs = false,
+    -- entityTypes = { EntityType.ENTITY_PICKUP },
+    -- gridTypes = { GridEntityType.GRID_TNT },
+},
+```
+
 #### Helpers
 
 - `JSF.Combat.targeting` — lock-on idle / re-target rush / attack
@@ -312,6 +337,12 @@ Ver ejemplo en [`template/mod/stand_definition.lua`](../template/mod/stand_defin
     behaviorModule = _G.JoJoStandFramework.Combat.behaviors.generic, -- obligatorio
     combat = { -- opcional; quirks de idle
         -- chargeReleaseBehavior = "splash",
+    },
+    targeting = { -- opcional; defaults = enemies+grid+bombs
+        -- enemies = true,
+        -- grid = true,
+        -- pushBombs = true,
+        -- targetBombs = true,
     },
     animations = { spIdle = {...}, spMad = {...}, ... },
     stats = { ChargeLength = 7, Punches = 5, ... },
@@ -508,3 +539,4 @@ Ver [credit.txt](../credit.txt).
 | 2026-07-05 | Assets en `resources/`; plantilla unificada en `template/` |
 | 2026-07-08 | Skills/Events/compose/`combat` flags; targeting + anim; room entity cache |
 | 2026-07-08 | Animations namespace only (`standDef.animations.*`); no flatten en RegisterStand |
+| 2026-07-08 | `standDef.targeting` declarativo (enemies/grid/bombs/entityTypes/gridTypes) |

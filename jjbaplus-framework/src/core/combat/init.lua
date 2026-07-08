@@ -58,8 +58,9 @@ function Combat.defaultInitStandData(standData, player, standDef, standEntity)
     standData.posrate = 0.08
     standData.alpha = -3
     standData.alphagoal = -3
-    standData.TargetEntity = true
-    standData.TargetGrid = true
+    local targetingPolicy = standDef.targeting or {}
+    standData.TargetEntity = targetingPolicy.entities ~= false
+    standData.TargetGrid = targetingPolicy.grid ~= false
 end
 
 function Combat.initStandData(standDef, standData, player, standEntity)

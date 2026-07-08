@@ -48,12 +48,12 @@ return function(player, standDef, jsf, shootDir)
 
     if standData.statetime % 4 == 0 and standData.punches < standData.maxpunches then
         standData.punches = standData.punches + 1
-        if (not standData.tgt) or (standData.tgt and standChecks:IsTargetable(standData.tgt, player, standEntity) and not standChecks:IsValidEnemy(standData.tgt, player, standEntity) and not standData.tgt.CollisionClass) then
+        if (not standData.tgt) or (standData.tgt and standChecks:IsTargetable(standData.tgt, player, standDef, standEntity) and not standChecks:IsValidEnemy(standData.tgt, player, standDef, standEntity) and not standData.tgt.CollisionClass) then
             standData.punches = standData.maxpunches
         end
         if standData.tgt and standData.tgt.CollisionClass then
             StandEffects:ToGridEntities(player, standDef, standData.tgt)
-            if not standChecks:IsValidGridEntity(standData.tgt.Position, player, standEntity) and standData.punches < standData.maxpunches then
+            if not standChecks:IsValidGridEntity(standData.tgt.Position, player, standDef, standEntity) and standData.punches < standData.maxpunches then
                 standData.punches = standData.maxpunches
             end
         end
@@ -105,7 +105,7 @@ return function(player, standDef, jsf, shootDir)
             knockback = knockback * ITEM_MODIFIERS.PiscesKnockbackMult
         end
         local magnet = player:HasCollectible(CollectibleType.COLLECTIBLE_STRANGE_ATTRACTOR)
-        targeting.forEachValidEnemy(player, standEntity, function(en)
+        targeting.forEachValidEnemy(player, standDef, standEntity, function(en)
             local bossmult = 1
             if en:IsBoss() then bossmult = STATS.KnockbackBossMult end
             local length = (en.Position - hitpos):Length()
