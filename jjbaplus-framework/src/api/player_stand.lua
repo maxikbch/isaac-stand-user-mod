@@ -1,5 +1,6 @@
 local utils = require("src/utils")
 local debug = require("src/debug")
+local EventBus = require("src/events/bus")
 
 local function ensurePlayerData(player)
     local playerData = player:GetData()
@@ -135,6 +136,14 @@ return function(registry)
 
         jsf.activeDiscItem = newDiscItem
         jsf.activeStandId = newStandId
+
+        EventBus.emit("stand_disc_swapped", {
+            player = player,
+            oldDisc = oldDisc,
+            newDisc = newDiscItem,
+            newStandId = newStandId,
+        })
+
         return true
     end
 

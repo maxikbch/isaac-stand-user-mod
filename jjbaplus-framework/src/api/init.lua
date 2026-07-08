@@ -4,6 +4,8 @@ local StandInput = require("src/core/input")
 local Combat = require("src/core/combat/init")
 local entities = require("src/core/entities")
 local entityIds = require("src/constants/entity_ids")
+local SkillFacade = require("src/skills/facade")
+local EventBus = require("src/events/bus")
 
 return function(mod)
     local registry = {
@@ -73,6 +75,9 @@ return function(mod)
     end
 
     mod._playerApi = playerApi
+
+    mod.Skills = SkillFacade
+    mod.Events = EventBus
 
     mod.Character = {
         registerCallbacks = require("src/character/base_callbacks"),

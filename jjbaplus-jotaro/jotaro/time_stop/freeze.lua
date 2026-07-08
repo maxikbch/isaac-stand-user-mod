@@ -1,13 +1,14 @@
 local context = require("jotaro.time_stop.context")
 
 local function updateTimeFreeze(player, standDef, standState)
+    local JSF = _G.JoJoStandFramework
     local entities = Isaac.GetRoomEntities()
 
     if not player:HasCollectible(standDef.discItem) or Game():GetRoom():GetFrameCount() == 0 then
-        context.setSkillDuration(standState, 0)
+        context.setSkillDuration(player, 0, JSF)
     end
 
-    local duration = context.getSkillDuration(standState)
+    local duration = context.getSkillDuration(player, JSF)
 
     if duration == 1 then
         for i, entity in pairs(entities) do

@@ -17,8 +17,8 @@ local function onShader(name, JSF)
 
     local maxTime = standDef.stats.SuperDuration
 
-    context.forEachStarPlatinumPlayer(JSF, function(_, _, standState)
-        local duration = context.getSkillDuration(standState)
+    context.forEachStarPlatinumPlayer(JSF, function(player, standDef)
+        local duration = context.getSkillDuration(player, JSF)
         if duration > 0 then
             dist = 1 / (maxTime - 2 - duration)
                 + 1 / (duration - 2)

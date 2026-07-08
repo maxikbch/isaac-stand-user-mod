@@ -1,0 +1,16 @@
+name: Validate
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  validate-stands:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate stand definitions
+        shell: pwsh
+        run: .\scripts\validate-stands.ps1

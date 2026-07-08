@@ -70,6 +70,7 @@ return function(player, standDef, jsf, shootDir)
     end
 
     local maxcharge = setStat:MaxCharge(player, standDef)
+    local hooks = standDef.hooks or {}
 
     local faceSpriteIndex = ((player:GetHeadDirection() + 2) % 4) + 1
     local aimIndex = ((player:GetHeadDirection() + 2) % 4) + 1
@@ -77,19 +78,31 @@ return function(player, standDef, jsf, shootDir)
         faceSpriteIndex = utils:VecDir(shootDir) + 1
         aimIndex = utils:VecDir(shootDir) + 1
     end
+
+    local windSuffix = hooks.windAnimSuffix or "2"
+
     if not input.shoot then
-        if game:GetRoom():IsClear() then
+        if hooks.getIdleFaceAnim then
+            standSprite:Play(hooks.getIdleFaceAnim(standDef, faceSpriteIndex, game:GetRoom():IsClear()))
+        elseif game:GetRoom():IsClear() then
             standSprite:Play(standDef.spIdle[faceSpriteIndex])
         else
             standSprite:Play(standDef.spMad[faceSpriteIndex])
         end
         if standData.charge == 0 then
             standData.charge = maxcharge
-            standData.behavior = "rush"
+            if hooks.getChargeReleaseBehavior then
+                standData.behavior = hooks.getChargeReleaseBehavior(player, standDef, standData)
+            else
+                standData.behavior = "rush"
+            end
             standData.launchdir = input.releasedir
             if standData.launchdir.X == 0 and standData.launchdir.Y == 0 then standData.launchdir = Vector(1, 0) end
+        elseif hooks.onIdleReleasePartialCharge then
+            hooks.onIdleReleasePartialCharge(standData, maxcharge)
+        else
+            standData.charge = math.min(maxcharge, standData.charge + (maxcharge / 90))
         end
-        standData.charge = math.min(maxcharge, standData.charge + (maxcharge / 90))
         standData.ready = false
         if game:GetRoom():GetFrameCount() < 1 or not player:HasCollectible(CollectibleType.COLLECTIBLE_LUDOVICO_TECHNIQUE) then
             standData.launchto = game:GetRoom():GetClampedPosition(playerPosition + ((input.releasedir * standData.range) + (player:GetTearMovementInheritance(input.releasedir) * 10)), 20)
@@ -97,7 +110,9 @@ return function(player, standDef, jsf, shootDir)
     else
         setStat:Range(player, standDef, standEntity)
         standData.launchto = game:GetRoom():GetClampedPosition(playerPosition + ((input.releasedir * standData.range) + (player:GetTearMovementInheritance(shootDir) * 10)), 20)
-        if standData.charge > 0 then
+        local showWind = hooks.idleWindOnlyAtFullCharge and standData.charge == maxcharge
+            or not hooks.idleWindOnlyAtFullCharge and standData.charge > 0
+        if showWind then
             standSprite:Play(standDef.spWind[aimIndex])
         elseif standSprite:IsEventTriggered("WindEnd") then
             standSprite:Play(standDef.spWound[aimIndex])
@@ -110,11 +125,20 @@ return function(player, standDef, jsf, shootDir)
         elseif standSprite:IsEventTriggered("FlashEnd") then
             standSprite:Play(standDef.spReady[aimIndex])
         end
-        if standSprite:IsPlaying("Wound2E") or standSprite:IsPlaying("Wound2S") or standSprite:IsPlaying("Wound2W") or standSprite:IsPlaying("Wound2N") then
-            standSprite:Play(standDef.spWound[aimIndex])
-        end
-        if standSprite:IsPlaying("ReadyE") or standSprite:IsPlaying("ReadyS") or standSprite:IsPlaying("ReadyW") or standSprite:IsPlaying("ReadyN") then
-            standSprite:Play(standDef.spReady[aimIndex])
+        if windSuffix == "2" then
+            if standSprite:IsPlaying("Wound2E") or standSprite:IsPlaying("Wound2S") or standSprite:IsPlaying("Wound2W") or standSprite:IsPlaying("Wound2N") then
+                standSprite:Play(standDef.spWound[aimIndex])
+            end
+            if standSprite:IsPlaying("ReadyE") or standSprite:IsPlaying("ReadyS") or standSprite:IsPlaying("ReadyW") or standSprite:IsPlaying("ReadyN") then
+                standSprite:Play(standDef.spReady[aimIndex])
+            end
+        else
+            if standSprite:IsPlaying("WoundS") or standSprite:IsPlaying("WoundN") or standSprite:IsPlaying("WoundE") or standSprite:IsPlaying("WoundW") then
+                standSprite:Play(standDef.spWound[aimIndex])
+            end
+            if standSprite:IsPlaying("ReadyS") or standSprite:IsPlaying("ReadyN") or standSprite:IsPlaying("ReadyE") or standSprite:IsPlaying("ReadyW") then
+                standSprite:Play(standDef.spReady[aimIndex])
+            end
         end
 
         standData.charge = math.max(0, standData.charge - 1)

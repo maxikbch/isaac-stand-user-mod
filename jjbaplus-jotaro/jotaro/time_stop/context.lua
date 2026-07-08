@@ -1,14 +1,12 @@
 local STAND_ID = "star_platinum"
 local SKILL_ID = "time_stop"
 
-local function getSkillDuration(standState)
-    standState.skillDurations = standState.skillDurations or {}
-    return standState.skillDurations[SKILL_ID] or 0
+local function getSkillDuration(player, JSF)
+    return JSF.Skills.getDuration(player, SKILL_ID, JSF)
 end
 
-local function setSkillDuration(standState, value)
-    standState.skillDurations = standState.skillDurations or {}
-    standState.skillDurations[SKILL_ID] = value
+local function setSkillDuration(player, value, JSF)
+    JSF.Skills.setDuration(player, SKILL_ID, value, JSF)
 end
 
 local function getStandContext(player, JSF)

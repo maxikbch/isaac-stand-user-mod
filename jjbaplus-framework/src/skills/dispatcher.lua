@@ -1,6 +1,7 @@
 local StandInput = require("src/core/input")
 local SkillState = require("src/skills/state")
 local SkillResolve = require("src/skills/resolve")
+local EventBus = require("src/events/bus")
 local utils = require("src/utils")
 
 local SLOT_BINDINGS = {
@@ -75,6 +76,14 @@ local function activateActive(player, standDef, jsf, slotName, skillId, skillDef
     if skillDef.onActivate then
         skillDef.onActivate(ctx)
     end
+
+    EventBus.emit("skill_activate", {
+        player = player,
+        standDef = standDef,
+        skillId = skillId,
+        skillDef = skillDef,
+        ctx = ctx,
+    })
 end
 
 local function deactivateActive(player, standDef, jsf, skillId, skillDef, ctx)
@@ -90,6 +99,14 @@ local function deactivateActive(player, standDef, jsf, skillId, skillDef, ctx)
     if skillDef.onDeactivate then
         skillDef.onDeactivate(ctx)
     end
+
+    EventBus.emit("skill_deactivate", {
+        player = player,
+        standDef = standDef,
+        skillId = skillId,
+        skillDef = skillDef,
+        ctx = ctx,
+    })
 end
 
 local function tryInstant(player, standDef, jsf, slotName, skillId, skillDef, ctx)

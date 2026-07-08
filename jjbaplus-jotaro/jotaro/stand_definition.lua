@@ -56,7 +56,19 @@ return {
             duration = stats.SuperDuration,
             cooldown = stats.SuperCooldown,
             onActivate = function(ctx)
+                ctx.jsf.Events.emit("global_time_frozen", {
+                    player = ctx.player,
+                    standDef = ctx.standDef,
+                    active = true,
+                })
                 timeStop.onActivate(ctx.player, ctx.standDef)
+            end,
+            onDeactivate = function(ctx)
+                ctx.jsf.Events.emit("global_time_frozen", {
+                    player = ctx.player,
+                    standDef = ctx.standDef,
+                    active = false,
+                })
             end,
         },
     },

@@ -1,18 +1,15 @@
-local IdleBehavior = require("src/core/combat/behaviors/generic/idle")
-local RushBehavior = require("src/core/combat/behaviors/generic/rush")
-local AttackBehavior = require("src/core/combat/behaviors/generic/attack")
-local ReturnBehavior = require("src/core/combat/behaviors/generic/return")
+local stateMachine = require("src/core/combat/behaviors/state_machine")
 
-return function(player, standDef, jsf, shootDir)
-    local standData = jsf.standEntity:GetData()
+local states = {
+    idle = require("src/core/combat/behaviors/generic/idle"),
+    rush = require("src/core/combat/behaviors/generic/rush"),
+    attack = require("src/core/combat/behaviors/generic/attack"),
+    ["return"] = require("src/core/combat/behaviors/generic/return"),
+}
 
-    if standData.behavior == "idle" then
-        IdleBehavior(player, standDef, jsf, shootDir)
-    elseif standData.behavior == "rush" then
-        RushBehavior(player, standDef, jsf, shootDir)
-    elseif standData.behavior == "attack" then
-        AttackBehavior(player, standDef, jsf, shootDir)
-    elseif standData.behavior == "return" then
-        ReturnBehavior(player, standDef, jsf, shootDir)
-    end
-end
+return {
+    states = states,
+    update = function(player, standDef, jsf, shootDir)
+        stateMachine.run(states, player, standDef, jsf, shootDir)
+    end,
+}

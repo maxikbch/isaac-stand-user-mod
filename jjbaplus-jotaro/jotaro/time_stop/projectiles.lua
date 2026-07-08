@@ -16,7 +16,7 @@ local function onProjectileUpdate(tear, JSF)
         return
     end
 
-    local duration = context.getSkillDuration(standState)
+    local duration = context.getSkillDuration(player, JSF)
     if duration == 1 then
         local data = tear:GetData()
         data.TimeFrozen = false

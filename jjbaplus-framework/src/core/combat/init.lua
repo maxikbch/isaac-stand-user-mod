@@ -77,6 +77,7 @@ end
 
 Combat.behaviors = {
     generic = require("src/core/combat/behaviors/generic/main"),
+    compose = require("src/core/combat/behaviors/compose"),
 }
 
 return Combat

@@ -20,7 +20,7 @@ local function onEntityTakeDamage(entity, damageFlags, source, JSF)
         return nil
     end
 
-    if context.getSkillDuration(standState) > 0
+    if context.getSkillDuration(player, JSF) > 0
         and entity.Type ~= EntityType.ENTITY_PLAYER
         and damageFlags & DamageFlag.DAMAGE_LASER ~= 0
         and not player:HasCollectible(CollectibleType.COLLECTIBLE_LUDOVICO_TECHNIQUE) then

@@ -31,14 +31,13 @@ function data:ShouldRestoreSession(mod)
     return savedData.runSeed == self:GetRunSeed()
 end
 
-local function SavePlayerData(mod, jsf)
+local function SavePlayerData(savedData, jsf)
     return function(player, index)
         local standDef = jsf:GetActiveStand(player)
         if not standDef then
             return
         end
 
-        local savedData = data:Get(mod) or {}
         local jsfData = jsf:GetPlayerData(player)
 
         savedData.runSeed = data:GetRunSeed()
@@ -58,8 +57,6 @@ local function SavePlayerData(mod, jsf)
         if jsfData.standState then
             playerSave.standState = jsfData.standState
         end
-
-        mod:SaveData(json.encode(savedData))
     end
 end
 
@@ -127,7 +124,9 @@ function data:LoadPlayer(mod, jsf, player, index)
 end
 
 function data:SavePlayersData(mod, jsf)
-    utils:ForAllPlayers(SavePlayerData(mod, jsf))
+    local savedData = self:Get(mod) or {}
+    utils:ForAllPlayers(SavePlayerData(savedData, jsf))
+    mod:SaveData(json.encode(savedData))
 end
 
 function data:LoadPlayersData(mod, jsf)
