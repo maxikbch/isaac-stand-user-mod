@@ -17,16 +17,17 @@ local function resolveChargeReleaseBehavior(player, standDef, standData, combat,
 end
 
 local function resolveIdleFaceAnim(standDef, faceSpriteIndex, roomClear, combat, hooks)
+    local anims = standDef.animations or {}
     if hooks.getIdleFaceAnim then
         return hooks.getIdleFaceAnim(standDef, faceSpriteIndex, roomClear)
     end
     if combat.idleAnimMode == "idle_only" then
-        return standDef.spIdle[faceSpriteIndex]
+        return anims.spIdle[faceSpriteIndex]
     end
     if roomClear then
-        return standDef.spIdle[faceSpriteIndex]
+        return anims.spIdle[faceSpriteIndex]
     end
-    return standDef.spMad[faceSpriteIndex]
+    return anims.spMad[faceSpriteIndex]
 end
 
 local function applyPartialChargeRelease(standData, maxcharge, combat, hooks)
@@ -49,6 +50,7 @@ return function(player, standDef, jsf, shootDir)
     local standSprite = standEntity:GetSprite()
     local playerPosition = player.Position
     local sounds = standDef.sounds
+    local anims = standDef.animations or {}
     local hooks = standDef.hooks or {}
     local combat = resolveCombat(standDef)
 
@@ -121,31 +123,31 @@ return function(player, standDef, jsf, shootDir)
         local showWind = windOnlyAtFull and standData.charge == maxcharge
             or not windOnlyAtFull and standData.charge > 0
         if showWind then
-            standSprite:Play(standDef.spWind[aimIndex])
+            standSprite:Play(anims.spWind[aimIndex])
         elseif standSprite:IsEventTriggered("WindEnd") then
-            standSprite:Play(standDef.spWound[aimIndex])
+            standSprite:Play(anims.spWound[aimIndex])
         elseif standData.charge == 0 and not standData.ready then
-            standSprite:Play(standDef.spFlash[aimIndex])
+            standSprite:Play(anims.spFlash[aimIndex])
             standData.ready = true
             if sounds.punchready then
                 sfx:Play(sounds.punchready, .35, 0, false, .98)
             end
         elseif standSprite:IsEventTriggered("FlashEnd") then
-            standSprite:Play(standDef.spReady[aimIndex])
+            standSprite:Play(anims.spReady[aimIndex])
         end
         if windSuffix == "2" then
             if standSprite:IsPlaying("Wound2E") or standSprite:IsPlaying("Wound2S") or standSprite:IsPlaying("Wound2W") or standSprite:IsPlaying("Wound2N") then
-                standSprite:Play(standDef.spWound[aimIndex])
+                standSprite:Play(anims.spWound[aimIndex])
             end
             if standSprite:IsPlaying("ReadyE") or standSprite:IsPlaying("ReadyS") or standSprite:IsPlaying("ReadyW") or standSprite:IsPlaying("ReadyN") then
-                standSprite:Play(standDef.spReady[aimIndex])
+                standSprite:Play(anims.spReady[aimIndex])
             end
         else
             if standSprite:IsPlaying("WoundS") or standSprite:IsPlaying("WoundN") or standSprite:IsPlaying("WoundE") or standSprite:IsPlaying("WoundW") then
-                standSprite:Play(standDef.spWound[aimIndex])
+                standSprite:Play(anims.spWound[aimIndex])
             end
             if standSprite:IsPlaying("ReadyS") or standSprite:IsPlaying("ReadyN") or standSprite:IsPlaying("ReadyE") or standSprite:IsPlaying("ReadyW") then
-                standSprite:Play(standDef.spReady[aimIndex])
+                standSprite:Play(anims.spReady[aimIndex])
             end
         end
 

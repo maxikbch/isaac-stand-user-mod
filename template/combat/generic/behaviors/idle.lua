@@ -15,6 +15,7 @@ return function(player, standDef, jsf, shootDir)
     local playerPosition = player.Position
     local STATS = standDef.stats
     local sounds = standDef.sounds
+    local anims = standDef.animations or {}
 
     if standData.behavior ~= "idle" then
         return
@@ -80,9 +81,9 @@ return function(player, standDef, jsf, shootDir)
     end
     if not playerData.shoot then
         if game:GetRoom():IsClear() then
-            standSprite:Play(standDef.spIdle[faceSpriteIndex])
+            standSprite:Play(anims.spIdle[faceSpriteIndex])
         else
-            standSprite:Play(standDef.spMad[faceSpriteIndex])
+            standSprite:Play(anims.spMad[faceSpriteIndex])
         end
         if standData.charge == 0 then
             standData.charge = maxcharge
@@ -99,23 +100,23 @@ return function(player, standDef, jsf, shootDir)
         setStat:Range(player, standDef, standEntity)
         standData.launchto = game:GetRoom():GetClampedPosition(playerPosition + ((playerData.releasedir * standData.range) + (player:GetTearMovementInheritance(shootDir) * 10)), 20)
         if standData.charge > 0 then
-            standSprite:Play(standDef.spWind[aimIndex])
+            standSprite:Play(anims.spWind[aimIndex])
         elseif standSprite:IsEventTriggered("WindEnd") then
-            standSprite:Play(standDef.spWound[aimIndex])
+            standSprite:Play(anims.spWound[aimIndex])
         elseif standData.charge == 0 and not standData.ready then
-            standSprite:Play(standDef.spFlash[aimIndex])
+            standSprite:Play(anims.spFlash[aimIndex])
             standData.ready = true
             if sounds.punchready then
                 sfx:Play(sounds.punchready, .35, 0, false, .98)
             end
         elseif standSprite:IsEventTriggered("FlashEnd") then
-            standSprite:Play(standDef.spReady[aimIndex])
+            standSprite:Play(anims.spReady[aimIndex])
         end
         if standSprite:IsPlaying("Wound2E") or standSprite:IsPlaying("Wound2S") or standSprite:IsPlaying("Wound2W") or standSprite:IsPlaying("Wound2N") then
-            standSprite:Play(standDef.spWound[aimIndex])
+            standSprite:Play(anims.spWound[aimIndex])
         end
         if standSprite:IsPlaying("ReadyE") or standSprite:IsPlaying("ReadyS") or standSprite:IsPlaying("ReadyW") or standSprite:IsPlaying("ReadyN") then
-            standSprite:Play(standDef.spReady[aimIndex])
+            standSprite:Play(anims.spReady[aimIndex])
         end
 
         standData.charge = math.max(0, standData.charge - 1)

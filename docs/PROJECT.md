@@ -273,7 +273,7 @@ Flags leídos por el idle genérico (Kakyoin los usa):
 | Campo | Default | Efecto |
 |-------|---------|--------|
 | `chargeReleaseBehavior` | `"rush"` | Estado al soltar carga completa |
-| `idleAnimMode` | mad/idle según sala | `"idle_only"` fuerza `spIdle` |
+| `idleAnimMode` | mad/idle según sala | `"idle_only"` fuerza `animations.spIdle` |
 | `releasePartialCharge` | `"regen"` | `"reset"` = vuelve a max al soltar mid-charge |
 | `windOnlyAtFullCharge` | `false` | Wind solo con barra llena |
 | `windAnimSuffix` | `"2"` | Sufijo de Wound (`""` = WoundE sin `2`) |
@@ -285,6 +285,7 @@ Hooks equivalentes (`getChargeReleaseBehavior`, etc.) siguen funcionando si se n
 - `JSF.Combat.targeting` — lock-on idle / re-target rush / attack
 - `JSF.Combat.anim.playDir(sprite, "Rush", launchdir)` — `RushN/E/S/W`
 - Lista de entidades de sala: cache por frame (`src/core/room_entities.lua`)
+- Animaciones viven solo en `standDef.animations` (ya no se copian a la raíz del def)
 
 ### Schema de `stand_definition.lua`
 
@@ -506,3 +507,4 @@ Ver [credit.txt](../credit.txt).
 | 2026-07-05 | Slugs auto; scripts `.cmd`; fix spawn stand (`ForAllPlayers`, entities2 v5) |
 | 2026-07-05 | Assets en `resources/`; plantilla unificada en `template/` |
 | 2026-07-08 | Skills/Events/compose/`combat` flags; targeting + anim; room entity cache |
+| 2026-07-08 | Animations namespace only (`standDef.animations.*`); no flatten en RegisterStand |

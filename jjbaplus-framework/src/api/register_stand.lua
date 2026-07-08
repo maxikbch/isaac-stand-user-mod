@@ -172,12 +172,7 @@ local function normalizeStandDef(def)
     def.hooks = def.hooks or {}
     def.sounds = def.sounds or {}
     def.linkedCharacters = def.linkedCharacters or {}
-
-    if def.animations then
-        for key, value in pairs(def.animations) do
-            def[key] = value
-        end
-    end
+    def.animations = def.animations or {}
 
     def.floatOffset = def.floatOffset or Vector(0, -36)
     def.meterGfx = def.meterGfx or {}
