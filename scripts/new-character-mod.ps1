@@ -104,7 +104,8 @@ function Write-JJBATemplateFile {
         New-Item -ItemType Directory -Force -Path $targetDir | Out-Null
     }
     $raw = Get-Content -Path $Source -Raw -Encoding UTF8
-    Set-Content -Path $Destination -Value (Expand-JJBATemplate -Text $raw) -Encoding UTF8 -NoNewline
+    $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+    [System.IO.File]::WriteAllText($Destination, (Expand-JJBATemplate -Text $raw), $utf8NoBom)
 }
 
 Write-Host "Creating $displayName at $modPath"

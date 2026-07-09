@@ -102,12 +102,16 @@ Si el framework no está presente, el content mod aborta con mensaje en consola.
 
 ### Assets: `content/` + `resources/`
 
-Isaac carga **XML y menú** desde `content/`. Los sprites de juego (costumes, stand, retratos de boss/stage, meter HUD) y los **`.wav`** van en **`resources/`**.
+Isaac carga **XML y menú** desde `content/`. Los sprites de juego (costumes, stand, retratos de UI, meter HUD) y los **`.wav`** van en **`resources/`**.
+
+**Retratos de personaje (Repentance+):** el juego ya no usa `bigportrait` / `bigportraitroot`. Solo existe un `portrait` referenciado desde `portraitroot` (carpeta `ui/stage/`). Ese mismo PNG se usa en la transición de piso y en la pantalla VS de boss (`versusscreen.anm2` apunta a `../stage/`). El nombre del personaje en boss sigue en `nameimageroot` → `ui/boss/`. Para un retrato distinto solo en boss haría falta un `versusscreen.anm2` propio del mod.
 
 | Mod | Dónde editar arte |
 |-----|-------------------|
 | Framework (meter HUD) | `jjbaplus-framework/resources/gfx/stand_framework/` |
-| Personaje (stand, costumes, disco, UI boss/stage) | `jjbaplus-{slug}/resources/gfx/{slug}/` |
+| Personaje (stand, costumes, disco, UI) | `jjbaplus-{slug}/resources/gfx/{slug}/` |
+| Retrato principal (`portrait`) | `resources/gfx/{slug}/ui/stage/playerportrait.png` |
+| Nombre en boss (`nameimage`) | `resources/gfx/{slug}/ui/boss/playername.png` |
 | Menú de personaje | `jjbaplus-{slug}/content/gfx/` (charactermenu, portraits, etc.) |
 | Sonidos | `jjbaplus-{slug}/resources/sounds/{slug}/` (`.wav` referenciados en `content/sounds.xml`) |
 
