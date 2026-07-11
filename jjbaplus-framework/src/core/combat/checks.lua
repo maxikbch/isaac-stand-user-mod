@@ -29,8 +29,12 @@ local function isAllowedGridType(gridType, policy)
     return DEFAULT_GRID_TYPES[gridType] == true
 end
 
+function standChecks:IsGridEntity(en)
+    return en ~= nil and en.CollisionClass ~= nil
+end
+
 function standChecks:IsTargetable(en, player, standDef, standEntity)
-    if not en or not en:Exists() or en.CollisionClass then
+    if not en or standChecks:IsGridEntity(en) or not en:Exists() then
         return false
     end
 
@@ -62,13 +66,13 @@ function standChecks:CanPush(en, player, standDef, standEntity)
     end
 
     return en
-        and not en.CollisionClass
+        and not standChecks:IsGridEntity(en)
         and en.Type == EntityType.ENTITY_BOMB
         and not en:GetSprite():IsPlaying("Explode")
 end
 
 function standChecks:IsValidEnemy(en, player, standDef, standEntity)
-    if not en or en.CollisionClass then
+    if not en or standChecks:IsGridEntity(en) then
         return false
     end
 
@@ -131,6 +135,24 @@ function standChecks:IsValidGridEntity(position, player, standDef, standEntity)
     end
 
     return gridEntity
+end
+
+function standChecks:IsGridTarget(en, player, standDef, standEntity)
+    if not standChecks:IsGridEntity(en) then
+        return false
+    end
+    return standChecks:IsValidGridEntity(en.Position, player, standDef, standEntity) ~= nil
+end
+
+function standChecks:IsValidCombatTarget(en, player, standDef, standEntity)
+    if not en then
+        return false
+    end
+    if standChecks:IsGridEntity(en) then
+        return standChecks:IsGridTarget(en, player, standDef, standEntity)
+    end
+    return standChecks:IsValidEnemy(en, player, standDef, standEntity)
+        or standChecks:IsTargetable(en, player, standDef, standEntity)
 end
 
 return standChecks

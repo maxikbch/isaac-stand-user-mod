@@ -81,10 +81,7 @@ function targeting.updateRushTarget(player, standDef, standEntity, standData, op
         end
     end
 
-    if not (
-        standChecks:IsValidEnemy(standData.tgt, player, standDef, standEntity)
-        or standChecks:IsTargetable(standData.tgt, player, standDef, standEntity)
-    ) then
+    if not standChecks:IsValidCombatTarget(standData.tgt, player, standDef, standEntity) then
         standData.tgt = nil
     end
 
@@ -111,16 +108,15 @@ end
 function targeting.updateAttackTarget(player, standDef, standEntity, standData)
     local STATS = standDef.stats
 
-    if standData.tgt and not standData.tgt.CollisionClass and not standData.tgt:Exists() then
+    if standData.tgt
+        and not standChecks:IsGridEntity(standData.tgt)
+        and not standData.tgt:Exists()
+    then
         standData.tgt = nil
     end
 
     if standData.punches < standData.maxpunches
-        and not (
-            standChecks:IsValidEnemy(standData.tgt, player, standDef, standEntity)
-            or standChecks:IsTargetable(standData.tgt, player, standDef, standEntity)
-        )
-        and not (standData.tgt and standData.tgt.CollisionClass)
+        and not standChecks:IsValidCombatTarget(standData.tgt, player, standDef, standEntity)
     then
         standData.tgt = nil
         local maxdist = STATS.ExtraTargetRange + (player.MoveSpeed * STATS.ExtraTargetRangeBonus)
