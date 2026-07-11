@@ -5,21 +5,22 @@
     <id>3760655881</id>
     <description>[JJBA+] core framework. Required by all JJBA+ character mods.
 
-Why a framework? I want to go next level with this tboi JJBA mods, so this framework will help creating new characters and adding new (future) mechanics like:
-- Stand Disc: An item for every stand.
-- Stand Disc Room: A room like planetary where any character can grab a stand disc from any of the installed JJBA+ character mods, gaining an stand or switching with one already equiped.
-- Stand Arrow: An item that gives the player a random stand from their installed JJBA+ characters mod. If player already has a stand, then this item will evolve the stand to a Requiem form (with custom ones for characters that dont have a cannon one).
-- Broken Stand Arrow: Same as the above item, but as a trinket.
-- Many more...
+    Why a framework? I want to go next level with these TBOI JJBA mods, so this framework will help create new characters and add new (future) mechanics like:
+    - Stand Disc: An item for every stand.
+    - Stand Disc Room: A room like planetary where any character can grab a stand disc from any of the installed JJBA+ character mods, gaining a stand or switching with one already equipped.
+    - Stand Arrow: An item that gives the player a random stand from their installed JJBA+ characters mod. If player already has a stand, then this item will evolve the stand to a Requiem form (with custom evolutions for stands that don't have a canon one).
+    - Broken Stand Arrow: Same as the above item, but as a trinket.
+    - Many more...
 
-Whats next? I will be polishing the framework at the same time i fix and polishing Jotaro and Kakyion (next to be released), so i can have a good base for it. Once i feel the proyect base line its fine, i will share the github repo so anybody can use it (maybe you can already work with this mod a little, but i dont recomend doing so till the 1.0 release). My idea is to talk and ask permision to migrate other characters to JJBA+ framework or even allow other people to add their own ones to the repo, just to keep trac of them and keep compabilities.
+    What's next? I will be polishing the framework at the same time I fix and polish Jotaro and Kakyoin, so I can have a good base for it. Once I feel the project baseline is fine, I will share the github repo so anybody can use it (maybe you can already work with this mod a little, but I don't recommend doing so till the base release). My idea is to talk and ask permission to migrate other characters to JJBA+ framework or even allow other people to add their own ones to the repo, just to keep track of them and keep compatibilities.
 
-Why now? I dunno, i just wanted. Anyways, this will be a side project i will be working on besides my job and studies, so dont be waiting for weekly updates or so. 
+    Why now? I dunno, I just wanted. Anyways, this will be a side project I will be working on besides my job and studies, so don't be waiting for weekly updates or so. 
 
-Why JJBA+? Its just an easy name to distinguish from other JJBA mods.
+    Why JJBA+? It's just an easy name to distinguish from other JJBA mods.
 
-Thanks to https://steamcommunity.com/sharedfiles/filedetails/?id=943074431 creators, for being the base of this mod.
-</description>
+    Thanks to the following mods that worked as a base for this mod:    
+    - [url=https://steamcommunity.com/sharedfiles/filedetails/?id=943074431]Josuke and Crazy Diamond[/url]
+    </description>
     <version>0.2</version>
     <visibility>Friends Only</visibility>
     <tag id="Lua"/>
