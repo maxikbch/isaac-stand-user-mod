@@ -115,7 +115,7 @@ function data:ResetPlayerSession(jsf, player)
     }
 
     if hadActiveSkill then
-        Music():Resume()
+        MusicManager():Resume()
     end
 end
 

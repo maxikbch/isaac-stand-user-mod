@@ -1,7 +1,6 @@
 local context = require("jotaro.time_stop.context")
 
 local sfx = SFXManager()
-local music = MusicManager()
 
 local function onShader(name, JSF)
     if name ~= "ZaWarudo" then
@@ -35,7 +34,6 @@ local function onShader(name, JSF)
                 sfx:Play(standDef.sounds.tick5, 5, 0, false, 1)
             elseif duration == 1 then
                 sfx:Play(standDef.sounds.resumeTime, 2, 0, false, 1)
-                music:Resume()
             end
         end
     end)

@@ -7,7 +7,7 @@
     DamageLastHit = 2.4,
     Knockback = 5,
     KnockbackLastHitMult = 2.5,
-    PunchSize = 2,
+    PunchSize = 1.5,
     KnockbackBirthrightMult = 5,
     KnockbackBossMult = 0.5,
     LockonWidth = 50,

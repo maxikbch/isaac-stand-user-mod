@@ -49,7 +49,7 @@ function standChecks:IsTargetable(en, player, standDef, standEntity)
     end
 
     if policy.targetBombs ~= false and en.Type == EntityType.ENTITY_BOMB then
-        return true
+        return not en:GetSprite():IsPlaying("Explode")
     end
 
     if listContains(policy.entityTypes, en.Type) then
@@ -72,7 +72,7 @@ function standChecks:CanPush(en, player, standDef, standEntity)
 end
 
 function standChecks:IsValidEnemy(en, player, standDef, standEntity)
-    if not en or standChecks:IsGridEntity(en) then
+    if not en or standChecks:IsGridEntity(en) or not en:Exists() or en:IsDead() then
         return false
     end
 
@@ -126,11 +126,19 @@ function standChecks:IsValidGridEntity(position, player, standDef, standEntity)
         return nil
     end
 
+    if gridEntity.CollisionClass == GridCollisionClass.GRIDCOLL_NONE then
+        return nil
+    end
+
     if gridType == GridEntityType.GRID_POOP and gridEntity.State and gridEntity.State >= 1000 then
         return nil
     end
 
     if gridType == GridEntityType.GRID_FIREPLACE and gridEntity.State and gridEntity.State >= 1000 then
+        return nil
+    end
+
+    if gridType == GridEntityType.GRID_TNT and gridEntity.State and gridEntity.State >= 4 then
         return nil
     end
 

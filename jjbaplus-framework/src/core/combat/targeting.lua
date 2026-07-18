@@ -109,16 +109,12 @@ function targeting.updateAttackTarget(player, standDef, standEntity, standData)
     local STATS = standDef.stats
 
     if standData.tgt
-        and not standChecks:IsGridEntity(standData.tgt)
-        and not standData.tgt:Exists()
+        and not standChecks:IsValidCombatTarget(standData.tgt, player, standDef, standEntity)
     then
         standData.tgt = nil
     end
 
-    if standData.punches < standData.maxpunches
-        and not standChecks:IsValidCombatTarget(standData.tgt, player, standDef, standEntity)
-    then
-        standData.tgt = nil
+    if standData.punches < standData.maxpunches and not standData.tgt then
         local maxdist = STATS.ExtraTargetRange + (player.MoveSpeed * STATS.ExtraTargetRangeBonus)
         if utils:hasbit(player.TearFlags, TearFlags.TEAR_HOMING) then
             maxdist = maxdist + ITEM_MODIFIERS.HomingTargetRangeBonus

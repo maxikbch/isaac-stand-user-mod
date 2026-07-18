@@ -1,14 +1,19 @@
 local context = require("jotaro.time_stop.context")
 
+local music = MusicManager()
+
 local function updateTimeFreeze(player, standDef, standState)
     local JSF = _G.JoJoStandFramework
     local entities = Isaac.GetRoomEntities()
 
-    if not player:HasCollectible(standDef.discItem) or Game():GetRoom():GetFrameCount() == 0 then
-        context.setSkillDuration(player, 0, JSF)
-    end
-
     local duration = context.getSkillDuration(player, JSF)
+    if duration > 0
+        and (not player:HasCollectible(standDef.discItem) or Game():GetRoom():GetFrameCount() == 0)
+    then
+        context.setSkillDuration(player, 0, JSF)
+        music:Resume()
+        duration = 0
+    end
 
     if duration == 1 then
         for i, entity in pairs(entities) do

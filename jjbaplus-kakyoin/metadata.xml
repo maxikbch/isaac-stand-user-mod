@@ -6,7 +6,7 @@
     <description>
     Play as both Kakyoin and Hierophant Green from JoJo's Bizarre Adventure!
 
-    Hierophant Green is a new familiar that can charge and shoot his unique Emerald Splash. To charge, just shoot tears in any direction. Also, if you load the required amount of energy, you can press C (keyboard) or R3 (joystick) to use his special ability: "20 Meters Emerald Splash".
+    Hierophant Green is a new familiar that can charge and shoot his unique Emerald Splash. To charge, just shoot tears in any direction. Also, if you load the required amount of energy, you can press C (keyboard) or R3 (joystick) to use his special ability: &quot;20 Meters Emerald Splash&quot;.
 
     This mod is a remaster/remake of my older (broken by updates) mod [url=https://steamcommunity.com/sharedfiles/filedetails/?id=1575678153]Kakyoin and Hierophant Green[/url], which I have already reworked a little. I will be fixing and polishing it, and maybe reworking some assets and mechanics.
     
@@ -18,7 +18,7 @@
     Feel free to ask me any questions or suggestions, or if you find any bug, please report it to me in the comments.
     
     </description>
-    <version>1.0</version>
+    <version>1.1</version>
     <visibility>Friends Only</visibility>
     <tag id="Lua"/>
     <tag id="Player Characters"/>

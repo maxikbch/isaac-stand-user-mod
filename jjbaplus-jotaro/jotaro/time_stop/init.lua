@@ -7,12 +7,18 @@ local damageFilter = require("jotaro.time_stop.damage_filter")
 local sfx = SFXManager()
 local music = MusicManager()
 
+local function resumeMusic()
+    music:Resume()
+end
+
 return {
     onActivate = function(player, standDef)
         sfx:Play(standDef.sounds.stopTime, 2, 0, false, 1)
         sfx:Play(standDef.sounds.zaWarudo, 2, 0, false, 1)
-        music:Disable()
+        music:Pause()
     end,
+
+    onDeactivate = resumeMusic,
 
     postUpdate = function(JSF)
         context.forEachStarPlatinumPlayer(JSF, freeze.updateTimeFreeze)

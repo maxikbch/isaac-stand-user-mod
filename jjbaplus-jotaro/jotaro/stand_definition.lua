@@ -2,6 +2,26 @@ local character = require("jotaro.character_definition")
 local stats = require("jotaro.stand_stats")
 local timeStop = require("jotaro.time_stop")
 
+local function emitGlobalTimeFrozen(ctx, active)
+    if ctx.framework and ctx.framework.Events then
+        ctx.framework.Events.emit("global_time_frozen", {
+            player = ctx.player,
+            standDef = ctx.standDef,
+            active = active,
+        })
+    end
+end
+
+local function activateTimeStop(ctx)
+    emitGlobalTimeFrozen(ctx, true)
+    timeStop.onActivate(ctx.player, ctx.standDef)
+end
+
+local function deactivateTimeStop(ctx)
+    emitGlobalTimeFrozen(ctx, false)
+    timeStop.onDeactivate()
+end
+
 return {
     id = "star_platinum",
     discItem = Isaac.GetItemIdByName("Star Platinum Disc"),
@@ -25,8 +45,8 @@ return {
     animations = {
         spIdle = { "IdleE", "IdleS", "IdleW", "IdleN" },
         spMad = { "MadE", "MadS", "MadW", "MadN" },
-        spWind = { "Wind2E", "Wind2S", "Wind2W", "Wind2N" },
-        spWound = { "Wound2E", "Wound2S", "Wound2W", "Wound2N" },
+        spWind = { "WindE", "WindS", "WindW", "WindN" },
+        spWound = { "WoundE", "WoundS", "WoundW", "WoundN" },
         spFlash = { "FlashE", "FlashS", "FlashW", "FlashN" },
         spReady = { "ReadyE", "ReadyS", "ReadyW", "ReadyN" },
         spRush = { "RushE", "RushS", "RushW", "RushN" },
@@ -55,25 +75,8 @@ return {
             useCost = stats.SuperMaxCharge,
             duration = stats.SuperDuration,
             cooldown = stats.SuperCooldown,
-            onActivate = function(ctx)
-                if ctx.framework and ctx.framework.Events then
-                    ctx.framework.Events.emit("global_time_frozen", {
-                        player = ctx.player,
-                        standDef = ctx.standDef,
-                        active = true,
-                    })
-                end
-                timeStop.onActivate(ctx.player, ctx.standDef)
-            end,
-            onDeactivate = function(ctx)
-                if ctx.framework and ctx.framework.Events then
-                    ctx.framework.Events.emit("global_time_frozen", {
-                        player = ctx.player,
-                        standDef = ctx.standDef,
-                        active = false,
-                    })
-                end
-            end,
+            onActivate = activateTimeStop,
+            onDeactivate = deactivateTimeStop,
         },
     },
 
