@@ -4,12 +4,19 @@ local roomLayout = require("kakyoin.room_layout")
 local TEAR_SUBTYPE = 0
 local EMERALD_NAME = "HG Emerald"
 local RADIO_NAME = "HG Emerald Radio"
+local BREAK_NAME = "HG Emerald Break"
+local BREAK_ANIM = "Break"
 --- Base art (`emeralds.anm2`) points toward North (screen up); Isaac 0° is East.
 local SPRITE_ANGLE_OFFSET = 90
+--- Tear Height is negative while airborne; near 0 means it has landed.
+local LAND_HEIGHT = -5
+--- Break is 7 frames at 30fps; keep a little buffer.
+local BREAK_TIMEOUT = 12
 
 local variants = {
     emerald = -1,
     radio = -1,
+    breakFx = -1,
 }
 local initialized = false
 
@@ -21,12 +28,16 @@ local function ensureVariants()
 
     variants.emerald = Isaac.GetEntityVariantByName(EMERALD_NAME)
     variants.radio = Isaac.GetEntityVariantByName(RADIO_NAME)
+    variants.breakFx = Isaac.GetEntityVariantByName(BREAK_NAME)
 
     if variants.emerald < 0 then
         Isaac.DebugString("[JJBA+ Kakyoin] missing entity variant: " .. EMERALD_NAME)
     end
     if variants.radio < 0 then
         Isaac.DebugString("[JJBA+ Kakyoin] missing entity variant: " .. RADIO_NAME)
+    end
+    if variants.breakFx < 0 then
+        Isaac.DebugString("[JJBA+ Kakyoin] missing entity variant: " .. BREAK_NAME)
     end
 end
 
@@ -35,8 +46,74 @@ local function vecFromAngle(angle, speed)
 end
 
 local function applySpriteRotation(tear)
+    local data = tear:GetData()
     local sprite = tear:GetSprite()
-    sprite.Rotation = tear.Velocity:GetAngleDegrees() + SPRITE_ANGLE_OFFSET
+    local rotation = tear.Velocity:GetAngleDegrees() + SPRITE_ANGLE_OFFSET
+    sprite.Rotation = rotation
+    data.breakRotation = rotation
+    data.breakScale = tear.Scale
+end
+
+local function spawnBreakEffect(position, rotation, scale)
+    ensureVariants()
+
+    local variant = variants.breakFx
+    if not variant or variant < 0 then
+        variant = EffectVariant.NULL
+    end
+
+    local entity = Isaac.Spawn(
+        EntityType.ENTITY_EFFECT,
+        variant,
+        0,
+        position,
+        Vector.Zero,
+        nil
+    )
+    if not entity or not entity:Exists() then
+        return nil
+    end
+
+    local effect = entity:ToEffect()
+    local sprite = effect:GetSprite()
+    sprite:Play(BREAK_ANIM, true)
+    sprite.Rotation = rotation or 0
+    local s = scale or 1
+    sprite.Scale = Vector(s, s)
+
+    effect.DepthOffset = 10
+    effect:SetTimeout(BREAK_TIMEOUT)
+    effect:GetData().jjbaEmeraldBreak = true
+    return effect
+end
+
+--- Spawns Break VFX from a tear. When `once` is true, only the first call succeeds.
+local function trySpawnBreakFromTear(tear, once)
+    local data = tear:GetData()
+    if not data.jjbaEmerald then
+        return false
+    end
+    if once and data.breakSpawned then
+        return false
+    end
+    if once then
+        data.breakSpawned = true
+    end
+
+    local rotation = data.breakRotation
+    if rotation == nil then
+        local sprite = tear:GetSprite()
+        rotation = sprite and sprite.Rotation or 0
+    end
+
+    local scale = data.breakScale
+    if scale == nil then
+        local asTear = tear.ToTear and tear:ToTear()
+        scale = (asTear and asTear.Scale) or 1
+    end
+
+    spawnBreakEffect(tear.Position, rotation, scale)
+    return true
 end
 
 --- Native crop size of `emerald_radio.anm2` layer art.
@@ -80,7 +157,9 @@ local function spawnEmeraldTear(player, position, velocity, damageMult, stats, o
     end
 
     applySpriteRotation(tear)
-    tear:GetData().jjbaEmerald = true
+    local data = tear:GetData()
+    data.jjbaEmerald = true
+    data.breakScale = tear.Scale
 
     return entity
 end
@@ -127,8 +206,56 @@ local function spawnRadioEffect(position)
 end
 
 local function onTearUpdate(tear)
-    if tear:GetData().jjbaEmerald then
-        applySpriteRotation(tear)
+    local data = tear:GetData()
+    if not data.jjbaEmerald then
+        return
+    end
+
+    applySpriteRotation(tear)
+
+    -- Floor impact when the tear lands (spectral tears often never hit walls).
+    if tear.Height >= LAND_HEIGHT then
+        trySpawnBreakFromTear(tear, true)
+    end
+end
+
+local function onTearCollision(tear, collider)
+    local data = tear:GetData()
+    if not data.jjbaEmerald then
+        return
+    end
+    if not collider or collider:ToPlayer() then
+        return
+    end
+
+    -- Non-piercing: one Break then the tear dies. Piercing: flash on each hit.
+    local piercing = tear:HasTearFlags(TearFlags.TEAR_PIERCING)
+    trySpawnBreakFromTear(tear, not piercing)
+end
+
+--- Covers any tear death path that skipped collision / floor checks.
+local function onTearRemove(entity)
+    if entity.Type ~= EntityType.ENTITY_TEAR then
+        return
+    end
+
+    local data = entity:GetData()
+    if not data.jjbaEmerald then
+        return
+    end
+
+    trySpawnBreakFromTear(entity, true)
+end
+
+local function onBreakEffectUpdate(effect)
+    local data = effect:GetData()
+    if not data.jjbaEmeraldBreak then
+        return
+    end
+
+    local sprite = effect:GetSprite()
+    if not sprite:IsPlaying(BREAK_ANIM) and sprite:IsFinished(BREAK_ANIM) then
+        effect:Remove()
     end
 end
 
@@ -139,5 +266,8 @@ return {
     fitRadioTelegraph = fitRadioTelegraph,
     setRadioTelegraphAlpha = setRadioTelegraphAlpha,
     onTearUpdate = onTearUpdate,
+    onTearCollision = onTearCollision,
+    onTearRemove = onTearRemove,
+    onBreakEffectUpdate = onBreakEffectUpdate,
     init = ensureVariants,
 }
