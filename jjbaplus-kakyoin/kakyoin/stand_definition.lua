@@ -1,4 +1,4 @@
-local character = require("kakyoin.character_definition")
+﻿local character = require("kakyoin.character_definition")
 local settings = require("kakyoin.settings")
 local stats = require("kakyoin.stand_stats")
 local emeraldSplash = require("kakyoin.emerald_splash")
@@ -64,7 +64,7 @@ return {
             cooldown = freeSkill1 and 0 or stats.SuperCooldown,
             cooldownStartsOn = "complete",
             fullChargeSounds = {
-                voice = Isaac.GetSoundIdByName("HierophantGreen_FullChargeVoice"),
+                voice = { name = "HierophantGreen_FullChargeVoice", volume = 1 },
             },
             onPress = function(ctx)
                 return emeraldSplash.tryActivate(ctx)
@@ -84,22 +84,24 @@ return {
         },
     },
 
+    -- volume / pitch / loop live here so combat code only picks a key.
+    -- ExtraSounds reuses punch/rage samples (cry_* were duplicates).
     sounds = {
-        punchlight = Isaac.GetSoundIdByName("Kakyoin_PunchLight"),
-        punchheavy = Isaac.GetSoundIdByName("Kakyoin_PunchHeavy"),
-        punchready = Isaac.GetSoundIdByName("Kakyoin_PunchReady"),
-        whoosh = Isaac.GetSoundIdByName("Kakyoin_Whoosh"),
-        rage = Isaac.GetSoundIdByName("Kakyoin_Rage"),
-        cryStart = Isaac.GetSoundIdByName("HierophantGreen_Cry_Start"),
-        cryMid = Isaac.GetSoundIdByName("HierophantGreen_Cry_Mid"),
-        cryFinish = Isaac.GetSoundIdByName("HierophantGreen_Cry_Finish"),
-        cry = Isaac.GetSoundIdByName("HierophantGreen_Cry"),
-        emeraldSplash = Isaac.GetSoundIdByName("HierophantGreen_EmeraldSplash"),
-        emerald = Isaac.GetSoundIdByName("HierophantGreen_Emerald"),
-        splash = Isaac.GetSoundIdByName("HierophantGreen_Splash"),
-        kurae = Isaac.GetSoundIdByName("HierophantGreen_Kurae"),
-        twentyMeters = Isaac.GetSoundIdByName("HierophantGreen_20Meters"),
-        emeraldoSplashuo = Isaac.GetSoundIdByName("HierophantGreen_EmeraldoSplashuo"),
+        punchlight = { name = "Kakyoin_PunchLight", volume = 0.75 },
+        punchheavy = { name = "Kakyoin_PunchHeavy", volume = 0.75 },
+        punchready = { name = "Kakyoin_PunchReady", volume = 0.35, pitch = 0.98 },
+        whoosh = { name = "Kakyoin_Whoosh", volume = 0.8 },
+        rage = { name = "Kakyoin_Rage", volume = 0.75 },
+        cryStart = { name = "Kakyoin_PunchHeavy", volume = 0.75 },
+        cryMid = { name = "Kakyoin_PunchLight", volume = 0.75, loop = true },
+        cryFinish = { name = "Kakyoin_PunchHeavy", volume = 0.75 },
+        cry = { name = "Kakyoin_Rage", volume = 0.75 },
+        emeraldSplash = { name = "HierophantGreen_EmeraldSplash", volume = 1 },
+        emerald = { name = "HierophantGreen_Emerald", volume = 2 },
+        splash = { name = "HierophantGreen_Splash", volume = 0.7 },
+        kurae = { name = "HierophantGreen_Kurae", volume = 1 },
+        twentyMeters = { name = "HierophantGreen_20Meters", volume = 1 },
+        emeraldoSplashuo = { name = "HierophantGreen_EmeraldoSplashuo", volume = 1 },
     },
 
     linkedCharacters = {

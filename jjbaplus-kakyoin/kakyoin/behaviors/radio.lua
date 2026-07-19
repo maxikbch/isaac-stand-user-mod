@@ -3,8 +3,8 @@ local emeraldSplash = require("kakyoin.emerald_splash")
 local roomLayout = require("kakyoin.room_layout")
 
 local JSF = _G.JoJoStandFramework
+local Audio = JSF.Audio
 local game = Game()
-local sfx = SFXManager()
 
 local EMERALD_SPEED = 25
 local DEFAULT_PER_FRAME = 3
@@ -542,7 +542,7 @@ local function onPhaseEnter(phase, sounds, standData, standEntity, standDef, sta
     if phase == PHASE.KURAE then
         spawnKuraeTrails(standDef, standEntity, standData, stats)
         if sounds.kurae then
-            sfx:Play(sounds.kurae, 1, 0, false, 1)
+            Audio.play(sounds.kurae)
         end
         return
     end
@@ -556,14 +556,14 @@ local function onPhaseEnter(phase, sounds, standData, standEntity, standDef, sta
             end
         end
         if sounds.twentyMeters then
-            sfx:Play(sounds.twentyMeters, 1, 0, false, 1)
+            Audio.play(sounds.twentyMeters)
         end
         return
     end
 
     if phase == PHASE.RAIN then
         if sounds.emeraldoSplashuo then
-            sfx:Play(sounds.emeraldoSplashuo, 1, 0, false, 1)
+            Audio.play(sounds.emeraldoSplashuo)
         end
     end
 end

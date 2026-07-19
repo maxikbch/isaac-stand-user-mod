@@ -1,9 +1,9 @@
 local setStat = require("src/core/combat/set_stat")
 local targeting = require("src/core/combat/targeting")
 local utils = require("src/utils")
+local Audio = require("src/audio")
 
 local game = Game()
-local sfx = SFXManager()
 
 local function resolveCombat(standDef)
     return standDef.combat or {}
@@ -152,7 +152,7 @@ return function(player, standDef, jsf, shootDir)
             standSprite:Play(anims.spFlash[aimIndex])
             standData.ready = true
             if sounds.punchready then
-                sfx:Play(sounds.punchready, .35, 0, false, .98)
+                Audio.play(sounds.punchready)
             end
         elseif standSprite:IsEventTriggered("FlashEnd") then
             standSprite:Play(anims.spReady[aimIndex])

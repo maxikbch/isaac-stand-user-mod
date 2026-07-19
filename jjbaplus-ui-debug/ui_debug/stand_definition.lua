@@ -85,14 +85,15 @@ return {
     },
 
     sounds = {
-        punchlight = Isaac.GetSoundIdByName("Character_PunchLight"),
-        punchheavy = Isaac.GetSoundIdByName("Character_PunchHeavy"),
-        punchready = Isaac.GetSoundIdByName("Character_PunchReady"),
-        whoosh = Isaac.GetSoundIdByName("Character_Whoosh"),
-        cryStart = Isaac.GetSoundIdByName("Character_Cry_Start"),
-        cryMid = Isaac.GetSoundIdByName("Character_Cry_Mid"),
-        cryFinish = Isaac.GetSoundIdByName("Character_Cry_Finish"),
-        cry = Isaac.GetSoundIdByName("Character_Cry"),
+        punchlight = { name = "Character_PunchLight", volume = 0.75 },
+        punchheavy = { name = "Character_PunchHeavy", volume = 0.75 },
+        punchready = { name = "Character_PunchReady", volume = 0.35, pitch = 0.98 },
+        whoosh = { name = "Character_Whoosh", volume = 0.8 },
+        rage = { name = "Character_Rage", volume = 0.75 },
+        cryStart = { name = "Character_PunchHeavy", volume = 0.75 },
+        cryMid = { name = "Character_PunchLight", volume = 0.75, loop = true },
+        cryFinish = { name = "Character_PunchHeavy", volume = 0.75 },
+        cry = { name = "Character_Rage", volume = 0.75 },
     },
 
     linkedCharacters = {

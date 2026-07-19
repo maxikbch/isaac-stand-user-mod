@@ -1,11 +1,11 @@
 local JSF = _G.JoJoStandFramework
 local Combat = JSF.Combat
+local Audio = JSF.Audio
 local standChecks = Combat.checks
 local setStat = Combat.setStat
 local utils = Combat.utils
 
 local game = Game()
-local sfx = SFXManager()
 
 return function(player, standDef, jsf, shootDir)
     local playerData = player:GetData()
@@ -107,7 +107,7 @@ return function(player, standDef, jsf, shootDir)
             standSprite:Play(anims.spFlash[aimIndex])
             standData.ready = true
             if sounds.punchready then
-                sfx:Play(sounds.punchready, .35, 0, false, .98)
+                Audio.play(sounds.punchready)
             end
         elseif standSprite:IsEventTriggered("FlashEnd") then
             standSprite:Play(anims.spReady[aimIndex])

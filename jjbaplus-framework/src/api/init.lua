@@ -2,6 +2,7 @@ local registerStandFactory = require("src/api/register_stand")
 local playerStandFactory = require("src/api/player_stand")
 local StandInput = require("src/core/input")
 local Combat = require("src/core/combat/init")
+local Audio = require("src/audio")
 local entities = require("src/core/entities")
 local entityIds = require("src/constants/entity_ids")
 local SkillFacade = require("src/skills/facade")
@@ -17,6 +18,7 @@ return function(mod)
     mod._registry = registry
     mod.API_VERSION = 1
     mod.Combat = Combat
+    mod.Audio = Audio
     mod.Entities = {
         Spawn = entities.Spawn,
         KIND_STAND = entityIds.KIND_STAND,

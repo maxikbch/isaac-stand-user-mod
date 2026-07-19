@@ -1,6 +1,6 @@
 local context = require("jotaro.time_stop.context")
 
-local sfx = SFXManager()
+local Audio = _G.JoJoStandFramework.Audio
 
 local function onShader(name, JSF)
     if name ~= "ZaWarudo" then
@@ -29,11 +29,11 @@ local function onShader(name, JSF)
                 on = 0.5
             end
             if duration == 277 then
-                sfx:Play(standDef.sounds.tick9, 5, 0, false, 1)
+                Audio.play(standDef.sounds.tick9)
             elseif duration == 157 then
-                sfx:Play(standDef.sounds.tick5, 5, 0, false, 1)
+                Audio.play(standDef.sounds.tick5)
             elseif duration == 1 then
-                sfx:Play(standDef.sounds.resumeTime, 2, 0, false, 1)
+                Audio.play(standDef.sounds.resumeTime)
             end
         end
     end)

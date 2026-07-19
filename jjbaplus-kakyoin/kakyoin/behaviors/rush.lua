@@ -1,9 +1,8 @@
 local JSF = _G.JoJoStandFramework
 local Combat = JSF.Combat
+local Audio = JSF.Audio
 local targeting = Combat.targeting
 local anim = Combat.anim
-
-local sfx = SFXManager()
 
 return function(player, standDef, jsf, shootDir)
     local playerData = player:GetData()
@@ -22,7 +21,7 @@ return function(player, standDef, jsf, shootDir)
         standData.launchpos = standEntity.Position
         standData.launchtgt = standData.launchto
         if sounds.emerald then
-            sfx:Play(sounds.emerald, 2, 0, false, 1)
+            Audio.play(sounds.emerald)
         end
         anim.playDir(standSprite, "Idle", standData.launchdir)
     end

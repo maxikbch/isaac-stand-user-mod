@@ -4,7 +4,7 @@ local shader = require("jotaro.time_stop.shader")
 local projectiles = require("jotaro.time_stop.projectiles")
 local damageFilter = require("jotaro.time_stop.damage_filter")
 
-local sfx = SFXManager()
+local Audio = _G.JoJoStandFramework.Audio
 local music = MusicManager()
 
 local function resumeMusic()
@@ -13,8 +13,8 @@ end
 
 return {
     onActivate = function(player, standDef)
-        sfx:Play(standDef.sounds.stopTime, 2, 0, false, 1)
-        sfx:Play(standDef.sounds.zaWarudo, 2, 0, false, 1)
+        Audio.play(standDef.sounds.stopTime)
+        Audio.play(standDef.sounds.zaWarudo)
         music:Pause()
     end,
 

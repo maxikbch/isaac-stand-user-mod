@@ -1,5 +1,6 @@
 local JSF = _G.JoJoStandFramework
 local Combat = JSF.Combat
+local Audio = JSF.Audio
 local ITEM_MODIFIERS = Combat.ITEM_MODIFIERS
 local Settings = Combat.Settings
 local standChecks = Combat.checks
@@ -7,7 +8,6 @@ local setStat = Combat.setStat
 local StandEffects = Combat.effects
 local utils = Combat.utils
 
-local sfx = SFXManager()
 local rng = RNG()
 
 return function(player, standDef, jsf, shootDir)
@@ -113,7 +113,7 @@ return function(player, standDef, jsf, shootDir)
                 end
 
                 if standData.tgt and sounds.punchheavy then
-                    sfx:Play(sounds.punchheavy, .75, 0, false, 1)
+                    Audio.play(sounds.punchheavy)
                     if player:HasCollectible(317) and standData.punches == standData.maxpunches then
                         local splash = Isaac.Spawn(1000, 53, 0, standData.tgt.Position, Vector(0, 0), player)
                         splash:GetSprite().Scale = Vector(2, 2)
@@ -122,11 +122,13 @@ return function(player, standDef, jsf, shootDir)
             else
                 ref.CollisionDamage = ref.CollisionDamage * (standData.damage * STATS.Damage)
                 if standData.tgt and sounds.punchlight then
-                    sfx:Play(sounds.punchlight, .75, 0, false, 1 + math.min(.3, (.015 * standData.punches)))
+                    Audio.play(sounds.punchlight, {
+                        pitch = 1 + math.min(.3, (.015 * standData.punches)),
+                    })
                 end
             end
             if standData.tgt == nil and sounds.whoosh then
-                sfx:Play(sounds.whoosh, .8, 0, false, 1)
+                Audio.play(sounds.whoosh)
             end
             ref.Scale = STATS.PunchSize
             ref.Height = -20
@@ -171,19 +173,23 @@ return function(player, standDef, jsf, shootDir)
 
     if Settings.ExtraSounds then
         if standData.punches == standData.maxpunches then
-            if sounds.cryMid and sfx:IsPlaying(sounds.cryMid) then
-                sfx:Stop(sounds.cryMid)
-                if sounds.cryFinish then sfx:Play(sounds.cryFinish, .75, 0, false) end
-            elseif sounds.cryFinish and sounds.cry and not sfx:IsPlaying(sounds.cryFinish) and not sfx:IsPlaying(sounds.cry) then
-                sfx:Play(sounds.cry, .75, 0, false)
+            if Audio.isPlaying(sounds.cryMid) then
+                Audio.stop(sounds.cryMid)
+                Audio.play(sounds.cryFinish)
+            elseif sounds.cryFinish and sounds.cry
+                and not Audio.isPlaying(sounds.cryFinish)
+                and not Audio.isPlaying(sounds.cry) then
+                Audio.play(sounds.cry)
             end
         elseif standData.punches == 0 then
-            if sounds.cryStart and not sfx:IsPlaying(sounds.cryStart) then
-                sfx:Play(sounds.cryStart, .75, 0, false)
+            if sounds.cryStart and not Audio.isPlaying(sounds.cryStart) then
+                Audio.play(sounds.cryStart)
             end
         else
-            if sounds.cryStart and sounds.cryMid and not sfx:IsPlaying(sounds.cryStart) and not sfx:IsPlaying(sounds.cryMid) then
-                sfx:Play(sounds.cryMid, .75, 0, true)
+            if sounds.cryStart and sounds.cryMid
+                and not Audio.isPlaying(sounds.cryStart)
+                and not Audio.isPlaying(sounds.cryMid) then
+                Audio.play(sounds.cryMid)
             end
         end
     end

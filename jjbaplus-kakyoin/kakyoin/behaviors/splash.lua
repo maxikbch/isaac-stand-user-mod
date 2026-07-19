@@ -2,8 +2,7 @@ local emeraldEntities = require("kakyoin.emerald_entities")
 local JSF = _G.JoJoStandFramework
 local setStat = JSF.Combat.setStat
 local anim = JSF.Combat.anim
-
-local sfx = SFXManager()
+local Audio = JSF.Audio
 
 local EMERALD_SPEED = 25
 local MAX_PUNCHES = 30
@@ -87,7 +86,7 @@ return function(player, standDef, jsf, shootDir)
 
     if standData.statetime == 0 then
         if sounds.splash then
-            sfx:Play(sounds.splash, 0.7, 0, false, 1)
+            Audio.play(sounds.splash)
         end
         anim.playDir(standSprite, "SplashIn", standData.launchdir)
         setStat:AttackAmount(player, standDef, standEntity)
