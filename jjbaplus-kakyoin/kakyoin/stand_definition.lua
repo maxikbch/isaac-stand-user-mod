@@ -1,4 +1,4 @@
-﻿local character = require("kakyoin.character_definition")
+local character = require("kakyoin.character_definition")
 local settings = require("kakyoin.settings")
 local stats = require("kakyoin.stand_stats")
 local emeraldSplash = require("kakyoin.emerald_splash")
@@ -51,6 +51,8 @@ return {
         primary = {
             maxCharge = stats.SuperMaxCharge,
             gainOnHit = true,
+            fillColor = Color(0 / 255, 162 / 255, 94 / 255, 1, 0, 0, 0),
+            filledColor = Color(0 / 255, 201 / 255, 101 / 255, 1, 0, 0, 0),
         },
     },
 
@@ -61,6 +63,9 @@ return {
             useCost = freeSkill1 and 0 or stats.SuperMaxCharge,
             cooldown = freeSkill1 and 0 or stats.SuperCooldown,
             cooldownStartsOn = "complete",
+            fullChargeSounds = {
+                voice = Isaac.GetSoundIdByName("HierophantGreen_FullChargeVoice"),
+            },
             onPress = function(ctx)
                 return emeraldSplash.tryActivate(ctx)
             end,

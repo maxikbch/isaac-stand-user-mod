@@ -1,4 +1,4 @@
-﻿<sounds root="sounds/kakyoin/">
+<sounds root="sounds/kakyoin/">
 	<sound name="Kakyoin_PunchLight">
 		<sample weight="1" path="punchlight.wav" />
 	</sound>
@@ -43,5 +43,8 @@
 	</sound>
 	<sound name="HierophantGreen_EmeraldoSplashuo">
 		<sample weight="1" path="emeraldo_splashuo.wav" />
+	</sound>
+	<sound name="HierophantGreen_FullChargeVoice">
+		<sample weight="1" path="hierophant_green.wav" />
 	</sound>
 </sounds>

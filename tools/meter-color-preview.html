@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JJBA+ Meter Color Preview</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, system-ui, sans-serif;
+      background: #111318;
+      color: #eef1f6;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 24px; }
+    main { width: min(100%, 980px); margin: 0 auto; }
+    h1 { margin: 0 0 6px; font-size: 24px; }
+    .subtitle { margin: 0 0 20px; color: #aeb6c5; }
+    .panel {
+      padding: 18px;
+      border: 1px solid #303641;
+      border-radius: 12px;
+      background: #1a1e25;
+    }
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    label { display: block; margin-bottom: 6px; color: #c9d0dc; font-size: 13px; }
+    input, select, button {
+      width: 100%;
+      min-height: 38px;
+      border: 1px solid #3b4350;
+      border-radius: 7px;
+      background: #11151b;
+      color: inherit;
+    }
+    input[type="file"] { padding: 7px; }
+    input[type="color"] { padding: 3px; cursor: pointer; }
+    input[type="number"], input[type="text"] { padding: 8px 10px; }
+    input[type="range"] { border: 0; }
+    button { padding: 8px 12px; cursor: pointer; background: #273142; }
+    button:hover { background: #334059; }
+    .rgb {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+    }
+    .previews {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .preview-card {
+      min-height: 260px;
+      border: 1px solid #303641;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #15181e;
+    }
+    .preview-card h2 { margin: 0; padding: 10px 12px; font-size: 14px; background: #222832; }
+    .stage {
+      min-height: 220px;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      overflow: auto;
+      background-color: #8d8d8d;
+      background-image:
+        linear-gradient(45deg, #777 25%, transparent 25%),
+        linear-gradient(-45deg, #777 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #777 75%),
+        linear-gradient(-45deg, transparent 75%, #777 75%);
+      background-size: 16px 16px;
+      background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+    }
+    .swatch {
+      width: 140px;
+      height: 140px;
+      border: 1px solid rgb(255 255 255 / 25%);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgb(0 0 0 / 35%);
+    }
+    canvas {
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+    .drop-zone {
+      padding: 14px;
+      border: 1px dashed #536078;
+      border-radius: 8px;
+      text-align: center;
+      color: #aeb6c5;
+    }
+    .drop-zone.dragging { border-color: #75a7ff; background: #202a3a; }
+    .code-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .code-row input { font-family: Consolas, monospace; }
+    .code-row button { width: auto; }
+    .hint { margin: 10px 0 0; color: #919bab; font-size: 12px; }
+    #status { min-height: 18px; margin: 10px 0 0; color: #8fce9b; font-size: 13px; }
+    #conversionStatus { min-height: 18px; margin: 8px 0 0; color: #d8b96d; font-size: 13px; }
+    @media (max-width: 650px) {
+      body { padding: 12px; }
+      .previews { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Meter Color Preview</h1>
+    <p class="subtitle">Previsualiza la multiplicación RGB que aplica <code>Sprite.Color</code> en Isaac.</p>
+
+    <section class="panel">
+      <div class="controls">
+        <div>
+          <label for="spriteFile">Spritesheet PNG</label>
+          <input id="spriteFile" type="file" accept="image/png,image/*">
+        </div>
+        <div>
+          <label for="colorProfile">Perfil de los valores ingresados</label>
+          <select id="colorProfile">
+            <option value="adobe-rgb">Adobe RGB (1998)</option>
+            <option value="srgb">sRGB</option>
+          </select>
+        </div>
+        <div>
+          <label for="colorPicker">Canales de origen</label>
+          <input id="colorPicker" type="color" value="#26d940">
+        </div>
+        <div>
+          <label for="hexColor">Hex de origen</label>
+          <input id="hexColor" type="text" value="#26D940" maxlength="7" spellcheck="false">
+        </div>
+        <div>
+          <label>RGB de origen (0–255)</label>
+          <div class="rgb">
+            <input id="red" type="number" min="0" max="255" value="38" aria-label="Rojo">
+            <input id="green" type="number" min="0" max="255" value="217" aria-label="Verde">
+            <input id="blue" type="number" min="0" max="255" value="64" aria-label="Azul">
+          </div>
+        </div>
+        <div>
+          <label for="convertedColor">Equivalente sRGB usado por Isaac</label>
+          <input id="convertedColor" type="text" readonly>
+        </div>
+        <div>
+          <label for="zoom">Zoom del sprite: <span id="zoomValue">4×</span></label>
+          <input id="zoom" type="range" min="1" max="12" step="1" value="4">
+        </div>
+        <div>
+          <label for="background">Fondo de preview</label>
+          <select id="background">
+            <option value="checker">Transparencia</option>
+            <option value="#111111">Oscuro</option>
+            <option value="#777777">Gris</option>
+            <option value="#eeeeee">Claro</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="dropZone" class="drop-zone">También podés arrastrar aquí el spritesheet del medidor.</div>
+      <p id="status">Elegí o arrastrá un PNG para comenzar.</p>
+      <p id="conversionStatus"></p>
+
+      <div class="previews">
+        <article class="preview-card">
+          <h2>Color puro convertido a sRGB</h2>
+          <div class="stage"><div id="swatch" class="swatch"></div></div>
+        </article>
+        <article class="preview-card">
+          <h2>Resultado sobre el sprite</h2>
+          <div class="stage"><canvas id="previewCanvas"></canvas></div>
+        </article>
+      </div>
+
+      <div class="code-row">
+        <input id="luaColor" type="text" readonly aria-label="Código Lua">
+        <button id="copyLua" type="button">Copiar Lua</button>
+      </div>
+      <p class="hint">Adobe RGB se convierte colorimétricamente a sRGB antes del cálculo por píxel: resultado = sprite × sRGB / 255. Los canales alpha y offset permanecen sin cambios.</p>
+    </section>
+  </main>
+
+  <script>
+    "use strict";
+
+    const elements = {
+      file: document.querySelector("#spriteFile"),
+      profile: document.querySelector("#colorProfile"),
+      picker: document.querySelector("#colorPicker"),
+      hex: document.querySelector("#hexColor"),
+      red: document.querySelector("#red"),
+      green: document.querySelector("#green"),
+      blue: document.querySelector("#blue"),
+      converted: document.querySelector("#convertedColor"),
+      conversionStatus: document.querySelector("#conversionStatus"),
+      zoom: document.querySelector("#zoom"),
+      zoomValue: document.querySelector("#zoomValue"),
+      background: document.querySelector("#background"),
+      swatch: document.querySelector("#swatch"),
+      canvas: document.querySelector("#previewCanvas"),
+      dropZone: document.querySelector("#dropZone"),
+      status: document.querySelector("#status"),
+      lua: document.querySelector("#luaColor"),
+      copy: document.querySelector("#copyLua"),
+      stages: document.querySelectorAll(".stage")
+    };
+
+    const context = elements.canvas.getContext("2d", { willReadFrequently: true });
+    let sourceImage = null;
+    let sourcePixels = null;
+
+    function clampChannel(value) {
+      const number = Number(value);
+      return Number.isFinite(number) ? Math.max(0, Math.min(255, Math.round(number))) : 0;
+    }
+
+    function getRgb() {
+      return [
+        clampChannel(elements.red.value),
+        clampChannel(elements.green.value),
+        clampChannel(elements.blue.value)
+      ];
+    }
+
+    function rgbToHex([red, green, blue]) {
+      return "#" + [red, green, blue]
+        .map(channel => channel.toString(16).padStart(2, "0"))
+        .join("")
+        .toUpperCase();
+    }
+
+    function hexToRgb(hex) {
+      const match = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+      if (!match) return null;
+      const value = Number.parseInt(match[1], 16);
+      return [(value >> 16) & 255, (value >> 8) & 255, value & 255];
+    }
+
+    function adobeRgbToSrgb(rgb) {
+      const gamma = 563 / 256;
+      const [red, green, blue] = rgb.map(channel => Math.pow(channel / 255, gamma));
+
+      const x = 0.5767309 * red + 0.1855540 * green + 0.1881852 * blue;
+      const y = 0.2973769 * red + 0.6273491 * green + 0.0752741 * blue;
+      const z = 0.0270343 * red + 0.0706872 * green + 0.9911085 * blue;
+
+      const linear = [
+        3.2404542 * x - 1.5371385 * y - 0.4985314 * z,
+        -0.9692660 * x + 1.8760108 * y + 0.0415560 * z,
+        0.0556434 * x - 0.2040259 * y + 1.0572252 * z
+      ];
+      const outOfGamut = linear.some(channel => channel < 0 || channel > 1);
+      const encoded = linear.map(channel => {
+        const clamped = Math.max(0, Math.min(1, channel));
+        const srgb = clamped <= 0.0031308
+          ? 12.92 * clamped
+          : 1.055 * Math.pow(clamped, 1 / 2.4) - 0.055;
+        return Math.round(srgb * 255);
+      });
+
+      return { rgb: encoded, outOfGamut };
+    }
+
+    function getOutputRgb() {
+      const source = getRgb();
+      if (elements.profile.value === "adobe-rgb") {
+        return adobeRgbToSrgb(source);
+      }
+      return { rgb: source, outOfGamut: false };
+    }
+
+    function setRgb(rgb) {
+      [elements.red.value, elements.green.value, elements.blue.value] = rgb;
+      const hex = rgbToHex(rgb);
+      elements.hex.value = hex;
+      elements.picker.value = hex.toLowerCase();
+      updatePreview();
+    }
+
+    function updatePreview() {
+      const conversion = getOutputRgb();
+      const rgb = conversion.rgb;
+      const hex = rgbToHex(rgb);
+      elements.swatch.style.background = hex;
+      elements.converted.value = `${hex} — rgb(${rgb.join(", ")})`;
+      elements.conversionStatus.textContent = conversion.outOfGamut
+        ? "Parte del color Adobe RGB queda fuera de sRGB; el resultado fue recortado al rango disponible."
+        : elements.profile.value === "adobe-rgb"
+          ? "Conversión Adobe RGB (1998) → sRGB aplicada."
+          : "Sin conversión: los valores ingresados ya son sRGB.";
+      elements.lua.value =
+        `Color(${rgb[0]} / 255, ${rgb[1]} / 255, ${rgb[2]} / 255, 1, 0, 0, 0)`;
+
+      if (!sourceImage || !sourcePixels) return;
+
+      const output = new ImageData(
+        new Uint8ClampedArray(sourcePixels.data),
+        sourcePixels.width,
+        sourcePixels.height
+      );
+
+      for (let index = 0; index < output.data.length; index += 4) {
+        output.data[index] = Math.round(output.data[index] * rgb[0] / 255);
+        output.data[index + 1] = Math.round(output.data[index + 1] * rgb[1] / 255);
+        output.data[index + 2] = Math.round(output.data[index + 2] * rgb[2] / 255);
+      }
+
+      context.putImageData(output, 0, 0);
+    }
+
+    function updateZoom() {
+      const zoom = Number(elements.zoom.value);
+      elements.zoomValue.textContent = `${zoom}×`;
+      elements.canvas.style.width = `${elements.canvas.width * zoom}px`;
+      elements.canvas.style.height = `${elements.canvas.height * zoom}px`;
+    }
+
+    function updateBackground() {
+      const value = elements.background.value;
+      elements.stages.forEach(stage => {
+        if (value === "checker") {
+          stage.style.removeProperty("background");
+          stage.style.removeProperty("background-image");
+        } else {
+          stage.style.background = value;
+          stage.style.backgroundImage = "none";
+        }
+      });
+    }
+
+    function loadFile(file) {
+      if (!file || !file.type.startsWith("image/")) {
+        elements.status.textContent = "El archivo debe ser una imagen PNG.";
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = event => {
+        const image = new Image();
+        image.onload = () => {
+          sourceImage = image;
+          elements.canvas.width = image.naturalWidth;
+          elements.canvas.height = image.naturalHeight;
+          context.clearRect(0, 0, image.naturalWidth, image.naturalHeight);
+          context.drawImage(image, 0, 0);
+          sourcePixels = context.getImageData(0, 0, image.naturalWidth, image.naturalHeight);
+          elements.status.textContent =
+            `${file.name} — ${image.naturalWidth}×${image.naturalHeight}px`;
+          updateZoom();
+          updatePreview();
+        };
+        image.onerror = () => {
+          elements.status.textContent = "No se pudo leer la imagen.";
+        };
+        image.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    elements.file.addEventListener("change", event => loadFile(event.target.files[0]));
+    elements.profile.addEventListener("change", updatePreview);
+    elements.picker.addEventListener("input", () => setRgb(hexToRgb(elements.picker.value)));
+    elements.hex.addEventListener("change", () => {
+      const rgb = hexToRgb(elements.hex.value);
+      if (rgb) setRgb(rgb);
+      else elements.hex.value = rgbToHex(getRgb());
+    });
+    [elements.red, elements.green, elements.blue].forEach(input => {
+      input.addEventListener("input", () => setRgb(getRgb()));
+    });
+    elements.zoom.addEventListener("input", updateZoom);
+    elements.background.addEventListener("change", updateBackground);
+
+    ["dragenter", "dragover"].forEach(type => {
+      elements.dropZone.addEventListener(type, event => {
+        event.preventDefault();
+        elements.dropZone.classList.add("dragging");
+      });
+    });
+    ["dragleave", "drop"].forEach(type => {
+      elements.dropZone.addEventListener(type, event => {
+        event.preventDefault();
+        elements.dropZone.classList.remove("dragging");
+      });
+    });
+    elements.dropZone.addEventListener("drop", event => loadFile(event.dataTransfer.files[0]));
+
+    elements.copy.addEventListener("click", async () => {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(elements.lua.value);
+      } else {
+        elements.lua.select();
+        document.execCommand("copy");
+        elements.lua.setSelectionRange(0, 0);
+      }
+      const previous = elements.copy.textContent;
+      elements.copy.textContent = "Copiado";
+      setTimeout(() => { elements.copy.textContent = previous; }, 900);
+    });
+
+    setRgb([38, 217, 64]);
+    updateBackground();
+  </script>
+</body>
+</html>

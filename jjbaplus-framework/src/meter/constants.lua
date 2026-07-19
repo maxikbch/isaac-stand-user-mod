@@ -21,9 +21,15 @@ return {
         skill1 = "BgSkill1",
         skill2 = "BgSkill2",
     },
+    -- White flash overlay when a circular meter is ready (charge >= max).
+    CIRCULAR_CHARGED_PULSE_SPEED = 0.15,
+    CIRCULAR_CHARGED_PULSE_POWER = 4,
+    CIRCULAR_CHARGED_PULSE_ALPHA = 0.65,
 
     -- Default green tint for grayscale charge sprites (vertical + circular fill).
-    DEFAULT_CHARGE_COLOR = Color(0.28, 1, 0.22, 1, 0, 0, 0),
+    DEFAULT_CHARGE_COLOR = Color(0, 195/255, 13/255, 1, 0, 0, 0),
+    -- Solid tint when a meter is at 100% (override per skill/pool with filledColor).
+    DEFAULT_FILLED_COLOR = Color(0, 249/255, 23/255, 1, 0, 0, 0),
     SPRITE_COLOR_WHITE = Color(1, 1, 1, 1, 0, 0, 0),
 
     -- Move the entire stand meter block on screen (coop slot offsets stay in utils).

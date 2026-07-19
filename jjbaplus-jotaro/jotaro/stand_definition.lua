@@ -65,6 +65,8 @@ return {
         primary = {
             maxCharge = stats.SuperMaxCharge,
             gainOnHit = true,
+            fillColor = Color(98 / 255, 42 / 255, 90 / 255, 1, 0, 0, 0),
+            filledColor = Color(198 / 255, 91 / 255, 183 / 255, 1, 0, 0, 0),
         },
     },
 
@@ -75,6 +77,9 @@ return {
             useCost = stats.SuperMaxCharge,
             duration = stats.SuperDuration,
             cooldown = stats.SuperCooldown,
+            fullChargeSounds = {
+                voice = Isaac.GetSoundIdByName("Jotaro_FullChargeVoice"),
+            },
             onActivate = activateTimeStop,
             onDeactivate = deactivateTimeStop,
         },

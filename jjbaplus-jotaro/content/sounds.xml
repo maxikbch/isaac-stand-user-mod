@@ -1,4 +1,4 @@
-﻿<sounds root="sounds/jotaro/">
+<sounds root="sounds/jotaro/">
 	<sound name="Jotaro_PunchLight">
 		<sample weight="1" path="punchlight.wav" />
 	</sound>
@@ -40,5 +40,8 @@
 	</sound>
 	<sound name="StarPlatinum_Tick9">
 		<sample weight="1" path="ticking_9.wav" />
+	</sound>
+	<sound name="Jotaro_FullChargeVoice">
+		<sample weight="1" path="yare yare daze.wav" />
 	</sound>
 </sounds>

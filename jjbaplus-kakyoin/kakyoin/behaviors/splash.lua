@@ -87,7 +87,7 @@ return function(player, standDef, jsf, shootDir)
 
     if standData.statetime == 0 then
         if sounds.splash then
-            sfx:Play(sounds.splash, 0.3, 0, false, 1)
+            sfx:Play(sounds.splash, 0.7, 0, false, 1)
         end
         anim.playDir(standSprite, "SplashIn", standData.launchdir)
         setStat:AttackAmount(player, standDef, standEntity)
