@@ -1,4 +1,4 @@
-<sounds root="sounds/ui/">
+<sounds root="sfx/ui/">
 	<sound name="JJBAPlus_FullCharge">
 		<sample weight="1" path="full_charge.wav" />
 	</sound>

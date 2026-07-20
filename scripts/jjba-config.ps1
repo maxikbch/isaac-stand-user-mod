@@ -15,7 +15,7 @@ $script:JJBA_TemplatePath = Join-Path $JJBA_RepoRoot "template"
 $script:JJBA_TemplateCharacterGfxPath = Join-Path $JJBA_TemplatePath "resources\gfx\character"
 $script:JJBA_TemplateMenuGfxPath = Join-Path $JJBA_TemplatePath "content\gfx"
 $script:JJBA_TemplateFrameworkGfxPath = Join-Path $JJBA_TemplatePath "resources\gfx\framework"
-$script:JJBA_TemplateCharacterSoundsPath = Join-Path $JJBA_TemplatePath "resources\sounds\character"
+$script:JJBA_TemplateCharacterSoundsPath = Join-Path $JJBA_TemplatePath "resources\sfx\character"
 
 function Get-JJBAIsaacModsPath {
     if ($JJBA_IsaacModsPath) {

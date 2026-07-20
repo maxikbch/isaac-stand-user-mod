@@ -1,4 +1,4 @@
-<sounds root="sounds/{{GFX_NAMESPACE}}/">
+<sounds root="sfx/{{GFX_NAMESPACE}}/">
 	<sound name="{{SOUND_PREFIX}}_PunchLight">
 		<sample weight="1" path="punch_light.wav" />
 	</sound>

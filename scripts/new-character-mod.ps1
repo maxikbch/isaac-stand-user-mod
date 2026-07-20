@@ -144,7 +144,7 @@ Get-ChildItem -Path $JJBA_TemplateMenuGfxPath -File | ForEach-Object {
 
 & "$PSScriptRoot\setup-framework-assets.ps1"
 
-$targetSounds = Join-Path $modPath "resources\sounds\$gfxNamespace"
+$targetSounds = Join-Path $modPath "resources\sfx\$gfxNamespace"
 Copy-JJBAAssetTree -Source $JJBA_TemplateCharacterSoundsPath -Destination $targetSounds
 
 $newEntry = [ordered]@{

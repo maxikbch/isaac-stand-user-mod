@@ -52,7 +52,7 @@ Plantilla: [`template/`](template/) · Ver [`template/README.md`](template/READM
 |------|---------|
 | Gameplay (stand, costumes, UI boss/stage) | `resources/gfx/{slug}/` |
 | Menú (selector, portraits, death screen) | `content/gfx/` |
-| Sonidos | `resources/sounds/{slug}/` + `content/sounds.xml` |
+| Sonidos | `resources/sfx/{slug}/` + `content/sounds.xml` |
 | HUD del framework | `jjbaplus-framework/resources/gfx/stand_framework/` |
 
 Los `.anm2` de menú deben declarar una animación con el mismo nombre que el personaje en `players.xml`.

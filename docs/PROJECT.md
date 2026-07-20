@@ -113,7 +113,7 @@ Isaac carga **XML y menú** desde `content/`. Los sprites de juego (costumes, st
 | Retrato principal (`portrait`) | `resources/gfx/{slug}/ui/stage/playerportrait.png` |
 | Nombre en boss (`nameimage`) | `resources/gfx/{slug}/ui/boss/playername.png` |
 | Menú de personaje | `jjbaplus-{slug}/content/gfx/` (charactermenu, portraits, etc.) |
-| Sonidos | `jjbaplus-{slug}/resources/sounds/{slug}/` (`.wav` referenciados en `content/sounds.xml`) |
+| Sonidos | `jjbaplus-{slug}/resources/sfx/{slug}/` (`.wav` referenciados en `content/sounds.xml`) |
 
 El scaffold copia desde `template/` a `resources/gfx/{slug}/`, `content/gfx/` (menú) y sincroniza el HUD del framework. Los `.anm2` de menú deben usar una animación con el **mismo nombre** que `<player name="...">` en `players.xml` (ej. `"Jotaro"` para el personaje Jotaro).
 
@@ -482,7 +482,7 @@ jjbaplus-jotaro/
 ├── resources/
 │   ├── gfx/
 │   │   └── jotaro/              ← stand, costumes, disco, UI boss/stage
-│   └── sounds/
+│   └── sfx/
 │       └── jotaro/              ← .wav referenciados en sounds.xml
 ├── main.lua
 ├── stand_definition.lua
@@ -513,7 +513,7 @@ Ver checklist completo en [`docs/TESTING.md`](TESTING.md).
 
 - Puede quedar código legacy en la raíz del repo (`src/`, `content/`). **No activar** `isaac-stand-user-mod` como mod en Isaac.
 - Mod pre-framework [`kakyoin_1575678153/`](../kakyoin_1575678153/) — ver [`docs/legacy/README.md`](legacy/README.md).
-- Sonidos en `content/sounds.xml` requieren `.wav` en `resources/sounds/{slug}/`. El scaffold copia placeholders desde `template/resources/sounds/character/`.
+- Sonidos en `content/sounds.xml` requieren `.wav` en `resources/sfx/{slug}/`. El scaffold copia placeholders desde `template/resources/sfx/character/`.
 - Swap de discos: `MC_PRE_PICKUP_COLLISION` (vanilla); disco anterior va al pedestal vacío más cercano o al suelo.
 - Debug del framework: `jjbaplus-framework/settings.lua` → `DebugOverlay = true` (overlay + logs de `JSF.Events`).
 
