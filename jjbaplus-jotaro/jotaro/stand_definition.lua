@@ -98,20 +98,16 @@ return {
     },
 
     -- volume / pitch / loop live here so combat code only picks a key.
-    -- ExtraSounds reuses punch/rage samples (cry_* were duplicates).
     sounds = {
-        punchlight = { name = "Jotaro_PunchLight", volume = 0.75 },
-        punchheavy = { name = "Jotaro_PunchHeavy", volume = 0.75 },
-        punchready = { name = "Jotaro_PunchReady", volume = 0.35, pitch = 0.98 },
+        punchLight = { name = "Jotaro_PunchLight", volume = 0.75 },
+        punchHeavy = { name = "Jotaro_PunchHeavy", volume = 0.75 },
+        punchReady = { name = "Jotaro_PunchReady", volume = 0.35, pitch = 0.98 },
         whoosh = { name = "Jotaro_Whoosh", volume = 0.8 },
         rage = { name = "Jotaro_Rage", volume = 0.75 },
-        cryStart = { name = "Jotaro_PunchHeavy", volume = 0.75 },
-        cryMid = { name = "Jotaro_PunchLight", volume = 0.75, loop = true },
-        cryFinish = { name = "Jotaro_PunchHeavy", volume = 0.75 },
-        cry = { name = "Jotaro_Rage", volume = 0.75 },
         zaWarudo = { name = "StarPlatinum_ZaWarudo", volume = 2 },
         stopTime = { name = "StarPlatinum_StopTime", volume = 2 },
         resumeTime = { name = "StarPlatinum_ResumeTime", volume = 2 },
+        tokiWaUgokidasu = { name = "StarPlatinum_TokiWaUgokidasu", volume = 2 },
         tick5 = { name = "StarPlatinum_Tick5", volume = 5 },
         tick9 = { name = "StarPlatinum_Tick9", volume = 5 },
     },

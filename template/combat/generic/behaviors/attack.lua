@@ -112,8 +112,8 @@ return function(player, standDef, jsf, shootDir)
                     ref.CollisionDamage = ref.CollisionDamage * (standData.damage * setStat:GetFinisherDamageMult(player, standDef))
                 end
 
-                if standData.tgt and sounds.punchheavy then
-                    Audio.play(sounds.punchheavy)
+                if standData.tgt and sounds.punchHeavy then
+                    Audio.play(sounds.punchHeavy)
                     if player:HasCollectible(317) and standData.punches == standData.maxpunches then
                         local splash = Isaac.Spawn(1000, 53, 0, standData.tgt.Position, Vector(0, 0), player)
                         splash:GetSprite().Scale = Vector(2, 2)
@@ -121,8 +121,8 @@ return function(player, standDef, jsf, shootDir)
                 end
             else
                 ref.CollisionDamage = ref.CollisionDamage * (standData.damage * STATS.Damage)
-                if standData.tgt and sounds.punchlight then
-                    Audio.play(sounds.punchlight, {
+                if standData.tgt and sounds.punchLight then
+                    Audio.play(sounds.punchLight, {
                         pitch = 1 + math.min(.3, (.015 * standData.punches)),
                     })
                 end
@@ -167,29 +167,6 @@ return function(player, standDef, jsf, shootDir)
                 if length <= 150 and length >= 30 and magnet and not en:IsBoss() then
                     en.Velocity = en.Velocity + ((hitpos - en.Position):Normalized() * ITEM_MODIFIERS.MagnetForce)
                 end
-            end
-        end
-    end
-
-    if Settings.ExtraSounds then
-        if standData.punches == standData.maxpunches then
-            if Audio.isPlaying(sounds.cryMid) then
-                Audio.stop(sounds.cryMid)
-                Audio.play(sounds.cryFinish)
-            elseif sounds.cryFinish and sounds.cry
-                and not Audio.isPlaying(sounds.cryFinish)
-                and not Audio.isPlaying(sounds.cry) then
-                Audio.play(sounds.cry)
-            end
-        elseif standData.punches == 0 then
-            if sounds.cryStart and not Audio.isPlaying(sounds.cryStart) then
-                Audio.play(sounds.cryStart)
-            end
-        else
-            if sounds.cryStart and sounds.cryMid
-                and not Audio.isPlaying(sounds.cryStart)
-                and not Audio.isPlaying(sounds.cryMid) then
-                Audio.play(sounds.cryMid)
             end
         end
     end

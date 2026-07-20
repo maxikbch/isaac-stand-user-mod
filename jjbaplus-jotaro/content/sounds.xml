@@ -23,6 +23,9 @@
 	<sound name="StarPlatinum_ResumeTime">
 		<sample weight="1" path="time_resume.wav" />
 	</sound>
+	<sound name="StarPlatinum_TokiWaUgokidasu">
+		<sample weight="1" path="toki_wa_ugokidasu.wav" />
+	</sound>
 	<sound name="StarPlatinum_Tick5">
 		<sample weight="1" path="ticking_5.wav" />
 	</sound>

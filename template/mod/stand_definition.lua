@@ -71,17 +71,12 @@ return {
     },
 
     -- volume / pitch / loop live here so combat code only picks a key.
-    -- ExtraSounds reuses punch/rage samples (cry_* were duplicates).
     sounds = {
-        punchlight = { name = "{{SOUND_PREFIX}}_PunchLight", volume = 0.75 },
-        punchheavy = { name = "{{SOUND_PREFIX}}_PunchHeavy", volume = 0.75 },
-        punchready = { name = "{{SOUND_PREFIX}}_PunchReady", volume = 0.35, pitch = 0.98 },
+        punchLight = { name = "{{SOUND_PREFIX}}_PunchLight", volume = 0.75 },
+        punchHeavy = { name = "{{SOUND_PREFIX}}_PunchHeavy", volume = 0.75 },
+        punchReady = { name = "{{SOUND_PREFIX}}_PunchReady", volume = 0.35, pitch = 0.98 },
         whoosh = { name = "{{SOUND_PREFIX}}_Whoosh", volume = 0.8 },
         rage = { name = "{{SOUND_PREFIX}}_Rage", volume = 0.75 },
-        cryStart = { name = "{{SOUND_PREFIX}}_PunchHeavy", volume = 0.75 },
-        cryMid = { name = "{{SOUND_PREFIX}}_PunchLight", volume = 0.75, loop = true },
-        cryFinish = { name = "{{SOUND_PREFIX}}_PunchHeavy", volume = 0.75 },
-        cry = { name = "{{SOUND_PREFIX}}_Rage", volume = 0.75 },
     },
 
     linkedCharacters = {

@@ -85,15 +85,11 @@ return {
     },
 
     sounds = {
-        punchlight = { name = "Character_PunchLight", volume = 0.75 },
-        punchheavy = { name = "Character_PunchHeavy", volume = 0.75 },
-        punchready = { name = "Character_PunchReady", volume = 0.35, pitch = 0.98 },
+        punchLight = { name = "Character_PunchLight", volume = 0.75 },
+        punchHeavy = { name = "Character_PunchHeavy", volume = 0.75 },
+        punchReady = { name = "Character_PunchReady", volume = 0.35, pitch = 0.98 },
         whoosh = { name = "Character_Whoosh", volume = 0.8 },
         rage = { name = "Character_Rage", volume = 0.75 },
-        cryStart = { name = "Character_PunchHeavy", volume = 0.75 },
-        cryMid = { name = "Character_PunchLight", volume = 0.75, loop = true },
-        cryFinish = { name = "Character_PunchHeavy", volume = 0.75 },
-        cry = { name = "Character_Rage", volume = 0.75 },
     },
 
     linkedCharacters = {

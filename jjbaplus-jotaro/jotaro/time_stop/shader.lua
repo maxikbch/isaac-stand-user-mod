@@ -34,6 +34,7 @@ local function onShader(name, JSF)
                 Audio.play(standDef.sounds.tick5)
             elseif duration == 1 then
                 Audio.play(standDef.sounds.resumeTime)
+                Audio.play(standDef.sounds.tokiWaUgokidasu)
             end
         end
     end)

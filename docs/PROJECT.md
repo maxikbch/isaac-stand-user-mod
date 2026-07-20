@@ -353,7 +353,7 @@ Ver ejemplo en [`template/mod/stand_definition.lua`](../template/mod/stand_defin
     chargePools = { primary = { maxCharge = 100, gainOnHit = true } },
     skills = { example_skill = { kind = "active", chargePool = "primary", ... } },
     slots = { skill1 = { enabled = true, skill = "example_skill", ... } },
-    sounds = { punchlight = ..., ... },
+    sounds = { punchLight = ..., ... },
     hooks = {
         getMaxPunches = function(player, standDef) ... end,
         getFinisherDamageMult = function(player, standDef) ... end,
@@ -382,7 +382,6 @@ El **`+`** solo aparece en el nombre visible del launcher. Carpetas e ids Lua ev
 | Disco (`items.xml`) | nombre único | `Star Platinum Disc` |
 | Gfx en disco | `resources/gfx/{slug}/` | `resources/gfx/jotaro/stand.anm2` |
 | Sonidos combate | `{Personaje}_PunchLight` | `Jotaro_PunchLight` |
-| Sonidos cry | `{StandPascal}_Cry_Start` | `StarPlatinum_Cry_Start` |
 
 ### Entity IDs (stands y VFX)
 

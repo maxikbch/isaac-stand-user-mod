@@ -106,8 +106,8 @@ return function(player, standDef, jsf, shootDir)
         elseif standData.charge == 0 and not standData.ready then
             standSprite:Play(anims.spFlash[aimIndex])
             standData.ready = true
-            if sounds.punchready then
-                Audio.play(sounds.punchready)
+            if sounds.punchReady then
+                Audio.play(sounds.punchReady)
             end
         elseif standSprite:IsEventTriggered("FlashEnd") then
             standSprite:Play(anims.spReady[aimIndex])

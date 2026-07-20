@@ -85,17 +85,12 @@ return {
     },
 
     -- volume / pitch / loop live here so combat code only picks a key.
-    -- ExtraSounds reuses punch/rage samples (cry_* were duplicates).
     sounds = {
-        punchlight = { name = "Kakyoin_PunchLight", volume = 0.75 },
-        punchheavy = { name = "Kakyoin_PunchHeavy", volume = 0.75 },
-        punchready = { name = "Kakyoin_PunchReady", volume = 0.35, pitch = 0.98 },
+        punchLight = { name = "Kakyoin_PunchLight", volume = 0.75 },
+        punchHeavy = { name = "Kakyoin_PunchHeavy", volume = 0.75 },
+        punchReady = { name = "Kakyoin_PunchReady", volume = 0.35, pitch = 0.98 },
         whoosh = { name = "Kakyoin_Whoosh", volume = 0.8 },
         rage = { name = "Kakyoin_Rage", volume = 0.75 },
-        cryStart = { name = "Kakyoin_PunchHeavy", volume = 0.75 },
-        cryMid = { name = "Kakyoin_PunchLight", volume = 0.75, loop = true },
-        cryFinish = { name = "Kakyoin_PunchHeavy", volume = 0.75 },
-        cry = { name = "Kakyoin_Rage", volume = 0.75 },
         emeraldSplash = { name = "HierophantGreen_EmeraldSplash", volume = 1 },
         emerald = { name = "HierophantGreen_Emerald", volume = 2 },
         splash = { name = "HierophantGreen_Splash", volume = 0.7 },

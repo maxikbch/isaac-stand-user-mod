@@ -1,7 +1,6 @@
 return {
 
 	--BOOLEANS
-	ExtraSounds = true, --- remove sounds like stand crys if they are too annoying
 	ReapplyCostume = true, -- overrides other costumes which take the same layers as hair and clothes every room
 	VisibleTarget = false, -- shows a target to further assist with aiming
 	DebugOverlay = false, -- on-screen [JSF] text overlay (console logs always active)
