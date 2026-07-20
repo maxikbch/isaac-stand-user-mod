@@ -9,6 +9,10 @@ local ANM2_PATH = "gfx/kakyoin/net.anm2"
 local FULL_WIDTH = 524
 local DEFAULT_POINT_COUNT = 12
 local DEFAULT_CHORD_COUNT = 3
+local MIN_POINT_COUNT = 6
+local MIN_CHORD_COUNT = 1
+--- Approx perimeter of a 2x2 room AABB (stats counts are tuned for this size).
+local REF_ROOM_PERIMETER = 3200
 local POINT_JITTER = 0.03
 local DEPTH_OFFSET = 180
 local THREAD_SCALE_Y = 1
@@ -69,6 +73,39 @@ local function roomSize(topLeft, bottomRight)
     local w = math.max(1, bottomRight.X - topLeft.X)
     local h = math.max(1, bottomRight.Y - topLeft.Y)
     return w, h, 2 * (w + h)
+end
+
+local function clampInt(n, lo, hi)
+    n = math.floor(n + 0.5)
+    if n < lo then
+        return lo
+    end
+    if n > hi then
+        return hi
+    end
+    return n
+end
+
+--- Scale ring/chord density by real room perimeter (stats = max for ~2x2 / L).
+local function densityForRoom(stats)
+    local maxPoints = (stats and stats.RadioNetPointCount) or DEFAULT_POINT_COUNT
+    local maxChords = (stats and stats.RadioNetChordCount) or DEFAULT_CHORD_COUNT
+    local minPoints = (stats and stats.RadioNetPointCountMin) or MIN_POINT_COUNT
+    local minChords = (stats and stats.RadioNetChordCountMin) or MIN_CHORD_COUNT
+    local refPeri = (stats and stats.RadioNetRefPerimeter) or REF_ROOM_PERIMETER
+
+    local topLeft, bottomRight = roomLayout.getRoomRect()
+    local _, _, peri = roomSize(topLeft, bottomRight)
+    local scale = peri / math.max(1, refPeri)
+    if scale < 0.45 then
+        scale = 0.45
+    elseif scale > 1 then
+        scale = 1
+    end
+
+    local points = clampInt(maxPoints * scale, minPoints, maxPoints)
+    local chords = clampInt(maxChords * scale, minChords, maxChords)
+    return points, chords
 end
 
 local function pointOnPerimeter(topLeft, bottomRight, dist)
@@ -303,8 +340,7 @@ local radioNet = {}
 function radioNet.create(standData, stats)
     radioNet.destroy(standData)
 
-    local pointCount = (stats and stats.RadioNetPointCount) or DEFAULT_POINT_COUNT
-    local chordCount = (stats and stats.RadioNetChordCount) or DEFAULT_CHORD_COUNT
+    local pointCount, chordCount = densityForRoom(stats)
     local outsetX = (stats and stats.RadioNetBorderOutsetX) or DEFAULT_OUTSET_X
     local outsetY = (stats and stats.RadioNetBorderOutsetY) or DEFAULT_OUTSET_Y
     local outsetJitter = (stats and stats.RadioNetOutsetJitter) or DEFAULT_OUTSET_JITTER
@@ -327,6 +363,8 @@ function radioNet.create(standData, stats)
 
     standData.radioNetAnchors = points
     standData.radioNetPlan = plan
+    standData.radioNetPointCount = pointCount
+    standData.radioNetChordCount = chordCount
     standData.radioNetSegments = {}
     standData.radioNetLive = {}
     standData.radioNetGhosts = {}
@@ -352,6 +390,8 @@ function radioNet.destroy(standData)
     end
     standData.radioNetPlan = nil
     standData.radioNetAnchors = nil
+    standData.radioNetPointCount = nil
+    standData.radioNetChordCount = nil
     standData.radioNetSegments = nil
     standData.radioNetLive = nil
     standData.radioNetGhosts = nil

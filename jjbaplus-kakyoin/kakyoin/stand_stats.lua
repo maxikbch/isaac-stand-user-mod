@@ -57,9 +57,12 @@
     RadioRainOffscreenChance = 0.12,
     RadioRainSplashAnimChance = 0.28,
     RadioRainInwardNudge = 10,
-    -- Procedural net telegraph (irregular outward ring + interior chords).
+    -- Procedural net telegraph (counts = max for ~2x2 / L; scaled down in smaller rooms).
     RadioNetPointCount = 12,
     RadioNetChordCount = 3,
+    RadioNetPointCountMin = 6,
+    RadioNetChordCountMin = 1,
+    RadioNetRefPerimeter = 3200,
     RadioNetBorderOutsetX = 28,
     RadioNetBorderOutsetY = 36,
     RadioNetOutsetJitter = 18,
