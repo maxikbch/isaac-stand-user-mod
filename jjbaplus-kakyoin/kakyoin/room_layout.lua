@@ -84,4 +84,9 @@ end
 
 return {
     getEffectiveRoomRect = getEffectiveRoomRect,
+    --- True playable AABB (no L/thin expansion). Prefer for wall-anchored VFX.
+    getRoomRect = function()
+        local room = game:GetRoom()
+        return room:GetTopLeftPos(), room:GetBottomRightPos()
+    end,
 }

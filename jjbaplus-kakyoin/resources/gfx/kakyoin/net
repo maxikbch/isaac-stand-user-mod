@@ -1,0 +1,20 @@
+<AnimatedActor>
+    <Info CreatedBy="robot" CreatedOn="07/20/2026 05:06:33 PM" Fps="30" Version="0"/>
+    <Content>
+        <Spritesheets/>
+        <Layers/>
+        <Nulls/>
+        <Events/>
+    </Content>
+    <Animations DefaultAnimation=""/>
+    <SourceDocument>
+        <Info CreatedBy="robot" CreatedOn="07/20/2026 05:06:33 PM" Fps="30" Version="0"/>
+        <Content>
+            <Spritesheets/>
+            <Layers/>
+            <Nulls/>
+            <Events/>
+        </Content>
+        <Animations DefaultAnimation=""/>
+    </SourceDocument>
+</AnimatedActor>

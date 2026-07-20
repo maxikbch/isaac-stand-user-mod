@@ -1,5 +1,6 @@
 local emeraldEntities = require("kakyoin.emerald_entities")
 local emeraldSplash = require("kakyoin.emerald_splash")
+local radioNet = require("kakyoin.radio_net")
 local roomLayout = require("kakyoin.room_layout")
 
 local JSF = _G.JoJoStandFramework
@@ -17,6 +18,16 @@ local DEFAULT_TRAIL_COUNT = 6
 local DEFAULT_TRAIL_SPEED = 28
 local DEFAULT_TRAIL_HOLD_FRAMES = 18
 local DEFAULT_TRAIL_FADE_FRAMES = 45
+local DEFAULT_WEAVER_INITIAL = 2
+local DEFAULT_WEAVER_INTERVAL_START = 6
+local DEFAULT_WEAVER_INTERVAL_END = 1
+local DEFAULT_WEAVER_SPEED_START = 52
+local DEFAULT_WEAVER_SPEED_END = 56
+local DEFAULT_WEAVER_MAX_ALIVE = 5
+local DEFAULT_WEAVER_FADE = 6
+local DEFAULT_WEAVER_ALPHA = 0.4
+local DEFAULT_WEAVER_NEAR = 48
+local DEFAULT_GHOST_GROW = 3
 local DEFAULT_EDGE_TRAIL_MAX = 18
 local DEFAULT_LAYOUT_EDGE_PER_TICK = 1
 local DEFAULT_LAYOUT_EDGE_INTERVAL = 3
@@ -24,15 +35,25 @@ local DEFAULT_LAYOUT_EDGE_HOLD = 8
 local DEFAULT_LAYOUT_EDGE_FADE = 14
 local DEFAULT_LAYOUT_EDGE_OSC_AMPLITUDE = 22
 local DEFAULT_LAYOUT_EDGE_OSC_SPEED = 0.5
-local DEFAULT_RAIN_EDGE_CHANCE = 0.45
+local DEFAULT_RAIN_EDGE_CHANCE = 0.35
 local DEFAULT_RAIN_EDGE_HOLD = 3
 local DEFAULT_RAIN_EDGE_FADE = 5
+local DEFAULT_RAIN_OFFSCREEN_CHANCE = 0.12
+local DEFAULT_RAIN_SPLASH_ANIM_CHANCE = 0.28
+local DEFAULT_RAIN_INWARD_NUDGE = 10
 local RAIN_END_FADE_FRAMES = 8
 local RAIN_SHAKE_TIMEOUT = 10
 local SCALE_JITTER_MIN = 0.7
 local SCALE_JITTER_RANGE = 0.6
 local IDLE_ANIMS = { "IdleE", "IdleS", "IdleW", "IdleN" }
 local PARTICLE_ANIMS = { "ParticleE", "ParticleS", "ParticleW", "ParticleN" }
+--- VecDir 0..3 → E,S,W,N (matches anim.dirSuffix).
+local LAUNCH_DIRS = {
+    [0] = Vector(1, 0),
+    [1] = Vector(0, 1),
+    [2] = Vector(-1, 0),
+    [3] = Vector(0, -1),
+}
 
 local TRAIL_KIND = {
     LAYOUT = "layout",
@@ -153,6 +174,25 @@ local function cleanupRadioTrails(standData)
     standData.radioTrails = nil
 end
 
+local function cleanupRadioWeavers(standData)
+    if standData.radioWeavers then
+        for _, weaver in ipairs(standData.radioWeavers) do
+            if weaver.entity and weaver.entity:Exists() then
+                weaver.entity:Remove()
+            end
+            if weaver.liveId then
+                radioNet.clearLiveSegment(standData, weaver.liveId)
+            end
+        end
+    end
+    standData.radioWeavers = nil
+    standData.radioWeaveQueue = nil
+    standData.radioWeaveCooldown = nil
+    standData.radioWeaveElapsed = nil
+    standData.radioWeaverLiveId = nil
+    standData.radioWeaveStandDef = nil
+end
+
 local function cleanupRadioEdgeTrails(standData)
     if not standData.radioEdgeTrails then
         return
@@ -163,6 +203,18 @@ local function cleanupRadioEdgeTrails(standData)
         end
     end
     standData.radioEdgeTrails = nil
+end
+
+local function cleanupRainMuzzles(standData)
+    if not standData.radioRainMuzzles then
+        return
+    end
+    for _, entity in ipairs(standData.radioRainMuzzles) do
+        if entity and entity:Exists() then
+            entity:Remove()
+        end
+    end
+    standData.radioRainMuzzles = nil
 end
 
 local function countAliveEdgeTrails(standData)
@@ -220,44 +272,358 @@ local function spawnEdgeTrail(standDef, standData, stats, position, velocity, tr
     return particle
 end
 
-local function spawnKuraeTrails(standDef, standEntity, standData, stats)
-    cleanupRadioTrails(standData)
-    if not JSF or not JSF.Entities then
-        return
-    end
-
-    local count = stats.RadioTrailCount or DEFAULT_TRAIL_COUNT
-    local speed = stats.RadioTrailSpeed or DEFAULT_TRAIL_SPEED
-    local origin = standEntity.Position
-    local utils = JSF.Combat.utils
-    standData.radioTrails = {}
-
-    for _, target in ipairs(pickTrailTargets(count)) do
-        local delta = target - origin
-        local velocity = Vector.Zero
-        if delta:Length() > 0.1 then
-            velocity = delta:Normalized() * speed
-        end
-
-        local particle = JSF.Entities.Spawn(standDef, JSF.Entities.KIND_PARTICLE, origin, velocity, nil)
-        if particle and particle:Exists() then
-            particle.PositionOffset = standEntity.PositionOffset
-            local sprite = particle:GetSprite()
-            local dirIndex = utils:VecDir(velocity) + 1
-            sprite:Play(IDLE_ANIMS[dirIndex] or "IdleS")
-            local color = Color(1, 1, 1, 0.9, 0, 0, 0)
-            sprite.Color = color
-            particle.Color = color
-            particle:GetData().jjbaManagedParticle = true
-            standData.radioTrails[#standData.radioTrails + 1] = particle
-        end
-    end
-end
-
 local function applyTrailAlpha(entity, alpha)
     local color = Color(1, 1, 1, alpha, 0, 0, 0)
     entity.Color = color
     entity:GetSprite().Color = color
+end
+
+local function shuffleInPlace(list)
+    for i = #list, 2, -1 do
+        local j = 1 + math.floor(math.random() * i)
+        list[i], list[j] = list[j], list[i]
+    end
+end
+
+local function countActiveWeavers(standData)
+    if not standData.radioWeavers then
+        return 0
+    end
+    local n = 0
+    for _, weaver in ipairs(standData.radioWeavers) do
+        if weaver.entity and weaver.entity:Exists() and not weaver.done then
+            n = n + 1
+        end
+    end
+    return n
+end
+
+local function weaveProgress01(standData, stats)
+    local kurae = stats.RadioKuraeFrames or DEFAULT_KURAE_FRAMES
+    local layout = stats.RadioLayoutFrames or DEFAULT_LAYOUT_FRAMES
+    local duration = math.max(1, kurae + layout)
+    local elapsed = standData.radioWeaveElapsed or 0
+    return math.max(0, math.min(1, elapsed / duration))
+end
+
+local function weaverIntervalForProgress(t, stats)
+    local a = stats.RadioWeaverIntervalStart or DEFAULT_WEAVER_INTERVAL_START
+    local b = stats.RadioWeaverIntervalEnd or DEFAULT_WEAVER_INTERVAL_END
+    -- Reach min interval ~3x sooner than linear weave progress.
+    local rushed = math.min(1, t * 3)
+    local eased = 1 - (1 - rushed) * (1 - rushed)
+    return math.max(1, a + (b - a) * eased)
+end
+
+local function weaverSpeedForProgress(t, stats)
+    local a = stats.RadioWeaverSpeedStart or DEFAULT_WEAVER_SPEED_START
+    local b = stats.RadioWeaverSpeedEnd or DEFAULT_WEAVER_SPEED_END
+    return a + (b - a) * t
+end
+
+local function takeNextWeaveSegment(standData)
+    local queue = standData.radioWeaveQueue
+    if not queue or #queue == 0 then
+        return nil
+    end
+    return table.remove(queue, 1)
+end
+
+local function weaverNearPoint(standData, point, radius)
+    if not standData.radioWeavers or not point then
+        return false
+    end
+    local r2 = radius * radius
+    for _, weaver in ipairs(standData.radioWeavers) do
+        if weaver.entity and weaver.entity:Exists() and not weaver.done then
+            local d = weaver.entity.Position - point
+            local lenSq = d.X * d.X + d.Y * d.Y
+            if lenSq <= r2 then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+local function prioritizeWeaveQueue(queue)
+    table.sort(queue, function(a, b)
+        local aw = a.preferWeaver and 1 or 0
+        local bw = b.preferWeaver and 1 or 0
+        if aw ~= bw then
+            return aw > bw
+        end
+        return (a.length or 0) > (b.length or 0)
+    end)
+    -- Light shuffle within preferWeaver / non-prefer bands so it doesn't look sorted.
+    local i = 1
+    while i <= #queue do
+        local prefer = queue[i].preferWeaver and true or false
+        local j = i
+        while j <= #queue and ((queue[j].preferWeaver and true or false) == prefer) do
+            j = j + 1
+        end
+        for k = j - 1, i + 1, -1 do
+            local r = i + math.floor(math.random() * (k - i + 1))
+            queue[k], queue[r] = queue[r], queue[k]
+        end
+        i = j
+    end
+end
+
+local function shouldSpawnWeaver(standData, stats, seg, t)
+    local maxAlive = stats.RadioWeaverMaxAlive or DEFAULT_WEAVER_MAX_ALIVE
+    if countActiveWeavers(standData) >= maxAlive then
+        return false
+    end
+    local near = stats.RadioWeaverNearRadius or DEFAULT_WEAVER_NEAR
+    if weaverNearPoint(standData, seg.from, near) then
+        return false
+    end
+
+    -- Bias: long/chord prefer weaver; late weave + min interval → more ghosts.
+    local chance
+    if seg.preferWeaver then
+        chance = 0.78 - t * 0.25
+    else
+        chance = 0.42 - t * 0.28
+    end
+    if t > 0.65 then
+        chance = chance * 0.55
+    end
+    return math.random() < math.max(0.08, chance)
+end
+
+local function stampAlpha(standData, stats)
+    return standData.radioNetStampAlpha
+        or (stats and stats.RadioNetStampAlpha)
+        or 0.85
+end
+
+local function spawnGhostStrand(standData, stats, seg)
+    local grow = stats.RadioNetGhostGrowFrames or DEFAULT_GHOST_GROW
+    -- Shorter strands grow faster.
+    if (seg.length or 0) < 160 then
+        grow = math.max(1, grow - 1)
+    end
+    radioNet.startGhost(standData, seg.from, seg.to, seg.variant, grow)
+end
+
+local function spawnOneWeaver(standDef, standEntity, standData, stats, seg, fromStand)
+    if not JSF or not JSF.Entities or not seg then
+        return false
+    end
+
+    local t = weaveProgress01(standData, stats)
+    local speed = weaverSpeedForProgress(t, stats)
+    local origin
+    if fromStand then
+        origin = standEntity.Position
+    else
+        origin = seg.from
+    end
+
+    local waypoints = { Vector(origin.X, origin.Y) }
+    if fromStand and (origin - seg.from):Length() > 8 then
+        waypoints[#waypoints + 1] = seg.from
+    elseif not fromStand then
+        -- Already at seg.from; only travel to end.
+    else
+        -- fromStand but already near from
+    end
+    if (waypoints[#waypoints] - seg.to):Length() > 1 then
+        waypoints[#waypoints + 1] = seg.to
+    end
+    if #waypoints < 2 then
+        waypoints = { Vector(seg.from.X, seg.from.Y), Vector(seg.to.X, seg.to.Y) }
+        origin = seg.from
+    end
+
+    local launchDir = waypoints[2] - waypoints[1]
+    local particle = JSF.Entities.Spawn(standDef, JSF.Entities.KIND_PARTICLE, waypoints[1], Vector.Zero, nil)
+    if not particle or not particle:Exists() then
+        return false
+    end
+
+    particle.PositionOffset = standEntity.PositionOffset
+    local sprite = particle:GetSprite()
+    playTrailAnim(sprite, launchDir, false)
+    local peakAlpha = stats.RadioWeaverAlpha or DEFAULT_WEAVER_ALPHA
+    local color = Color(1, 1, 1, peakAlpha, 0, 0, 0)
+    sprite.Color = color
+    particle.Color = color
+    particle:GetData().jjbaManagedParticle = true
+    particle:GetData().jjbaRadioWeaver = true
+
+    standData.radioWeaverLiveId = (standData.radioWeaverLiveId or 0) + 1
+    standData.radioWeavers = standData.radioWeavers or {}
+    standData.radioWeavers[#standData.radioWeavers + 1] = {
+        entity = particle,
+        waypoints = waypoints,
+        waypointIndex = 2,
+        segFrom = Vector(waypoints[1].X, waypoints[1].Y),
+        liveId = standData.radioWeaverLiveId,
+        variant = seg.variant or (1 + (standData.radioWeaverLiveId % 3)),
+        speed = speed,
+        peakAlpha = peakAlpha,
+        done = false,
+        fadeFrames = 0,
+    }
+    return true
+end
+
+local function beginWeave(standDef, standEntity, standData, stats)
+    cleanupRadioWeavers(standData)
+    cleanupRadioTrails(standData)
+    radioNet.create(standData, stats)
+
+    local queue = {}
+    for _, seg in ipairs(standData.radioNetPlan or {}) do
+        queue[#queue + 1] = seg
+    end
+    prioritizeWeaveQueue(queue)
+
+    standData.radioWeaveQueue = queue
+    standData.radioWeavers = {}
+    standData.radioWeaverLiveId = 0
+    standData.radioWeaveElapsed = 0
+    standData.radioOrigin = standEntity.Position
+    standData.radioWeaveStandDef = standDef
+
+    local initial = stats.RadioWeaverInitialCount or DEFAULT_WEAVER_INITIAL
+    for _ = 1, initial do
+        local seg = takeNextWeaveSegment(standData)
+        if not seg then
+            break
+        end
+        spawnOneWeaver(standDef, standEntity, standData, stats, seg, true)
+    end
+
+    standData.radioWeaveCooldown = weaverIntervalForProgress(0, stats)
+end
+
+local function tickWeaveSpawner(standDef, standEntity, standData, stats, allowSpawn)
+    if not standData.radioWeaveQueue then
+        return
+    end
+
+    standData.radioWeaveElapsed = (standData.radioWeaveElapsed or 0) + 1
+    radioNet.updateGhosts(standData)
+
+    if not allowSpawn then
+        return
+    end
+
+    local queue = standData.radioWeaveQueue
+    if #queue == 0 then
+        return
+    end
+
+    standData.radioWeaveCooldown = (standData.radioWeaveCooldown or 0) - 1
+    if standData.radioWeaveCooldown > 0 then
+        return
+    end
+
+    local t = weaveProgress01(standData, stats)
+    local burst = 1
+    if t > 0.15 and math.random() < t + 0.2 then
+        burst = 2
+    end
+    if t > 0.4 then
+        burst = math.max(burst, 2)
+    end
+    if t > 0.65 then
+        burst = 3
+    end
+
+    for _ = 1, burst do
+        local seg = takeNextWeaveSegment(standData)
+        if not seg then
+            break
+        end
+        if shouldSpawnWeaver(standData, stats, seg, t) then
+            spawnOneWeaver(standDef, standEntity, standData, stats, seg, false)
+        else
+            spawnGhostStrand(standData, stats, seg)
+        end
+    end
+
+    standData.radioWeaveCooldown = weaverIntervalForProgress(weaveProgress01(standData, stats), stats)
+end
+
+local function updateWeavers(standData, stats)
+    if not standData.radioWeavers then
+        return
+    end
+
+    local fadeLen = stats.RadioWeaverFadeFrames or DEFAULT_WEAVER_FADE
+    local alive = {}
+
+    for _, weaver in ipairs(standData.radioWeavers) do
+        local entity = weaver.entity
+        local keep = true
+        if not entity or not entity:Exists() then
+            keep = false
+        elseif weaver.done then
+            weaver.fadeFrames = (weaver.fadeFrames or 0) + 1
+            local fadeT = weaver.fadeFrames / math.max(1, fadeLen)
+            local peak = weaver.peakAlpha or DEFAULT_WEAVER_ALPHA
+            local alpha = math.max(0, peak * (1 - fadeT))
+            applyTrailAlpha(entity, alpha)
+            if alpha <= 0.02 then
+                entity:Remove()
+                radioNet.clearLiveSegment(standData, weaver.liveId)
+                keep = false
+            end
+        else
+            local target = weaver.waypoints[weaver.waypointIndex]
+            if not target then
+                weaver.done = true
+            else
+                local pos = entity.Position
+                local delta = target - pos
+                local dist = delta:Length()
+                local step = weaver.speed or DEFAULT_WEAVER_SPEED_START
+                playTrailAnim(entity:GetSprite(), delta, false)
+                applyTrailAlpha(entity, weaver.peakAlpha or DEFAULT_WEAVER_ALPHA)
+
+                if dist <= step then
+                    entity.Position = target
+                    entity.Velocity = Vector.Zero
+                    radioNet.clearLiveSegment(standData, weaver.liveId)
+                    radioNet.addSegment(
+                        standData,
+                        weaver.segFrom,
+                        target,
+                        stampAlpha(standData, stats),
+                        weaver.variant
+                    )
+                    weaver.segFrom = Vector(target.X, target.Y)
+                    weaver.waypointIndex = weaver.waypointIndex + 1
+                    if weaver.waypointIndex > #weaver.waypoints then
+                        weaver.done = true
+                    end
+                else
+                    entity.Position = pos + delta:Normalized() * step
+                    entity.Velocity = Vector.Zero
+                    radioNet.updateLiveSegment(
+                        standData,
+                        weaver.liveId,
+                        weaver.segFrom,
+                        entity.Position,
+                        stampAlpha(standData, stats),
+                        weaver.variant
+                    )
+                end
+            end
+        end
+
+        if keep then
+            alive[#alive + 1] = weaver
+        end
+    end
+
+    standData.radioWeavers = alive
 end
 
 local function updateRadioTrails(standData, stats)
@@ -500,27 +866,135 @@ local function offscreenSpawnToward(targetPos, margin)
     return Vector(x, y)
 end
 
+local function vecToLaunchDir(vec)
+    local utils = JSF and JSF.Combat and JSF.Combat.utils
+    if utils then
+        return LAUNCH_DIRS[utils:VecDir(vec)] or LAUNCH_DIRS[2]
+    end
+    return LAUNCH_DIRS[2]
+end
+
+--- Pick a point on the irregular net ring (section between two anchors).
+local function pickRingSpawn(standData, targetPos, stats)
+    local anchors = standData.radioNetAnchors
+    if not anchors or #anchors < 2 then
+        return nil
+    end
+
+    local n = #anchors
+    standData.radioRainSection = ((standData.radioRainSection or 0) % n) + 1
+    local i = standData.radioRainSection
+    local j = (i % n) + 1
+    local t = 0.15 + math.random() * 0.7
+    local spawnPos = Vector(
+        anchors[i].X + (anchors[j].X - anchors[i].X) * t,
+        anchors[i].Y + (anchors[j].Y - anchors[i].Y) * t
+    )
+
+    local nudge = stats.RadioRainInwardNudge or DEFAULT_RAIN_INWARD_NUDGE
+    if nudge > 0 and targetPos then
+        local inward = targetPos - spawnPos
+        if inward:Length() > 0.1 then
+            spawnPos = spawnPos + inward:Normalized() * nudge
+        end
+    end
+
+    return spawnPos
+end
+
+local function spawnRainSplashMuzzle(standDef, standData, position, velocity)
+    if not JSF or not JSF.Entities then
+        return nil
+    end
+
+    local particle = JSF.Entities.Spawn(standDef, JSF.Entities.KIND_PARTICLE, position, Vector.Zero, nil)
+    if not particle or not particle:Exists() then
+        return nil
+    end
+
+    local launchdir = vecToLaunchDir(velocity)
+    local sprite = particle:GetSprite()
+    if JSF.Combat and JSF.Combat.anim then
+        JSF.Combat.anim.playDir(sprite, "SplashIn", launchdir)
+    else
+        playTrailAnim(sprite, velocity, true)
+    end
+
+    local color = Color(1, 1, 1, 0.8, 0, 0, 0)
+    sprite.Color = color
+    particle.Color = color
+    particle:GetData().jjbaManagedParticle = true
+    particle:GetData().jjbaRainSplashMuzzle = true
+
+    standData.radioRainMuzzles = standData.radioRainMuzzles or {}
+    standData.radioRainMuzzles[#standData.radioRainMuzzles + 1] = particle
+    return particle
+end
+
+local function updateRainMuzzles(standData)
+    if not standData.radioRainMuzzles then
+        return
+    end
+
+    local animApi = JSF and JSF.Combat and JSF.Combat.anim
+    local alive = {}
+    for _, entity in ipairs(standData.radioRainMuzzles) do
+        if entity and entity:Exists() then
+            -- SplashIn is 3 frames; keep a small buffer.
+            local done = entity.FrameCount >= 6
+            if animApi then
+                done = done or animApi.isFinishedDir(entity:GetSprite(), "SplashIn")
+            end
+            if done then
+                entity:Remove()
+            else
+                alive[#alive + 1] = entity
+            end
+        end
+    end
+    standData.radioRainMuzzles = #alive > 0 and alive or nil
+end
+
+local function maybeRainSplashFeedback(standDef, standData, stats, spawnPos, velocity)
+    local animChance = stats.RadioRainSplashAnimChance or DEFAULT_RAIN_SPLASH_ANIM_CHANCE
+    if math.random() < animChance then
+        spawnRainSplashMuzzle(standDef, standData, spawnPos, velocity)
+    end
+end
+
 local function spawnRainEmerald(player, standDef, standData, stats)
     local perFrame = stats.RadioEmeraldsPerFrame or DEFAULT_PER_FRAME
     local margin = stats.RadioSpawnMargin or DEFAULT_MARGIN
     local hpFloor = stats.RadioTargetHpFloor or DEFAULT_HP_FLOOR
     local trailChance = stats.RadioRainEdgeTrailChance or DEFAULT_RAIN_EDGE_CHANCE
+    local offscreenChance = stats.RadioRainOffscreenChance or DEFAULT_RAIN_OFFSCREEN_CHANCE
+    local angleSpread = stats.SplashAngleSpread or 11
     local targets, totalWeight, centerPos = collectRainTargets(hpFloor)
 
     for _ = 1, perFrame do
         local targetPos = pickWeightedTarget(targets, totalWeight, centerPos)
-        local spawnPos = offscreenSpawnToward(targetPos, margin)
+        local spawnPos
+        if math.random() < offscreenChance then
+            spawnPos = offscreenSpawnToward(targetPos, margin)
+        else
+            spawnPos = pickRingSpawn(standData, targetPos, stats)
+                or offscreenSpawnToward(targetPos, margin)
+        end
+
         local delta = targetPos - spawnPos
         local velocity
         if delta:Length() < 0.1 then
             velocity = Vector.FromAngle(math.random() * 360) * EMERALD_SPEED
         else
-            velocity = delta:Normalized() * EMERALD_SPEED
+            local angle = delta:GetAngleDegrees() + ((math.random() * 2) - 1) * angleSpread
+            velocity = Vector.FromAngle(angle) * EMERALD_SPEED
         end
 
         if math.random() < trailChance then
-            spawnEdgeTrail(standDef, standData, stats, spawnPos, Vector.Zero, TRAIL_KIND.RAIN, 0.65, velocity)
+            spawnEdgeTrail(standDef, standData, stats, spawnPos, Vector.Zero, TRAIL_KIND.RAIN, 0.55, velocity)
         end
+
+        maybeRainSplashFeedback(standDef, standData, stats, spawnPos, velocity)
 
         emeraldEntities.spawnTear(
             player,
@@ -540,7 +1014,10 @@ end
 
 local function onPhaseEnter(phase, sounds, standData, standEntity, standDef, stats)
     if phase == PHASE.KURAE then
-        spawnKuraeTrails(standDef, standEntity, standData, stats)
+        if not standData.damage then
+            standData.damage = 1
+        end
+        beginWeave(standDef, standEntity, standData, stats)
         if sounds.kurae then
             Audio.play(sounds.kurae)
         end
@@ -548,13 +1025,6 @@ local function onPhaseEnter(phase, sounds, standData, standEntity, standDef, sta
     end
 
     if phase == PHASE.LAYOUT then
-        if not standData.radioEntity or not standData.radioEntity:Exists() then
-            standData.radioEntity = emeraldEntities.spawnRadioEffect(game:GetRoom():GetCenterPos())
-            standData.radioOrigin = standEntity.Position
-            if not standData.damage then
-                standData.damage = 1
-            end
-        end
         if sounds.twentyMeters then
             Audio.play(sounds.twentyMeters)
         end
@@ -562,6 +1032,10 @@ local function onPhaseEnter(phase, sounds, standData, standEntity, standDef, sta
     end
 
     if phase == PHASE.RAIN then
+        -- No instant dump: keep weaving at max pace until the queue drains.
+        standData.radioWeaveCooldown = 0
+        standData.radioRainSection = 0
+        radioNet.clearAllLive(standData)
         if sounds.emeraldoSplashuo then
             Audio.play(sounds.emeraldoSplashuo)
         end
@@ -602,19 +1076,32 @@ return function(player, standDef, jsf, shootDir)
         standData.alphagoal = -100
     end
 
-    updateRadioTrails(standData, stats)
-    updateRadioEdgeTrails(standData, stats)
-
-    if phase == PHASE.LAYOUT or phase == PHASE.RAIN then
-        if standData.radioEntity and standData.radioEntity:Exists() then
-            emeraldEntities.fitRadioTelegraph(standData.radioEntity)
-            local overlayAlpha = telegraphAlpha(phase, layoutElapsed, layoutFrames, rainElapsed, rainFrames)
-            emeraldEntities.setRadioTelegraphAlpha(standData.radioEntity, overlayAlpha)
-            if phase == PHASE.LAYOUT then
-                tickLayoutEdgeTrails(standDef, standData, stats, layoutElapsed, layoutFrames, overlayAlpha)
-            end
+    if phase == PHASE.KURAE or phase == PHASE.LAYOUT then
+        tickWeaveSpawner(standDef, standEntity, standData, stats, true)
+        radioNet.setAlpha(standData, stampAlpha(standData, stats))
+    elseif phase == PHASE.RAIN then
+        local queueLeft = standData.radioWeaveQueue and #standData.radioWeaveQueue or 0
+        local stillWeaving = queueLeft > 0
+            or countActiveWeavers(standData) > 0
+            or radioNet.countGhosts(standData) > 0
+        if stillWeaving then
+            standData.radioWeaveElapsed = (stats.RadioKuraeFrames or DEFAULT_KURAE_FRAMES)
+                + (stats.RadioLayoutFrames or DEFAULT_LAYOUT_FRAMES)
+            tickWeaveSpawner(standDef, standEntity, standData, stats, true)
+        else
+            radioNet.updateGhosts(standData)
+        end
+        local overlayAlpha = telegraphAlpha(phase, layoutElapsed, layoutFrames, rainElapsed, rainFrames)
+        if overlayAlpha >= 0.99 then
+            radioNet.pulse(standData, overlayAlpha, rainElapsed)
+        else
+            radioNet.setAlpha(standData, overlayAlpha)
         end
     end
+
+    updateWeavers(standData, stats)
+    updateRadioEdgeTrails(standData, stats)
+    updateRainMuzzles(standData)
 
     if phase == PHASE.RAIN then
         spawnRainEmerald(player, standDef, standData, stats)
@@ -624,8 +1111,11 @@ return function(player, standDef, jsf, shootDir)
     standData.radioFrames = standData.radioFrames - 1
 
     if standData.radioFrames <= 0 then
+        cleanupRadioWeavers(standData)
         cleanupRadioTrails(standData)
         cleanupRadioEdgeTrails(standData)
+        cleanupRainMuzzles(standData)
+        radioNet.destroy(standData)
         if standData.radioEntity and standData.radioEntity:Exists() then
             standData.radioEntity:Remove()
         end

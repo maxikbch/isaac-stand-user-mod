@@ -93,7 +93,7 @@ return {
         rage = { name = "Kakyoin_Rage", volume = 0.75 },
         emeraldSplash = { name = "HierophantGreen_EmeraldSplash", volume = 1 },
         emerald = { name = "HierophantGreen_Emerald", volume = 2 },
-        splash = { name = "HierophantGreen_Splash", volume = 0.7 },
+        splash = { name = "HierophantGreen_Splash", volume = 0.85 },
         kurae = { name = "HierophantGreen_Kurae", volume = 1 },
         twentyMeters = { name = "HierophantGreen_20Meters", volume = 1 },
         emeraldoSplashuo = { name = "HierophantGreen_EmeraldoSplashuo", volume = 1 },

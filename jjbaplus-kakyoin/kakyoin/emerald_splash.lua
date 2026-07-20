@@ -1,5 +1,6 @@
 local SkillState = require("src/skills/state")
 local settings = require("kakyoin.settings")
+local radioNet = require("kakyoin.radio_net")
 
 local STAND_ID = "hierophant_green"
 local SKILL_ID = "emerald_splash"
@@ -78,6 +79,21 @@ function emeraldSplash.cleanupStandState(standEntity)
             end
         end
     end
+    if standData.radioWeavers then
+        for _, weaver in ipairs(standData.radioWeavers) do
+            if weaver.entity and weaver.entity:Exists() then
+                weaver.entity:Remove()
+            end
+        end
+    end
+    if standData.radioRainMuzzles then
+        for _, entity in ipairs(standData.radioRainMuzzles) do
+            if entity and entity:Exists() then
+                entity:Remove()
+            end
+        end
+    end
+    radioNet.destroy(standData)
     standData.radioEntity = nil
     standData.radioOrigin = nil
     standData.radioFrames = nil
@@ -85,6 +101,12 @@ function emeraldSplash.cleanupStandState(standEntity)
     standData.radioPhase = nil
     standData.radioTrails = nil
     standData.radioEdgeTrails = nil
+    standData.radioWeavers = nil
+    standData.radioRainMuzzles = nil
+    standData.radioWeaveQueue = nil
+    standData.radioWeaveCooldown = nil
+    standData.radioWeaveElapsed = nil
+    standData.radioRainSection = nil
     standData.superRush = false
 end
 
