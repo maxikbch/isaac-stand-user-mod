@@ -87,7 +87,7 @@ return {
     sounds = {
         punchLight = { name = "Character_PunchLight", volume = 0.75 },
         punchHeavy = { name = "Character_PunchHeavy", volume = 0.75 },
-        punchReady = { name = "Character_PunchReady", volume = 0.35, pitch = 0.98 },
+        punchReady = { name = "Character_PunchReady", volume = 0.5, pitch = 0.98 },
         whoosh = { name = "Character_Whoosh", volume = 0.8 },
         rage = { name = "Character_Rage", volume = 0.75 },
     },

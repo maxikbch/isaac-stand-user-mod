@@ -74,7 +74,7 @@ return {
     sounds = {
         punchLight = { name = "{{SOUND_PREFIX}}_PunchLight", volume = 0.75 },
         punchHeavy = { name = "{{SOUND_PREFIX}}_PunchHeavy", volume = 0.75 },
-        punchReady = { name = "{{SOUND_PREFIX}}_PunchReady", volume = 0.35, pitch = 0.98 },
+        punchReady = { name = "{{SOUND_PREFIX}}_PunchReady", volume = 0.5, pitch = 0.98 },
         whoosh = { name = "{{SOUND_PREFIX}}_Whoosh", volume = 0.8 },
         rage = { name = "{{SOUND_PREFIX}}_Rage", volume = 0.75 },
     },

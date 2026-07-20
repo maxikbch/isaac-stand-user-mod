@@ -1,6 +1,9 @@
 local character = require("jotaro.character_definition")
+local settings = require("jotaro.settings")
 local stats = require("jotaro.stand_stats")
 local timeStop = require("jotaro.time_stop")
+
+local freeSkill1 = settings.FreeSkill1 == true
 
 local function emitGlobalTimeFrozen(ctx, active)
     if ctx.framework and ctx.framework.Events then
@@ -74,9 +77,9 @@ return {
         time_stop = {
             kind = "active",
             chargePool = "primary",
-            useCost = stats.SuperMaxCharge,
+            useCost = freeSkill1 and 0 or stats.SuperMaxCharge,
             duration = stats.SuperDuration,
-            cooldown = stats.SuperCooldown,
+            cooldown = freeSkill1 and 0 or stats.SuperCooldown,
             fullChargeSounds = {
                 voice = { name = "Jotaro_FullChargeVoice", volume = 1 },
             },
@@ -89,7 +92,7 @@ return {
         skill1 = {
             enabled = true,
             skill = "time_stop",
-            requiresCharge = true,
+            requiresCharge = not freeSkill1,
             chargePool = "primary",
         },
         skill2 = {
@@ -101,15 +104,15 @@ return {
     sounds = {
         punchLight = { name = "Jotaro_PunchLight", volume = 0.75 },
         punchHeavy = { name = "Jotaro_PunchHeavy", volume = 0.75 },
-        punchReady = { name = "Jotaro_PunchReady", volume = 0.35, pitch = 0.98 },
+        punchReady = { name = "Jotaro_PunchReady", volume = 0.5, pitch = 0.98 },
         whoosh = { name = "Jotaro_Whoosh", volume = 0.8 },
         rage = { name = "Jotaro_Rage", volume = 0.75 },
-        zaWarudo = { name = "StarPlatinum_ZaWarudo", volume = 2 },
-        stopTime = { name = "StarPlatinum_StopTime", volume = 2 },
-        resumeTime = { name = "StarPlatinum_ResumeTime", volume = 2 },
+        zaWarudo = { name = "StarPlatinum_ZaWarudo", volume = 1 },
+        stopTime = { name = "StarPlatinum_StopTime", volume = 0.75 },
+        resumeTime = { name = "StarPlatinum_ResumeTime", volume = 0.75 },
         tokiWaUgokidasu = { name = "StarPlatinum_TokiWaUgokidasu", volume = 2 },
-        tick5 = { name = "StarPlatinum_Tick5", volume = 5 },
-        tick9 = { name = "StarPlatinum_Tick9", volume = 5 },
+        tick5 = { name = "StarPlatinum_Tick5", volume = 0.75 },
+        tick9 = { name = "StarPlatinum_Tick9", volume = 0.75 },
     },
 
     linkedCharacters = {
