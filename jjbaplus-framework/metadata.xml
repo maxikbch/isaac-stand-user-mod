@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <metadata>
-    <name>[JJBA+] Framework</name>
-    <directory>jjbaplus_framework</directory>
-    <id>3760655881</id>
-    <description>[JJBA+] core framework. Required by all JJBA+ character mods.
+  <name>[JJBA+] Framework</name>
+  <directory>jjbaplus_framework</directory>
+  <id>3760655881</id>
+  <description>[JJBA+] core framework. Required by all JJBA+ character mods.
 
     Why a framework? I want to go next level with these TBOI JJBA mods, so this framework will help create new characters and add new (future) mechanics like:
     - Stand Disc: An item for every stand.
@@ -21,7 +21,7 @@
     Thanks to the following mods that worked as a base for this mod:    
     - [url=https://steamcommunity.com/sharedfiles/filedetails/?id=943074431]Josuke and Crazy Diamond[/url]
     </description>
-    <version>0.3</version>
-    <visibility>Friends Only</visibility>
-    <tag id="Lua"/>
+  <version>0.4</version>
+  <visibility>Public</visibility>
+  <tag id="Lua" />
 </metadata>

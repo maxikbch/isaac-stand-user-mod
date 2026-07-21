@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <metadata>
-    <name>[JJBA+] Jotaro and Star Platinum</name>
-    <directory>jjbaplus_jotaro</directory>
-    <id>3760657720</id>
-    <description>
+  <name>[JJBA+] Jotaro and Star Platinum</name>
+  <directory>jjbaplus_jotaro</directory>
+  <id>3760657720</id>
+  <description>
     Play as both Jotaro and Star Platinum from JoJo's Bizarre Adventure!
 
-    Star Platinum is a new familiar that can rush to enemies, obstacles and other entities to punch the hell out of them. To charge, just shoot tears in any direction. Also, if you load the required amount of energy, you can press C (keyboard) or R3 (joystick) to use his special ability: &quot;Star Platinum: The World&quot;, to stop time for a little.
+    Star Platinum is a new familiar that can rush to enemies, obstacles and other entities to punch the hell out of them. To charge, just shoot tears in any direction. Also, if you load the required amount of energy, you can press C (keyboard) or R3 (joystick) to use his special ability: "Star Platinum: The World", to stop time for a little.
 
     This mod is a remaster of my older (broken by updates) mod [url=https://steamcommunity.com/sharedfiles/filedetails/?id=1545066440]Jotaro and Star Platinum[/url]. I will be fixing and polishing it, and maybe reworking some assets and mechanics.
     
@@ -19,9 +19,9 @@
     Feel free to ask me any questions or suggestions, or if you find any bug, please report it to me in the comments.
     
     </description>
-    <version>1.2</version>
-    <visibility>Friends Only</visibility>
-    <tag id="Lua"/>
-    <tag id="Player Characters"/>
-    <tag id="Familiars"/>
+  <version>1.3</version>
+  <visibility>Public</visibility>
+  <tag id="Lua" />
+  <tag id="Familiars" />
+  <tag id="Player Characters" />
 </metadata>
